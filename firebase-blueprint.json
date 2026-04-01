@@ -1,0 +1,79 @@
+{
+  "entities": {
+    "Job": {
+      "title": "Job",
+      "description": "A job listing in the portal",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "country": { "type": "string" },
+        "category": { "type": "string" },
+        "salary": { "type": "string" },
+        "experience": { "type": "string" },
+        "type": { "type": "string" },
+        "description": { "type": "string" },
+        "responsibilities": { "type": "array", "items": { "type": "string" } },
+        "requirements": { "type": "array", "items": { "type": "string" } },
+        "requiredDocuments": { "type": "array", "items": { "type": "string" } },
+        "deadline": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["title", "country", "category", "salary", "description", "deadline"]
+    },
+    "Application": {
+      "title": "Application",
+      "description": "A job application from a candidate",
+      "type": "object",
+      "properties": {
+        "jobId": { "type": "string" },
+        "jobTitle": { "type": "string" },
+        "fullName": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "passportNumber": { "type": "string" },
+        "experience": { "type": "string" },
+        "education": { "type": "string" },
+        "coverLetter": { "type": "string" },
+        "documents": { 
+          "type": "array", 
+          "items": { 
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "url": { "type": "string" },
+              "type": { "type": "string" }
+            }
+          }
+        },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["jobId", "fullName", "email", "phone", "passportNumber", "status"]
+    },
+    "SiteContent": {
+      "title": "SiteContent",
+      "description": "Dynamic content for the landing page",
+      "type": "object",
+      "properties": {
+        "heroTagline": { "type": "string" },
+        "aboutUs": { "type": "string" },
+        "services": { 
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          }
+        },
+        "countries": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "firestore": {
+    "/jobs": { "schema": "Job", "description": "Collection of job listings" },
+    "/applications": { "schema": "Application", "description": "Collection of job applications" },
+    "/siteContent": { "schema": "SiteContent", "description": "Collection for site configuration" }
+  }
+}

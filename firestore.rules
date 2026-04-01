@@ -1,0 +1,58 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+         (request.auth.token.email == "workineuhr@gmail.com" && request.auth.token.email_verified == true);
+    }
+
+    function isValidJob(data) {
+      return data.title is string && data.title.size() > 0 &&
+             data.country is string && data.country.size() > 0 &&
+             data.category is string &&
+             data.salary is string &&
+             data.description is string &&
+             data.deadline is string;
+    }
+
+    function isValidApplication(data) {
+      return data.jobId is string &&
+             data.fullName is string && data.fullName.size() > 0 &&
+             data.email is string && data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") &&
+             data.phone is string &&
+             data.passportNumber is string &&
+             data.status in ['pending', 'approved', 'rejected'];
+    }
+
+    // Jobs Collection
+    match /jobs/{jobId} {
+      allow read: if true; // Publicly readable
+      allow create, update, delete: if isAdmin() && isValidJob(request.resource.data);
+    }
+
+    // Applications Collection
+    match /applications/{applicationId} {
+      allow read: if isAdmin();
+      allow create: if isValidApplication(request.resource.data);
+      allow update: if isAdmin() && isValidApplication(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // Site Content
+    match /siteContent/{contentId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Users (for roles)
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow write: if isAdmin();
+    }
+  }
+}

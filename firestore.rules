@@ -8,7 +8,13 @@ service cloud.firestore {
     
     function isAdmin() {
       return isAuthenticated() && 
-         (request.auth.token.email == "workineuhr@gmail.com" && request.auth.token.email_verified == true);
+        (
+          // Default admin
+          (request.auth.token.email == "workineuhr@gmail.com") ||
+          // Role-based admin (fallback)
+          (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+        );
     }
 
     function isValidJob(data) {
@@ -26,32 +32,113 @@ service cloud.firestore {
              data.email is string && data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") &&
              data.phone is string &&
              data.passportNumber is string &&
-             data.status in ['pending', 'approved', 'rejected'];
+             data.status in ['pending', 'approved', 'rejected'] &&
+             (!('candidateUid' in data) || data.candidateUid == request.auth.uid || isAdmin());
+    }
+
+    function isValidRefundRequest(data) {
+      return data.id is string &&
+             data.candidateUid is string &&
+             data.status in ['pending', 'proposed', 'agreed', 'processing', 'completed', 'rejected'] &&
+             data.totalReceivedAmount is number &&
+             data.riskAmount is number &&
+             data.refundableAmount is number &&
+             data.agreedByCandidate is bool;
+    }
+
+    function isValidCandidate(data) {
+      return data.uid is string && 
+             (data.uid == request.auth.uid || isAdmin()) &&
+             data.fullName is string && data.fullName.size() > 0 &&
+             data.email is string && data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") &&
+             (!('refundRequest' in data) || isValidRefundRequest(data.refundRequest));
+    }
+
+    function isValidDiaryPost(data) {
+      return data.title is string && data.title.size() > 0 &&
+             data.content is string && data.content.size() > 0 &&
+             data.createdAt is number;
     }
 
     // Jobs Collection
     match /jobs/{jobId} {
       allow read: if true; // Publicly readable
-      allow create, update, delete: if isAdmin() && isValidJob(request.resource.data);
+      allow create, update: if isAdmin() && isValidJob(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // Diary Collection
+    match /diary/{postId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidDiaryPost(request.resource.data);
+      allow delete: if isAdmin();
     }
 
     // Applications Collection
     match /applications/{applicationId} {
-      allow read: if isAdmin();
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.candidateUid == request.auth.uid);
       allow create: if isValidApplication(request.resource.data);
-      allow update: if isAdmin() && isValidApplication(request.resource.data);
+      allow update: if isAdmin() || (isAuthenticated() && resource.data.candidateUid == request.auth.uid && isValidApplication(request.resource.data));
       allow delete: if isAdmin();
     }
 
-    // Site Content
-    match /siteContent/{contentId} {
+    // Candidates Collection
+    match /candidates/{candidateId} {
+      allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == candidateId);
+      allow create, update: if (isAdmin() || (isAuthenticated() && request.auth.uid == candidateId)) && isValidCandidate(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // Settings (Standardized path)
+    match /settings/{settingId} {
       allow read: if true;
       allow write: if isAdmin();
+    }
+
+    // Team Collection
+    match /team/{memberId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Reviews Collection
+    match /reviews/{reviewId} {
+      allow read: if true; // We'll filter approved ones in the UI, or we could use: if resource.data.status == 'approved' || isAdmin()
+      allow create: if request.resource.data.status == 'pending' && 
+                      request.resource.data.userName is string &&
+                      request.resource.data.rating is number &&
+                      request.resource.data.rating >= 1 &&
+                      request.resource.data.rating <= 5;
+      allow update, delete: if isAdmin();
     }
 
     // Users (for roles)
     match /users/{userId} {
       allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    // Contact Messages
+    match /contactMessages/{messageId} {
+      allow read, delete: if isAdmin();
+      allow create: if request.resource.data.fullName is string &&
+                      request.resource.data.fullName.size() > 0 &&
+                      request.resource.data.email is string &&
+                      request.resource.data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") &&
+                      request.resource.data.phone is string &&
+                      request.resource.data.message is string &&
+                      request.resource.data.message.size() > 0;
+    }
+
+    // Success Stories
+    match /successStories/{storyId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Clients & Partners
+    match /clients/{clientId} {
+      allow read: if true;
       allow write: if isAdmin();
     }
   }

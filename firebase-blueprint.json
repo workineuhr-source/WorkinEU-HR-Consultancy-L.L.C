@@ -34,6 +34,7 @@
         "experience": { "type": "string" },
         "education": { "type": "string" },
         "coverLetter": { "type": "string" },
+        "candidateUid": { "type": "string" },
         "documents": { 
           "type": "array", 
           "items": { 
@@ -67,13 +68,139 @@
             }
           }
         },
-        "countries": { "type": "array", "items": { "type": "string" } }
+        "countries": { "type": "array", "items": { "type": "string" } },
+        "officeMapUrl": { "type": "string" }
       }
+    },
+    "TeamMember": {
+      "title": "TeamMember",
+      "description": "A member of the HR consultancy team",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "position": { "type": "string" },
+        "whatsapp": { "type": "string" },
+        "photoUrl": { "type": "string" },
+        "order": { "type": "number" }
+      },
+      "required": ["name", "position", "whatsapp", "photoUrl"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "A user review or testimonial",
+      "type": "object",
+      "properties": {
+        "userName": { "type": "string" },
+        "rating": { "type": "number" },
+        "comment": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved"] },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["userName", "rating", "comment", "status"]
+    },
+    "ContactMessage": {
+      "title": "ContactMessage",
+      "description": "A message from the contact form",
+      "type": "object",
+      "properties": {
+        "fullName": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["fullName", "email", "phone", "message", "createdAt"]
+    },
+    "CandidateProfile": {
+      "title": "CandidateProfile",
+      "description": "A profile for a job candidate",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "fullName": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "passportNumber": { "type": "string" },
+        "nationality": { "type": "string" },
+        "experience": { "type": "string" },
+        "education": { "type": "string" },
+        "visaStatus": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "joiningDate": { "type": "string" },
+        "documents": { 
+          "type": "array", 
+          "items": { 
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "url": { "type": "string" },
+              "type": { "type": "string" },
+              "uploadedAt": { "type": "number" }
+            }
+          }
+        },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["uid", "fullName", "email", "createdAt"]
+    },
+    "DiaryPost": {
+      "title": "DiaryPost",
+      "description": "A blog post or diary entry",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "author": { "type": "string" },
+        "category": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["title", "content", "createdAt"]
+    },
+    "VisaSuccessStory": {
+      "title": "VisaSuccessStory",
+      "description": "A success story showing a candidate's photo and their received visa",
+      "type": "object",
+      "properties": {
+        "candidateName": { "type": "string" },
+        "candidatePhotoUrl": { "type": "string" },
+        "visaImageUrl": { "type": "string" },
+        "country": { "type": "string" },
+        "position": { "type": "string" },
+        "story": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "order": { "type": "number" }
+      },
+      "required": ["candidateName", "candidatePhotoUrl", "visaImageUrl", "country", "position", "createdAt"]
+    },
+    "ClientPartner": {
+      "title": "ClientPartner",
+      "description": "A client or partner company with reviews and stories",
+      "type": "object",
+      "properties": {
+        "companyName": { "type": "string" },
+        "country": { "type": "string" },
+        "logoUrl": { "type": "string" },
+        "review": { "type": "string" },
+        "reviewerName": { "type": "string" },
+        "reviewerPosition": { "type": "string" },
+        "storyNote": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "order": { "type": "number" }
+      },
+      "required": ["companyName", "country", "createdAt"]
     }
   },
   "firestore": {
     "/jobs": { "schema": "Job", "description": "Collection of job listings" },
     "/applications": { "schema": "Application", "description": "Collection of job applications" },
-    "/siteContent": { "schema": "SiteContent", "description": "Collection for site configuration" }
+    "/settings/siteContent": { "schema": "SiteContent", "description": "Global site configuration and content" },
+    "/team": { "schema": "TeamMember", "description": "Collection of team members" },
+    "/reviews": { "schema": "Review", "description": "Collection of user reviews" },
+    "/contactMessages": { "schema": "ContactMessage", "description": "Collection of contact form messages" },
+    "/candidates/{candidateId}": { "schema": "CandidateProfile", "description": "Profiles for job candidates" },
+    "/diary": { "schema": "DiaryPost", "description": "Collection of diary entries or blog posts" },
+    "/successStories": { "schema": "VisaSuccessStory", "description": "Collection of visa success stories" },
+    "/clients": { "schema": "ClientPartner", "description": "Collection of client partners and reviews" }
   }
 }

@@ -124,6 +124,11 @@ export interface CandidateProfile {
   phone?: string;
   whatsapp?: string;
   passportNumber?: string;
+  passportIssueDate?: string;
+  passportExpiryDate?: string;
+  passportIssueCountry?: string;
+  fatherName?: string;
+  motherName?: string;
   nationality?: string;
   experience?: string;
   education?: string;
@@ -133,7 +138,7 @@ export interface CandidateProfile {
   dateOfBirth?: string;
   gender?: string;
   skills?: { name: string; level: string }[];
-  languages?: { language: string; level: string }[];
+  languages?: { language: string; level: string; proficiency?: number }[];
   workHistory?: {
     company: string;
     position: string;
@@ -189,6 +194,7 @@ export interface CandidateProfile {
   searchHistory?: string[];
   refundRequest?: RefundRequest;
   photoUrl?: string;
+  cvPhotoStyle?: 'round' | 'square';
   jobAlerts?: JobAlert[];
 }
 
@@ -222,6 +228,23 @@ export interface RefundRequest {
   }[];
   createdAt: number;
   updatedAt: number;
+}
+
+export interface SystemSettings {
+  activeConfigId?: string;
+  apiConfigs: APIConfig[];
+  updatedAt?: number;
+}
+
+export interface APIConfig {
+  id: string;
+  provider: 'gemini' | 'openai' | 'custom';
+  apiKey: string;
+  endpoint?: string;
+  modelName?: string;
+  label: string;
+  isEnabled: boolean;
+  createdAt: number;
 }
 
 export interface VisaSuccessStory {

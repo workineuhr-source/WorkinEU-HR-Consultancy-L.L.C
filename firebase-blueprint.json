@@ -189,12 +189,24 @@
         "order": { "type": "number" }
       },
       "required": ["companyName", "country", "createdAt"]
+    },
+    "SystemSettings": {
+      "title": "SystemSettings",
+      "description": "Sensitive system configurations like API keys",
+      "type": "object",
+      "properties": {
+        "aiProvider": { "type": "string", "enum": ["gemini", "openai", "custom"] },
+        "aiApiKey": { "type": "string" },
+        "aiEndpoint": { "type": "string" },
+        "aiModelName": { "type": "string" }
+      }
     }
   },
   "firestore": {
     "/jobs": { "schema": "Job", "description": "Collection of job listings" },
     "/applications": { "schema": "Application", "description": "Collection of job applications" },
     "/settings/siteContent": { "schema": "SiteContent", "description": "Global site configuration and content" },
+    "/settings/system": { "schema": "SystemSettings", "description": "Sensitive system-wide settings and API keys" },
     "/team": { "schema": "TeamMember", "description": "Collection of team members" },
     "/reviews": { "schema": "Review", "description": "Collection of user reviews" },
     "/contactMessages": { "schema": "ContactMessage", "description": "Collection of contact form messages" },

@@ -44,6 +44,7 @@ import AdminDiary from './admin/AdminDiary';
 import AdminSuccessStories from './admin/AdminSuccessStories';
 import AdminClients from './admin/AdminClients';
 import AdminCandidateDetail from './admin/AdminCandidateDetail';
+import AdminSystemSettings from './admin/AdminSystemSettings';
 import ErrorBoundary from '../components/ErrorBoundary';
 
 export default function AdminDashboard() {
@@ -117,6 +118,7 @@ export default function AdminDashboard() {
     { name: 'User Reviews', path: '/admin/reviews', icon: <Clock size={20} /> },
     { name: 'Contact Messages', path: '/admin/messages', icon: <MessageCircle size={20} /> },
     { name: 'Manage Team', path: '/admin/team', icon: <Users size={20} /> },
+    { name: 'System Settings', path: '/admin/settings', icon: <Settings size={20} /> },
   ];
 
   return (
@@ -290,6 +292,7 @@ export default function AdminDashboard() {
                 <Route path="/clients" element={<AdminClients />} />
                 <Route path="/reviews" element={<AdminReviews />} />
                 <Route path="/messages" element={<AdminContactMessages />} />
+                <Route path="/settings" element={<AdminSystemSettings />} />
               </Routes>
             </ErrorBoundary>
           </div>

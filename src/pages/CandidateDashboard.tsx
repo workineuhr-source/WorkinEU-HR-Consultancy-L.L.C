@@ -3,7 +3,7 @@ import { auth, db } from '../firebase';
 import { doc, getDoc, updateDoc, collection, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { CandidateProfile, Application, Job } from '../types';
 import { getJobRecommendations } from '../services/aiService';
-import { CURRENCY_SYMBOLS } from '../constants';
+import { CURRENCY_SYMBOLS, JOB_POSITIONS } from '../constants';
 import { 
   User, 
   FileText, 
@@ -1596,6 +1596,38 @@ export default function CandidateDashboard() {
                             </button>
                           )}
                         </div>
+                        
+                        <div className="mt-6 pt-6 border-t border-gray-50 dark:border-white/5 flex items-center gap-4">
+                          <p className="text-xs font-black text-gray-400 uppercase tracking-widest">CV Photo Shape:</p>
+                          <div className="flex bg-gray-50 dark:bg-slate-800 p-1 rounded-xl">
+                            <button 
+                              onClick={async () => {
+                                if (!auth.currentUser) return;
+                                await updateDoc(doc(db, 'candidates', auth.currentUser.uid), { cvPhotoStyle: 'square' });
+                                setProfile({ ...profile, cvPhotoStyle: 'square' });
+                              }}
+                              className={cn(
+                                "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                profile.cvPhotoStyle === 'square' || !profile.cvPhotoStyle ? "bg-white dark:bg-slate-700 shadow-sm text-brand-blue dark:text-white" : "text-gray-400"
+                              )}
+                            >
+                              Square
+                            </button>
+                            <button 
+                              onClick={async () => {
+                                if (!auth.currentUser) return;
+                                await updateDoc(doc(db, 'candidates', auth.currentUser.uid), { cvPhotoStyle: 'round' });
+                                setProfile({ ...profile, cvPhotoStyle: 'round' });
+                              }}
+                              className={cn(
+                                "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                profile.cvPhotoStyle === 'round' ? "bg-white dark:bg-slate-700 shadow-sm text-brand-blue dark:text-white" : "text-gray-400"
+                              )}
+                            >
+                              Round
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1705,11 +1737,15 @@ export default function CandidateDashboard() {
                             <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-600" size={20} />
                             <input 
                               type="text" 
+                              list="job-position-options"
                               className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
                               placeholder="e.g. 5 Years in Construction"
                               value={profile.experience || ''}
                               onChange={(e) => setProfile({ ...profile, experience: e.target.value })}
                             />
+                            <datalist id="job-position-options">
+                              {JOB_POSITIONS.map(pos => <option key={pos} value={pos} />)}
+                            </datalist>
                           </div>
                         </div>
                         <div>
@@ -1722,6 +1758,62 @@ export default function CandidateDashboard() {
                               placeholder="e.g. Identity Verified, Premium Candidate"
                               value={profile.profileIntel || ''}
                               onChange={(e) => setProfile({ ...profile, profileIntel: e.target.value })}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Identity & Family Section */}
+                      <div className="pt-8 border-t border-gray-100 dark:border-white/5">
+                        <h4 className="text-lg font-bold text-brand-blue dark:text-white mb-6">Identity & Family Details</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                          <div>
+                            <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Passport Issue Date</label>
+                            <input 
+                              type="date" 
+                              className="w-full px-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
+                              value={profile.passportIssueDate || ''}
+                              onChange={(e) => setProfile({ ...profile, passportIssueDate: e.target.value })}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Passport Expiry Date</label>
+                            <input 
+                              type="date" 
+                              className="w-full px-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
+                              value={profile.passportExpiryDate || ''}
+                              onChange={(e) => setProfile({ ...profile, passportExpiryDate: e.target.value })}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Passport Issue Country</label>
+                            <input 
+                              type="text" 
+                              list="nationality-options"
+                              className="w-full px-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
+                              placeholder="e.g. Nepal"
+                              value={profile.passportIssueCountry || ''}
+                              onChange={(e) => setProfile({ ...profile, passportIssueCountry: e.target.value })}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Father's Name</label>
+                            <input 
+                              type="text" 
+                              className="w-full px-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
+                              placeholder="As per legal documents"
+                              value={profile.fatherName || ''}
+                              onChange={(e) => setProfile({ ...profile, fatherName: e.target.value })}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Mother's Name</label>
+                            <input 
+                              type="text" 
+                              className="w-full px-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
+                              placeholder="As per legal documents"
+                              value={profile.motherName || ''}
+                              onChange={(e) => setProfile({ ...profile, motherName: e.target.value })}
                             />
                           </div>
                         </div>
@@ -1834,6 +1926,43 @@ export default function CandidateDashboard() {
                                     <option key={level} value={level} className="dark:bg-slate-900">{level}</option>
                                   ))}
                                 </select>
+                                <div className="flex flex-col gap-2">
+                                  <div className="flex justify-between items-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                    <span>Proficiency</span>
+                                    <span className="text-brand-blue dark:text-brand-gold">{lang.proficiency || 0}%</span>
+                                  </div>
+                                  <input 
+                                    type="range" 
+                                    min="0" 
+                                    max="100" 
+                                    step="5"
+                                    className="w-full h-1.5 bg-gray-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-brand-gold"
+                                    value={lang.proficiency || 0}
+                                    onChange={(e) => {
+                                      const newLangs = [...(profile.languages || [])];
+                                      newLangs[index].proficiency = parseInt(e.target.value);
+                                      // Bonus: Auto-set level based on proficiency if it's currently a default
+                                      const val = parseInt(e.target.value);
+                                      if (val >= 90) newLangs[index].level = "Native";
+                                      else if (val >= 70) newLangs[index].level = "Fluent";
+                                      else if (val >= 40) newLangs[index].level = "Conversational";
+                                      else newLangs[index].level = "Basic";
+                                      
+                                      setProfile({ ...profile, languages: newLangs });
+                                    }}
+                                  />
+                                  <div className="flex gap-1 mt-1">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                      <div 
+                                        key={star} 
+                                        className={cn(
+                                          "w-2 h-2 rounded-full",
+                                          (lang.proficiency || 0) >= star * 20 ? "bg-brand-gold" : "bg-gray-200 dark:bg-slate-700"
+                                        )}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
                               </div>
                               <button 
                                 type="button"
@@ -1841,7 +1970,7 @@ export default function CandidateDashboard() {
                                   const newLangs = profile.languages?.filter((_, i) => i !== index);
                                   setProfile({ ...profile, languages: newLangs });
                                 }}
-                                className="p-2 text-red-400 hover:text-red-600 transition-colors"
+                                className="p-2 text-red-400 hover:text-red-600 transition-colors shrink-0"
                               >
                                 <Trash2 size={18} />
                               </button>

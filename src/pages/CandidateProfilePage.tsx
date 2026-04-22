@@ -21,7 +21,8 @@ import {
   Loader2,
   FileText,
   Sparkles,
-  MessageCircle
+  MessageCircle,
+  ShieldCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
@@ -75,21 +76,41 @@ export default function CandidateProfilePage() {
         if (!element) throw new Error("Template not found");
 
         const canvas = await html2canvas(element, {
-          scale: 4, // 4K/HD Quality
+          scale: 3, // 4K/HD Quality
           useCORS: true,
           logging: false,
           backgroundColor: '#ffffff',
-          windowWidth: element.scrollWidth,
-          windowHeight: element.scrollHeight
+          windowWidth: 794 // Standard A4 width at 96dpi
         });
         
         const imgData = canvas.toDataURL('image/png', 1.0);
         const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgProps = pdf.getImageProperties(imgData);
         const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        const pdfHeight = pdf.internal.pageSize.getHeight();
         
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+        const scale = 3; 
+
+        // Ratio of PDF mm per Canvas pixel
+        const ratio = pdfWidth / (canvasWidth / scale); 
+        const imgHeightInPdf = (canvasHeight / scale) * ratio;
+        
+        let heightLeft = imgHeightInPdf;
+        let position = 0;
+
+        // Add first page
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
+        heightLeft -= pdfHeight;
+
+        // Slice into more pages if needed
+        while (heightLeft >= 0) {
+          position = heightLeft - imgHeightInPdf;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
+          heightLeft -= pdfHeight;
+        }
+
         pdf.save(`Europass_CV_${profile.fullName.replace(/\s+/g, '_')}_${theme}.pdf`);
         
         setShowDownloadMenu(false);
@@ -229,13 +250,13 @@ export default function CandidateProfilePage() {
               transition={{ duration: 0.3 }}
               className="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-gray-100 p-8 md:p-12 print:shadow-none print:border-none print:p-0"
             >
-          {/* Top Section / Header - Enhanced Europass Style */}
-          <div className="flex flex-col lg:flex-row gap-12 items-center lg:items-end border-b-4 border-[#004494] pb-14 mb-16 relative">
-            <div className="w-56 h-56 bg-white rounded-3xl overflow-hidden shadow-2xl border-[6px] border-[#004494] shrink-0 relative group -mt-20 lg:-mt-24">
+          {/* Top Section / Header - Unified Europass Style */}
+          <div className="flex flex-col lg:flex-row gap-10 items-center lg:items-start border-b-[6px] border-[#004494] pb-12 mb-16 relative">
+            <div className="w-48 h-48 lg:w-56 lg:h-56 bg-white rounded-3xl overflow-hidden shadow-2xl border-[6px] border-[#004494] shrink-0 relative group">
               {profile.photoUrl ? (
                 <img src={profile.photoUrl} alt={profile.fullName} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-brand-blue text-white text-7xl font-black">
+                <div className="w-full h-full flex items-center justify-center bg-brand-blue text-white text-7xl font-black uppercase">
                   {profile.fullName.charAt(0)}
                 </div>
               )}
@@ -243,103 +264,256 @@ export default function CandidateProfilePage() {
                 <Link 
                   to="/candidate/dashboard" 
                   state={{ activeTab: 'profile' }}
-                  className="absolute inset-0 bg-brand-blue/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-bold gap-2 text-center p-2"
+                  className="absolute inset-0 bg-brand-blue/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white text-[10px] font-black uppercase gap-2 text-center p-4"
                 >
-                  <User size={32} />
-                  Change Professional Photo
+                  <User size={24} />
+                  Update Digital Asset
                 </Link>
               )}
             </div>
-            <div className="flex-grow text-center lg:text-left space-y-4">
-              <h1 className="text-6xl font-black text-[#004494] mb-2 tracking-tighter uppercase">{profile.fullName}</h1>
-              <p className="inline-block bg-[#f5f7f9] text-[#004494] font-black text-2xl uppercase tracking-[0.2em] px-6 py-2 rounded-2xl border border-[#e1e8ed] shadow-sm">
-                {profile.experience || 'Professional Candidate'}
-              </p>
+            
+            <div className="flex-grow text-center lg:text-left pt-4 overflow-hidden w-full">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#004494] mb-3 tracking-tighter uppercase whitespace-nowrap overflow-hidden text-ellipsis">
+                {profile.fullName}
+              </h1>
               
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-8 text-slate-500 font-bold pt-4">
-                <div className="flex items-center gap-3 hover:text-[#004494] transition-colors">
-                  <Mail size={20} className="text-[#004494]" />
-                  <span>{profile.email}</span>
+              <div className="inline-block bg-[#f5f7f9] text-[#004494] font-black text-lg lg:text-2xl uppercase tracking-widest px-6 py-2 rounded-2xl border border-[#e1e8ed] mb-6">
+                {profile.experience || 'Professional Candidate'}
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-8 text-slate-500 font-bold text-sm lg:text-base">
+                <div className="flex items-center justify-center lg:justify-start gap-3">
+                  <Mail size={18} className="text-[#004494] shrink-0" />
+                  <span className="truncate">{profile.email}</span>
                 </div>
                 {profile.phone && (
-                  <div className="flex items-center gap-3 hover:text-[#004494] transition-colors">
-                    <Phone size={20} className="text-[#004494]" />
+                  <div className="flex items-center justify-center lg:justify-start gap-3">
+                    <Phone size={18} className="text-[#004494] shrink-0" />
                     <span>{profile.phone}</span>
                   </div>
                 )}
-                {profile.whatsapp && (
-                  <div className="flex items-center gap-3 hover:text-[#004494] transition-colors">
-                    <MessageCircle size={20} className="text-emerald-500" />
-                    <span>WhatsApp: {profile.whatsapp}</span>
-                  </div>
-                )}
                 {profile.address && (
-                  <div className="flex items-center gap-3 hover:text-[#004494] transition-colors">
-                    <MapPin size={20} className="text-brand-gold" />
-                    <span>{profile.address}</span>
-                  </div>
-                )}
-                {profile.nationality && (
-                  <div className="flex items-center gap-3 hover:text-[#004494] transition-colors">
-                    <Globe size={20} className="text-[#004494]" />
-                    <span>{profile.nationality}</span>
-                  </div>
-                )}
-                {profile.homeCountry && (
-                  <div className="flex items-center gap-3 hover:text-[#004494] transition-colors">
-                    <Globe size={20} className="text-brand-gold" />
-                    <span className="text-[#004494]">Origin: {profile.homeCountry}</span>
-                  </div>
-                )}
-                {profile.currentCountry && (
-                  <div className="flex items-center gap-3 hover:text-[#004494] transition-colors">
-                    <MapPin size={20} className="text-brand-teal" />
-                    <span className="text-[#004494]">Current: {profile.currentCountry}</span>
+                  <div className="flex items-center justify-center lg:justify-start gap-3 sm:col-span-2">
+                    <MapPin size={18} className="text-brand-gold shrink-0" />
+                    <span className="truncate">{profile.address}</span>
                   </div>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* Left Column - Main Info */}
-            <div className="lg:col-span-2 space-y-12">
+          <div className="grid grid-cols-12 gap-12">
+            {/* Left Column - Sidebar (Europass Standard) */}
+            <div className="col-span-12 lg:col-span-4 space-y-10">
               
-              {/* Work History */}
-              <section>
-                <div className="flex items-center justify-between mb-8 border-b border-brand-teal/20 pb-2">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-brand-blue/5 text-brand-blue rounded-xl flex items-center justify-center">
-                      <Briefcase size={20} />
-                    </div>
-                    <h3 className="text-xl font-black text-brand-blue uppercase tracking-widest">Experience</h3>
+              {/* Personal Intel Snapshot */}
+              <section className="bg-[#f5f7f9] p-8 rounded-[2.5rem] border border-[#e1e8ed]">
+                <h3 className="text-[11px] font-black text-[#004494] uppercase tracking-[0.2em] border-b-2 border-[#e1e8ed] pb-3 mb-6">
+                  Personal Identity
+                </h3>
+                <div className="space-y-5">
+                  <div>
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                       <MapPin size={10} className="text-brand-gold" /> Nationality
+                    </p>
+                    <p className="text-sm font-black text-slate-800 uppercase">{profile.nationality || 'Not Specified'}</p>
                   </div>
-                  {isOwner && (
-                    <Link to="/candidate/dashboard" state={{ activeTab: 'profile' }} className="text-brand-gold font-bold text-xs uppercase hover:underline">
-                      Edit
-                    </Link>
+                  <div>
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                       <Globe size={10} className="text-brand-blue" /> Current Origin
+                    </p>
+                    <p className="text-sm font-black text-slate-800 uppercase">{profile.homeCountry || profile.currentCountry || 'Not Specified'}</p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                       <Calendar size={10} className="text-brand-gold" /> Date of Birth
+                    </p>
+                    <p className="text-sm font-black text-slate-800 uppercase">{profile.dateOfBirth || 'Not Specified'}</p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                       <User size={10} className="text-brand-blue" /> Passport Identity
+                    </p>
+                    <div className="space-y-1">
+                      <p className="text-sm font-black text-slate-800 uppercase tracking-tight">{profile.passportNumber || 'Pending Verification'}</p>
+                      {profile.passportIssueCountry && (
+                        <p className="text-[10px] font-bold text-slate-500 italic">Issued by {profile.passportIssueCountry}</p>
+                      )}
+                      {(profile.passportIssueDate || profile.passportExpiryDate) && (
+                        <div className="flex gap-4 mt-2">
+                          {profile.passportIssueDate && (
+                            <div>
+                               <p className="text-[8px] font-black text-slate-400 uppercase">Issued</p>
+                               <p className="text-[10px] font-bold text-slate-600">{profile.passportIssueDate}</p>
+                            </div>
+                          )}
+                          {profile.passportExpiryDate && (
+                            <div>
+                               <p className="text-[8px] font-black text-slate-400 uppercase">Expires</p>
+                               <p className="text-[10px] font-bold text-red-500">{profile.passportExpiryDate}</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {(profile.fatherName || profile.motherName) && (
+                    <div className="pt-4 mt-4 border-t border-slate-100">
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                         <ShieldCheck size={10} className="text-emerald-500" /> Family Dossier
+                      </p>
+                      <div className="space-y-3">
+                        {profile.fatherName && (
+                          <div>
+                             <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.1em]">Father's Name</p>
+                             <p className="text-[11px] font-bold text-slate-700">{profile.fatherName}</p>
+                          </div>
+                        )}
+                        {profile.motherName && (
+                          <div>
+                             <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.1em]">Mother's Name</p>
+                             <p className="text-[11px] font-bold text-slate-700">{profile.motherName}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   )}
                 </div>
-                
-                <div className="space-y-10">
-                  {profile.workHistory && profile.workHistory.length > 0 ? (
-                    profile.workHistory.map((work, i) => (
-                      <div key={i} className="relative pl-8 border-l-2 border-gray-100 last:border-l-0 pb-2">
-                        <div className="absolute top-0 -left-[9px] w-4 h-4 rounded-full bg-brand-gold border-4 border-white shadow-sm"></div>
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
-                          <h4 className="text-lg font-bold text-brand-blue">{work.position}</h4>
-                          <span className="text-xs font-bold text-brand-gold bg-brand-gold/10 px-3 py-1 rounded-full uppercase tracking-wider">
-                            {work.startDate} — {work.endDate || 'Present'}
-                          </span>
-                        </div>
-                        <p className="text-brand-blue/70 font-bold mb-3">{work.company}</p>
-                        <p className="text-gray-500 text-sm leading-relaxed whitespace-pre-line">{work.description}</p>
+              </section>
+
+              {/* Skills (Europass Interaction Style) */}
+              <section>
+                <h3 className="text-[11px] font-black text-[#004494] uppercase tracking-[0.2em] border-b-2 border-[#e1e8ed] pb-3 mb-6">
+                  Expertise Matrix
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {profile.skills && profile.skills.length > 0 ? (
+                    profile.skills.map((skill, i) => (
+                      <div key={i} className="bg-white border border-[#e1e8ed] px-3 py-1.5 rounded-xl shadow-sm">
+                        <p className="text-slate-700 font-bold text-[11px] uppercase tracking-wider">{skill.name}</p>
                       </div>
                     ))
                   ) : (
-                    <div className="py-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                       <History className="mx-auto text-gray-300 mb-2" size={32} />
-                       <p className="text-gray-400 font-bold italic">No work history added.</p>
+                    <p className="text-gray-400 italic text-xs">No skills indexed.</p>
+                  )}
+                </div>
+              </section>
+
+              {/* Languages (With Visual Dots) */}
+              <section>
+                <h3 className="text-[11px] font-black text-[#004494] uppercase tracking-[0.2em] border-b-2 border-[#e1e8ed] pb-3 mb-6">
+                  Linguistic Index
+                </h3>
+                <div className="space-y-6">
+                  {profile.languages && profile.languages.length > 0 ? (
+                    profile.languages.map((lang, index) => (
+                      <div key={index} className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <p className="text-slate-800 font-black text-xs uppercase tracking-tight">{lang.language}</p>
+                          <span className="text-[8px] font-black uppercase bg-[#f5f7f9] text-[#004494] px-2 py-1 rounded-lg border border-[#e1e8ed]">
+                            {lang.level}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex gap-1.5">
+                            {[1, 2, 3, 4, 5].map(dot => (
+                              <div 
+                                key={dot} 
+                                className={cn(
+                                  "w-2 h-2 rounded-full transition-all duration-300",
+                                  (lang.proficiency || (lang.level.includes('Native') ? 100 : lang.level.includes('Fluent') ? 80 : 50)) >= dot * 20 
+                                    ? "bg-[#004494] shadow-sm scale-110" 
+                                    : "bg-slate-200"
+                                )}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-400 italic text-xs">No languages provided.</p>
+                  )}
+                </div>
+              </section>
+
+              {/* Status Intel Badges */}
+              <div className="space-y-4 pt-6">
+                <div className={cn(
+                  "p-5 rounded-[2rem] flex items-center gap-4 border-2 transition-all",
+                  profile.workPermitStatus === 'approved' 
+                    ? "bg-emerald-50 border-emerald-100 text-emerald-700" 
+                    : "bg-slate-50 border-slate-100 text-slate-400"
+                )}>
+                  <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", profile.workPermitStatus === 'approved' ? "bg-emerald-100" : "bg-white")}>
+                    <Award size={20} />
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em] opacity-60 leading-none mb-1">Work Permit</p>
+                    <p className="font-black text-xs uppercase">{profile.workPermitStatus || 'Review Needed'}</p>
+                  </div>
+                </div>
+                <div className={cn(
+                  "p-5 rounded-[2rem] flex items-center gap-4 border-2 transition-all",
+                  profile.visaStatus === 'approved' 
+                    ? "bg-blue-50 border-blue-100 text-[#004494]" 
+                    : "bg-slate-50 border-slate-100 text-slate-400"
+                )}>
+                  <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", profile.visaStatus === 'approved' ? "bg-blue-100 text-brand-blue" : "bg-white")}>
+                    <Globe size={20} />
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em] opacity-60 leading-none mb-1">Visa Strategy</p>
+                    <p className="font-black text-xs uppercase">{profile.visaStatus || 'Review Needed'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - Main Professional Content */}
+            <div className="col-span-12 lg:col-span-8 space-y-12">
+              
+              {/* About Me Section - Professional Summary */}
+              <section className="bg-slate-50/50 p-8 rounded-[2.5rem] border border-slate-100">
+                <h3 className="text-[11px] font-black text-[#004494] uppercase tracking-[0.2em] border-b-2 border-slate-100 pb-3 mb-6 flex items-center gap-3">
+                  <Sparkles size={14} className="text-brand-gold" /> Professional Profile
+                </h3>
+                <p className="text-slate-700 text-sm leading-relaxed font-bold italic">
+                  {profile.aboutMe || 'Professional talent seeking opportunities with WorkinEU. Detailed expertise profile follows below.'}
+                </p>
+              </section>
+
+              {/* Work Experience */}
+              <section>
+                <div className="flex items-center justify-between mb-10 border-b-2 border-[#e1e8ed] pb-3">
+                  <h3 className="text-[11px] font-black text-[#004494] uppercase tracking-[0.2em] flex items-center gap-3">
+                    <Briefcase size={16} /> Professional Experience
+                  </h3>
+                </div>
+                
+                <div className="space-y-12">
+                  {profile.workHistory && profile.workHistory.length > 0 ? (
+                    profile.workHistory.map((work, i) => (
+                      <div key={i} className="relative pl-10 border-l-[3px] border-slate-100 last:border-l-0 pb-2">
+                        <div className="absolute top-0 -left-[11px] w-5 h-5 rounded-full bg-white border-[4px] border-[#004494] shadow-sm"></div>
+                        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
+                          <div>
+                            <h4 className="text-xl font-black text-slate-800 uppercase tracking-tight">{work.position}</h4>
+                            <p className="text-brand-gold font-bold text-sm flex items-center gap-2 mt-1">
+                              <Briefcase size={12} /> {work.company}
+                            </p>
+                          </div>
+                          <span className="inline-flex text-[10px] font-black text-white bg-[#004494] px-4 py-1.5 rounded-full uppercase tracking-widest whitespace-nowrap shadow-md shadow-[#004494]/10">
+                            {work.startDate} — {work.endDate || 'PRESENT'}
+                          </span>
+                        </div>
+                        <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-line text-justify">{work.description}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="py-12 bg-slate-50/50 rounded-[2.5rem] border-2 border-dashed border-slate-200 text-center">
+                       <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Employment dossier available upon direct request.</p>
                     </div>
                   )}
                 </div>
@@ -347,54 +521,47 @@ export default function CandidateProfilePage() {
 
               {/* Education */}
               <section>
-                <div className="flex items-center justify-between mb-8 border-b border-brand-teal/20 pb-2">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-brand-blue/5 text-brand-blue rounded-xl flex items-center justify-center">
-                      <GraduationCap size={20} />
-                    </div>
-                    <h3 className="text-xl font-black text-brand-blue uppercase tracking-widest">Education</h3>
-                  </div>
-                  {isOwner && (
-                    <Link to="/candidate/dashboard" state={{ activeTab: 'profile' }} className="text-brand-gold font-bold text-xs uppercase hover:underline">
-                      Edit
-                    </Link>
-                  )}
+                <div className="flex items-center justify-between mb-8 border-b-2 border-[#e1e8ed] pb-3">
+                  <h3 className="text-[11px] font-black text-[#004494] uppercase tracking-[0.2em] flex items-center gap-3">
+                    <GraduationCap size={16} /> Academic Background
+                  </h3>
                 </div>
                 
                 <div className="space-y-10">
                   {profile.educationHistory && profile.educationHistory.length > 0 ? (
                     profile.educationHistory.map((edu, i) => (
-                      <div key={i} className="relative pl-8 border-l-2 border-gray-100 last:border-l-0 pb-2">
-                        <div className="absolute top-0 -left-[9px] w-4 h-4 rounded-full bg-brand-blue border-4 border-white shadow-sm"></div>
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
-                          <h4 className="text-lg font-bold text-brand-blue">{edu.degree}</h4>
-                          <span className="text-xs font-bold text-brand-blue bg-brand-blue/10 px-3 py-1 rounded-full uppercase tracking-wider">
+                      <div key={i} className="relative pl-10 border-l-[3px] border-slate-100 last:border-l-0 pb-2">
+                        <div className="absolute top-0 -left-[11px] w-5 h-5 rounded-full bg-white border-[4px] border-brand-teal shadow-sm"></div>
+                        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-2">
+                          <div>
+                            <h4 className="text-lg font-black text-slate-800">{edu.degree}</h4>
+                            <p className="text-brand-teal font-bold text-xs italic mt-1">{edu.institution}</p>
+                          </div>
+                          <span className="inline-flex text-[10px] font-bold text-brand-teal bg-teal-50 border border-teal-100 px-3 py-1 rounded-full uppercase tracking-wider">
                             {edu.startDate} — {edu.endDate}
                           </span>
                         </div>
-                        <p className="text-brand-blue/70 font-bold mb-3">{edu.institution}</p>
-                        <p className="text-gray-500 text-sm leading-relaxed whitespace-pre-line">{edu.description}</p>
+                        <p className="text-slate-500 text-sm leading-relaxed mt-2">{edu.description}</p>
                       </div>
                     ))
                   ) : (
-                    <div className="py-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                       <GraduationCap className="mx-auto text-gray-300 mb-2" size={32} />
-                       <p className="text-gray-400 font-bold italic">No education history added.</p>
+                    <div className="py-10 bg-slate-50/50 rounded-[2.5rem] border border-dashed border-slate-200 text-center">
+                       <p className="text-slate-400 font-bold italic text-xs">Academic qualifications pending review.</p>
                     </div>
                   )}
                 </div>
               </section>
 
               {/* Documents Section */}
-              <section className="bg-brand-blue/5 p-10 rounded-[3rem] border border-brand-blue/10">
-                <div className="flex items-center justify-between mb-8 border-b border-brand-blue/10 pb-4">
+              <section className="bg-[#f5f7f9] p-10 rounded-[3rem] border border-[#e1e8ed]">
+                <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-white text-brand-blue rounded-2xl flex items-center justify-center shadow-lg shadow-brand-blue/5">
-                      <FileText size={24} />
+                    <div className="w-12 h-12 bg-white text-[#004494] rounded-2xl flex items-center justify-center shadow-lg border border-[#e1e8ed]">
+                      <FileText size={22} />
                     </div>
                     <div>
-                      <h3 className="text-xl font-black text-brand-blue uppercase tracking-widest leading-none mb-1">Document Dossier</h3>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Verified Mission Attachments</p>
+                      <h3 className="text-[11px] font-black text-[#004494] uppercase tracking-[0.2em] leading-none mb-1">Document Dossier</h3>
+                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Verified Digital Attachments</p>
                     </div>
                   </div>
                 </div>
@@ -402,17 +569,17 @@ export default function CandidateProfilePage() {
                 {profile.documents && profile.documents.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {profile.documents.map((doc, i) => (
-                      <div key={i} className="bg-white p-6 rounded-[2rem] border border-gray-100 flex items-center justify-between group hover:border-brand-gold transition-all shadow-sm">
+                      <div key={i} className="bg-white p-5 rounded-2xl border border-[#e1e8ed] flex items-center justify-between group hover:border-[#004494] transition-all">
                         <div className="flex items-center gap-4 overflow-hidden">
-                          <div className="w-12 h-12 bg-slate-50 text-brand-gold rounded-xl flex items-center justify-center shrink-0">
-                            <FileText size={24} />
+                          <div className="w-10 h-10 bg-slate-50 text-brand-gold rounded-xl flex items-center justify-center shrink-0">
+                            <FileText size={20} />
                           </div>
                           <div className="overflow-hidden">
-                            <p className="text-sm font-black text-brand-blue truncate" title={doc.name}>
+                            <p className="text-xs font-black text-[#004494] truncate" title={doc.name}>
                               {doc.name}
                             </p>
-                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-wider">
-                              Added {new Date(doc.uploadedAt).toLocaleDateString()}
+                            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wide">
+                              ID: {new Date(doc.uploadedAt).toLocaleDateString()}
                             </p>
                           </div>
                         </div>
@@ -420,134 +587,19 @@ export default function CandidateProfilePage() {
                           href={doc.url} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="w-10 h-10 bg-brand-blue/5 text-brand-blue rounded-xl flex items-center justify-center hover:bg-brand-blue hover:text-white transition-all shadow-sm"
+                          className="w-10 h-10 bg-brand-blue/5 text-brand-blue rounded-xl flex items-center justify-center hover:bg-[#004494] hover:text-white transition-all shadow-sm"
                         >
-                          <Download size={18} />
+                          <Download size={16} />
                         </a>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="py-16 text-center">
-                     <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-gray-200">
-                        <FileText className="text-gray-200" size={40} />
-                     </div>
-                     <p className="text-gray-400 font-bold italic text-sm">No documents attached to this profile.</p>
+                  <div className="py-10 text-center">
+                     <p className="text-slate-400 font-bold italic text-xs">Formal document vault empty.</p>
                   </div>
                 )}
               </section>
-            </div>
-
-            {/* Right Column - Sidebars */}
-            <div className="space-y-12">
-              
-              {/* Skills */}
-              <section>
-                <div className="flex items-center justify-between mb-8 border-b border-brand-teal/20 pb-2">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-brand-blue/5 text-brand-blue rounded-xl flex items-center justify-center">
-                      <Award size={20} />
-                    </div>
-                    <h3 className="text-xl font-black text-brand-blue uppercase tracking-widest">Skills</h3>
-                  </div>
-                  {isOwner && (
-                    <Link to="/candidate/dashboard" state={{ activeTab: 'profile' }} className="text-brand-gold font-bold text-xs uppercase hover:underline">
-                      Edit
-                    </Link>
-                  )}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {profile.skills && profile.skills.length > 0 ? (
-                    profile.skills.map((skill, i) => (
-                      <div key={i} className="bg-white border border-gray-100 px-4 py-2 rounded-xl shadow-sm">
-                        <p className="text-slate-900 font-bold text-sm">{skill.name}</p>
-                        {skill.level && <p className="text-[10px] text-brand-gold font-black uppercase tracking-wider">{skill.level}</p>}
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-400 italic text-sm">No skills added.</p>
-                  )}
-                </div>
-              </section>
-
-              {/* Languages */}
-              <section>
-                <div className="flex items-center justify-between mb-8 border-b border-brand-teal/20 pb-2">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-brand-blue/5 text-brand-blue rounded-xl flex items-center justify-center">
-                      <Languages size={20} />
-                    </div>
-                    <h3 className="text-xl font-black text-brand-blue uppercase tracking-widest">Languages</h3>
-                  </div>
-                  {isOwner && (
-                    <Link to="/candidate/dashboard" state={{ activeTab: 'profile' }} className="text-brand-gold font-bold text-xs uppercase hover:underline">
-                      Edit
-                    </Link>
-                  )}
-                </div>
-                <div className="space-y-4">
-                  {profile.languages && profile.languages.length > 0 ? (
-                    profile.languages.map((lang, i) => (
-                      <div key={i} className="flex justify-between items-center group">
-                        <p className="text-slate-900 font-bold">{lang.language}</p>
-                        <span className="text-[10px] font-black uppercase bg-brand-blue/10 text-brand-blue px-3 py-1 rounded-full">{lang.level}</span>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-400 italic text-sm">No languages added.</p>
-                  )}
-                </div>
-              </section>
-
-              {/* Personal Details Snapshot */}
-              <section className="bg-brand-blue/5 p-8 rounded-3xl border border-brand-blue/10">
-                <div className="flex justify-between items-center mb-6 border-b border-brand-blue/10 pb-2">
-                  <h3 className="text-lg font-black text-brand-blue uppercase tracking-widest">Profile Intel</h3>
-                  {isOwner && (
-                    <Link to="/candidate/dashboard" state={{ activeTab: 'profile' }} className="text-brand-gold font-bold text-[10px] uppercase hover:underline">
-                      Update
-                    </Link>
-                  )}
-                </div>
-                <div className="space-y-6">
-                  <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Passport ID</p>
-                    <p className="text-brand-blue font-bold">{profile.passportNumber || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Education Level</p>
-                    <p className="text-brand-blue font-bold">{profile.education || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">DOB</p>
-                    <p className="text-brand-blue font-bold">{profile.dateOfBirth || 'N/A'}</p>
-                  </div>
-                </div>
-              </section>
-
-              {/* Verification Badges */}
-              <div className="space-y-4">
-                <div className={cn(
-                  "p-4 rounded-2xl flex items-center gap-4 border",
-                  profile.workPermitStatus === 'approved' ? "bg-green-50 border-green-100 text-green-700" : "bg-gray-50 border-gray-100 text-gray-400"
-                )}>
-                  <Award size={24} />
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest">Work Permit Status</p>
-                    <p className="font-bold capitalize">{profile.workPermitStatus || 'Review Pending'}</p>
-                  </div>
-                </div>
-                <div className={cn(
-                  "p-4 rounded-2xl flex items-center gap-4 border",
-                  profile.visaStatus === 'approved' ? "bg-green-50 border-green-100 text-green-700" : "bg-gray-50 border-gray-100 text-gray-400"
-                )}>
-                  <Globe size={24} />
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest">Global Visa Status</p>
-                    <p className="font-bold capitalize">{profile.visaStatus || 'Review Pending'}</p>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
 

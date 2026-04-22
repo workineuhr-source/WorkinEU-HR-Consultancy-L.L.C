@@ -249,16 +249,37 @@ export default function AdminCandidateDetail() {
           scale: 2,
           useCORS: true,
           logging: false,
-          backgroundColor: '#ffffff'
+          backgroundColor: '#ffffff',
+          windowWidth: 794 // Force A4 pixel width during capture
         });
         
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgProps = pdf.getImageProperties(imgData);
         const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        const pdfHeight = pdf.internal.pageSize.getHeight();
         
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+        
+        // Ratio of PDF mm per Canvas pixel
+        const ratio = pdfWidth / (canvasWidth / 2); // Divide by scale=2
+        const imgHeightInPdf = (canvasHeight / 2) * ratio;
+        
+        let heightLeft = imgHeightInPdf;
+        let position = 0;
+
+        // Add first page
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
+        heightLeft -= pdfHeight;
+
+        // Slice into more pages if needed
+        while (heightLeft >= 0) {
+          position = heightLeft - imgHeightInPdf;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
+          heightLeft -= pdfHeight;
+        }
+
         pdf.save(`Europass_CV_${candidate.fullName.replace(/\s+/g, '_')}.pdf`);
         
         setCvCandidate(null);
@@ -589,6 +610,70 @@ export default function AdminCandidateDetail() {
              </div>
           </div>
 
+          {/* Identity & Family Details Admin Section */}
+          <div className="bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100 mb-8">
+             <div className="flex items-center gap-4 mb-10 border-b border-gray-50 pb-6">
+                <div className="p-4 bg-purple-50 text-purple-600 rounded-2xl">
+                  <ShieldCheck size={24} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-brand-blue">Identity & Family Intel</h3>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Passport Verification & Family Dossier</p>
+                </div>
+             </div>
+             
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="space-y-4">
+                  <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest">Passport Issue Date</label>
+                  <input 
+                    type="date"
+                    className="w-full px-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold"
+                    value={editingProfile.passportIssueDate || ''}
+                    onChange={(e) => setEditingProfile({ ...editingProfile, passportIssueDate: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-4">
+                  <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest">Passport Expiry Date</label>
+                  <input 
+                    type="date"
+                    className="w-full px-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold"
+                    value={editingProfile.passportExpiryDate || ''}
+                    onChange={(e) => setEditingProfile({ ...editingProfile, passportExpiryDate: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-4">
+                  <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest">Issuing Country</label>
+                  <input 
+                    list="all-countries"
+                    className="w-full px-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold"
+                    value={editingProfile.passportIssueCountry || ''}
+                    onChange={(e) => setEditingProfile({ ...editingProfile, passportIssueCountry: e.target.value })}
+                    placeholder="e.g. Nepal"
+                  />
+                </div>
+                <div className="space-y-4">
+                  <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest">Father's Full Name</label>
+                  <input 
+                    type="text"
+                    className="w-full px-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold"
+                    value={editingProfile.fatherName || ''}
+                    onChange={(e) => setEditingProfile({ ...editingProfile, fatherName: e.target.value })}
+                    placeholder="Father's Name"
+                  />
+                </div>
+                <div className="space-y-4">
+                  <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest">Mother's Full Name</label>
+                  <input 
+                    type="text"
+                    className="w-full px-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold"
+                    value={editingProfile.motherName || ''}
+                    onChange={(e) => setEditingProfile({ ...editingProfile, motherName: e.target.value })}
+                    placeholder="Mother's Name"
+                  />
+                </div>
+             </div>
+          </div>
+
           {/* Professional Portfolio */}
           <div className="bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100">
              <div className="flex items-center gap-4 mb-10 border-b border-gray-50 pb-6">
@@ -618,10 +703,16 @@ export default function AdminCandidateDetail() {
                       <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest">Professional Job Title / Role</label>
                       <input 
                         className="w-full px-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold"
+                        list="job-position-options"
                         value={editingProfile.experience || ''}
                         onChange={(e) => setEditingProfile({ ...editingProfile, experience: e.target.value })}
                         placeholder="e.g. Senior Logistics Coordinator"
                       />
+                      <datalist id="job-position-options">
+                        {JOB_POSITIONS.map(pos => (
+                          <option key={pos} value={pos} />
+                        ))}
+                      </datalist>
                     </div>
                     <div className="space-y-4">
                       <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest">Highest Education</label>
@@ -722,6 +813,154 @@ export default function AdminCandidateDetail() {
                         </div>
                       </div>
                     ))}
+                  </div>
+               </div>
+
+               {/* Skills Section */}
+               <div className="pt-10 border-t border-gray-100 mb-10">
+                  <div className="flex justify-between items-center mb-6">
+                    <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Core Professional Skills</h4>
+                    <button 
+                      onClick={() => setEditingProfile({ ...editingProfile, skills: [...(editingProfile.skills || []), { name: '', level: 'Intermediate' }] })}
+                      className="text-brand-gold font-black text-[10px] uppercase flex items-center gap-2 hover:underline"
+                    >
+                      <Plus size={16} /> Add Skill
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    {editingProfile.skills?.map((skill, i) => (
+                      <div key={i} className="flex gap-2 items-center bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 shadow-sm">
+                        <input 
+                          className="w-32 bg-transparent outline-none text-xs font-bold text-brand-blue"
+                          value={skill.name}
+                          onChange={(e) => {
+                            const newSkills = [...(editingProfile.skills || [])];
+                            newSkills[i] = { ...skill, name: e.target.value };
+                            setEditingProfile({ ...editingProfile, skills: newSkills });
+                          }}
+                          placeholder="Skill..."
+                        />
+                        <button 
+                          onClick={() => setEditingProfile({ ...editingProfile, skills: editingProfile.skills?.filter((_, idx) => idx !== i) })}
+                          className="text-red-400 hover:text-red-600 transition-colors"
+                        >
+                          <Trash size={14} />
+                        </button>
+                      </div>
+                    ))}
+                    {(editingProfile.skills || []).length === 0 && (
+                      <p className="text-xs font-bold text-slate-300 uppercase tracking-widest italic py-4">No specific skills indexed yet.</p>
+                    )}
+                  </div>
+               </div>
+
+               {/* Languages Section */}
+               <div className="pt-10 border-t border-gray-100">
+                  <div className="flex justify-between items-center mb-6">
+                    <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Linguistic Proficiencies</h4>
+                    <button 
+                      onClick={() => setEditingProfile({ ...editingProfile, languages: [...(editingProfile.languages || []), { language: '', level: 'Intermediate', proficiency: 50 }] })}
+                      className="text-brand-gold font-black text-[10px] uppercase flex items-center gap-2 hover:underline"
+                    >
+                      <Plus size={16} /> Add Language
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {editingProfile.languages?.map((lang, i) => (
+                      <div key={i} className="bg-slate-50/50 p-8 rounded-[2.5rem] border border-slate-100 space-y-6 group relative">
+                        <button 
+                          onClick={() => setEditingProfile({ ...editingProfile, languages: editingProfile.languages?.filter((_, idx) => idx !== i) })}
+                          className="absolute top-4 right-4 text-red-300 hover:text-red-500 transition-colors"
+                        >
+                          <Trash size={16} />
+                        </button>
+                        <div className="flex flex-col md:flex-row gap-4">
+                          <div className="flex-grow">
+                            <label className="block text-[8px] font-black text-gray-400 uppercase mb-2">Language</label>
+                            <input 
+                              list="common-languages"
+                              className="w-full bg-white px-5 py-3 rounded-xl border border-slate-100 outline-none focus:border-brand-gold text-sm font-bold"
+                              value={lang.language}
+                              onChange={(e) => {
+                                const newLangs = [...(editingProfile.languages || [])];
+                                newLangs[i] = { ...lang, language: e.target.value };
+                                setEditingProfile({ ...editingProfile, languages: newLangs });
+                              }}
+                              placeholder="e.g. English"
+                            />
+                            <datalist id="common-languages">
+                              {COMMON_LANGUAGES.map(l => <option key={l} value={l} />)}
+                            </datalist>
+                          </div>
+                          <div className="w-full md:w-40">
+                             <label className="block text-[8px] font-black text-gray-400 uppercase mb-2">Level</label>
+                             <select 
+                                className="w-full bg-white px-5 py-3 rounded-xl border border-slate-100 outline-none focus:border-brand-gold text-xs font-black uppercase tracking-widest"
+                                value={lang.level}
+                                onChange={(e) => {
+                                  const newLangs = [...(editingProfile.languages || [])];
+                                  newLangs[i] = { ...lang, level: e.target.value };
+                                  setEditingProfile({ ...editingProfile, languages: newLangs });
+                                }}
+                              >
+                                {PROFICIENCY_LEVELS.map(level => <option key={level} value={level}>{level}</option>)}
+                                <option value="Basic">Basic</option>
+                                <option value="Conversational">Conversational</option>
+                                <option value="Fluent">Fluent</option>
+                                <option value="Native">Native</option>
+                              </select>
+                          </div>
+                        </div>
+                        
+                        <div className="pt-4 border-t border-slate-100/50 space-y-4">
+                           <div className="flex justify-between items-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                             <span>Proficiency Intelligence</span>
+                             <span className="text-brand-gold bg-brand-gold/5 px-3 py-1 rounded-full border border-brand-gold/10 font-bold">{lang.proficiency || 0}%</span>
+                           </div>
+                           <input 
+                             type="range"
+                             min="0"
+                             max="100"
+                             step="5"
+                             className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-gold"
+                             value={lang.proficiency || 0}
+                             onChange={(e) => {
+                               const newLangs = [...(editingProfile.languages || [])];
+                               const val = parseInt(e.target.value);
+                               newLangs[i] = { ...lang, proficiency: val };
+                               
+                               // AI-assisted level classification
+                               if (val >= 95) newLangs[i].level = "Native";
+                               else if (val >= 80) newLangs[i].level = "Fluent";
+                               else if (val >= 60) newLangs[i].level = "Advanced";
+                               else if (val >= 40) newLangs[i].level = "Conversational";
+                               else if (val >= 20) newLangs[i].level = "Intermediate";
+                               else newLangs[i].level = "Basic";
+
+                               setEditingProfile({ ...editingProfile, languages: newLangs });
+                             }}
+                           />
+                           <div className="flex gap-2 justify-center">
+                             {[1, 2, 3, 4, 5].map(star => (
+                               <div 
+                                 key={star} 
+                                 className={cn(
+                                   "w-3 h-3 rounded-full transition-all duration-300",
+                                   (lang.proficiency || 0) >= star * 20 
+                                    ? "bg-brand-gold shadow-[0_0_10px_rgba(212,175,55,0.4)] scale-110" 
+                                    : "bg-slate-200"
+                                 )}
+                               />
+                             ))}
+                           </div>
+                        </div>
+                      </div>
+                    ))}
+                    {(editingProfile.languages || []).length === 0 && (
+                      <p className="col-span-full text-center py-12 bg-slate-50/50 rounded-[2.5rem] border border-dashed border-slate-100 text-slate-300 font-bold uppercase tracking-widest text-[10px]">
+                        Linguistic data stream currently offline.
+                      </p>
+                    )}
                   </div>
                </div>
              </div>

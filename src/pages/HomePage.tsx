@@ -697,27 +697,6 @@ export default function HomePage() {
         </Section>
       )}
 
-      {/* Scientific Professional Stats Transition */}
-      <section className="py-24 bg-slate-900 overflow-hidden relative">
-        <div className="max-w-[1920px] mx-auto px-4 md:px-8 relative z-10">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
-            {displayStats.map((stat, i) => (
-              <motion.div 
-                key={i} 
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="text-center group"
-              >
-                <h3 className="text-5xl md:text-7xl font-black text-brand-teal mb-4 tracking-tighter group-hover:scale-110 transition-transform duration-500">{stat.value}</h3>
-                <div className="h-px w-12 bg-brand-teal/30 mx-auto mb-6 group-hover:w-full transition-all duration-700"></div>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.5em] leading-none">{stat.label}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Our Process - The Recruitment Roadmap */}
       {content.showProcess !== false && (
         <Section 

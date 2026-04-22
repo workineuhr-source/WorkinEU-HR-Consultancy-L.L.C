@@ -68,6 +68,12 @@ export interface Application {
   }[];
   skills?: { name: string; level: string }[];
   status: 'pending' | 'approved' | 'rejected';
+  statusHistory?: {
+    prevStatus: string;
+    newStatus: string;
+    changedAt: number;
+    changedBy?: string;
+  }[];
   createdAt: number;
 }
 
@@ -116,11 +122,14 @@ export interface CandidateProfile {
   fullName: string;
   email: string;
   phone?: string;
+  whatsapp?: string;
   passportNumber?: string;
   nationality?: string;
   experience?: string;
   education?: string;
   address?: string;
+  homeCountry?: string;
+  currentCountry?: string;
   dateOfBirth?: string;
   gender?: string;
   skills?: { name: string; level: string }[];
@@ -140,7 +149,10 @@ export interface CandidateProfile {
     description: string;
   }[];
   visaStatus?: 'pending' | 'approved' | 'rejected';
-  workPermitStatus?: 'pending' | 'approved' | 'rejected';
+  workPermitStatus?: 'pending' | 'approved' | 'rejected' | 'Review Pending';
+  globalVisaStatus?: 'pending' | 'approved' | 'rejected' | 'Review Pending';
+  aboutMe?: string;
+  profileIntel?: string;
   documentProcessingStatus?: 'pending' | 'in-progress' | 'completed';
   joiningDate?: string;
   expectedArrivalDate?: string;
@@ -158,7 +170,11 @@ export interface CandidateProfile {
   // Payment Tracking
   paymentStatus?: 'pending' | 'partially-paid' | 'fully-paid';
   totalAmount?: string;
+  initialPay?: string;
+  payAfterWP?: string;
+  payAfterVisa?: string;
   paidAmount?: string;
+  paymentCurrency?: 'EUR' | 'NPR' | 'INR' | 'AED' | 'USD';
   includedPackageItems?: string[];
   excludedPackageItems?: string[];
   paymentHistory?: {
@@ -256,6 +272,14 @@ export interface SiteContent {
   servicesImageUrl?: string;
   whyChooseUsImageUrl?: string;
   guidingPrinciplesImageUrl?: string;
+  socialLinks?: {
+    facebook?: string;
+    whatsapp?: string;
+    linkedin?: string;
+    tiktok?: string;
+    instagram?: string;
+    youtube?: string;
+  };
   services: {
     title: string;
     description: string;

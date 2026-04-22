@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Linkedin, Mail, Phone, MapPin, MessageCircle, Instagram } from 'lucide-react';
+import { Facebook, Linkedin, Mail, Phone, MapPin, MessageCircle, Instagram, Youtube, Music2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -22,6 +22,14 @@ export default function Footer() {
     address: 'Mai Tower 4th Floor, Office No. 10, Al Qusais, Al Nahda 1, Dubai, UAE',
     whatsapp: '971501942811',
     branchOffices: [] as SiteContent['branchOffices']
+  });
+  const [socialLinks, setSocialLinks] = useState<SiteContent['socialLinks']>({
+    facebook: 'https://www.facebook.com/workineuhr/',
+    instagram: 'https://www.instagram.com/workineuhr/',
+    linkedin: 'https://www.linkedin.com/in/workineuhrconsultancy/',
+    whatsapp: '971501942811',
+    tiktok: 'https://www.tiktok.com/@workineuhr',
+    youtube: ''
   });
 
   useEffect(() => {
@@ -76,13 +84,15 @@ export default function Footer() {
             <p className="text-slate-300 text-lg leading-relaxed font-medium max-w-md">
               The world's premier bridge between exceptional global talent and prestigious international opportunities. Trust, excellence, and global reach.
             </p>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
               {[
-                { icon: Facebook, href: "https://www.facebook.com/workineuhr/", color: "hover:bg-[#1877F2]" },
-                { icon: Instagram, href: "https://www.instagram.com/workineuhr/", color: "hover:bg-gradient-to-tr hover:from-[#f9ce34] hover:via-[#ee2a7b] hover:to-[#6228d7]" },
-                { icon: Linkedin, href: "#", color: "hover:bg-[#0A66C2]" },
-                { icon: MessageCircle, href: `https://wa.me/${contactInfo.whatsapp}`, color: "hover:bg-[#25D366]" }
-              ].map((social, i) => (
+                { icon: Facebook, href: socialLinks?.facebook, color: "hover:bg-[#1877F2]", show: !!socialLinks?.facebook },
+                { icon: Instagram, href: socialLinks?.instagram, color: "hover:bg-gradient-to-tr hover:from-[#f9ce34] hover:via-[#ee2a7b] hover:to-[#6228d7]", show: !!socialLinks?.instagram },
+                { icon: Linkedin, href: socialLinks?.linkedin, color: "hover:bg-[#0A66C2]", show: !!socialLinks?.linkedin },
+                { icon: Music2, href: socialLinks?.tiktok, color: "hover:bg-black", show: !!socialLinks?.tiktok },
+                { icon: Youtube, href: socialLinks?.youtube, color: "hover:bg-[#FF0000]", show: !!socialLinks?.youtube },
+                { icon: MessageCircle, href: socialLinks?.whatsapp ? `https://wa.me/${socialLinks.whatsapp.replace(/\D/g, '')}` : `https://wa.me/${contactInfo.whatsapp}`, color: "hover:bg-[#25D366]", show: true }
+              ].filter(s => s.show).map((social, i) => (
                 <a 
                   key={i}
                   href={social.href} 

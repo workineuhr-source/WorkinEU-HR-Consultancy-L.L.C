@@ -79,3 +79,13 @@ export const JOB_CATEGORIES = [
   "Manufacturing & Production",
   "Oil & Gas Sector"
 ];
+
+export const CURRENCIES = ['EUR', 'NPR', 'INR', 'AED', 'USD'] as const;
+
+export const CURRENCY_SYMBOLS: Record<string, string> = {
+  EUR: '€',
+  NPR: 'Rs',
+  INR: '₹',
+  AED: 'د.إ',
+  USD: '$'
+};

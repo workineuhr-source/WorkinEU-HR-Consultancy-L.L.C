@@ -3,6 +3,7 @@ import { auth, db } from '../firebase';
 import { doc, getDoc, updateDoc, collection, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { CandidateProfile, Application, Job } from '../types';
 import { getJobRecommendations } from '../services/aiService';
+import { CURRENCY_SYMBOLS } from '../constants';
 import { 
   User, 
   FileText, 
@@ -33,7 +34,9 @@ import {
   Search,
   Home,
   Link,
-  ArrowUp
+  ArrowUp,
+  Upload,
+  Camera
 } from 'lucide-react';
 import JobCard from '../components/JobCard';
 import { toast } from 'sonner';
@@ -168,6 +171,28 @@ export default function CandidateDashboard() {
     }
   };
 
+  const handleCandidateDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = (e.target.files && e.target.files.length > 0) ? e.target.files[0] : null;
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File size must be less than 5MB");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      setNewDoc(prev => ({ 
+        ...prev, 
+        url: base64, 
+        name: prev.name || file.name 
+      }));
+      toast.success("File attached. Please click the checkmark to save.");
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleAddDocument = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile || !auth.currentUser) return;
@@ -281,23 +306,32 @@ export default function CandidateDashboard() {
     }
 
     setUploadingPhoto(true);
+    const toastId = toast.loading("Processing photo...");
+    
     try {
-      const storage = getStorage();
-      const storageRef = ref(storage, `candidates/${auth.currentUser.uid}/profile-photo`);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64 = event.target?.result as string;
+        
+        try {
+          await updateDoc(doc(db, 'candidates', auth.currentUser.uid), {
+            photoUrl: base64,
+            updatedAt: serverTimestamp()
+          });
 
-      await updateDoc(doc(db, 'candidates', auth.currentUser.uid), {
-        photoUrl: url,
-        updatedAt: serverTimestamp()
-      });
-
-      setProfile({ ...profile, photoUrl: url });
-      toast.success("Profile photo updated!");
+          setProfile({ ...profile, photoUrl: base64 });
+          toast.success("Profile photo updated!", { id: toastId });
+        } catch (dbError) {
+          console.error("Firestore update error:", dbError);
+          toast.error("Cloud document size limit reached. Please use a smaller photo.", { id: toastId });
+        } finally {
+          setUploadingPhoto(false);
+        }
+      };
+      reader.readAsDataURL(file);
     } catch (error) {
-      console.error("Error uploading photo:", error);
-      toast.error("Failed to upload photo.");
-    } finally {
+      console.error("Error processing photo:", error);
+      toast.error("Failed to process photo.", { id: toastId });
       setUploadingPhoto(false);
     }
   };
@@ -914,16 +948,25 @@ export default function CandidateDashboard() {
                           />
                         </div>
                         <div className="md:col-span-1">
-                          <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Document Link (Drive/PDF/Photo)</label>
-                          <input 
-                            type="url" 
-                            required
-                            placeholder="Paste Google Drive link or file URL"
-                            className="w-full px-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
-                            value={newDoc.url}
-                            onChange={(e) => setNewDoc({ ...newDoc, url: e.target.value })}
-                          />
-                          <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1 font-medium">Upload your PDF/Photo to Google Drive and paste the shareable link here.</p>
+                          <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Upload File (PDF/Photo)</label>
+                          <div className="relative group">
+                            <input 
+                              type="file" 
+                              required={!newDoc.url}
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                              onChange={handleCandidateDocumentUpload}
+                            />
+                            <div className={cn(
+                              "w-full px-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent flex items-center justify-between transition-all",
+                              newDoc.url ? "border-brand-gold bg-brand-gold/5" : "group-hover:border-brand-gold"
+                            )}>
+                              <span className="text-xs font-bold text-gray-400 truncate">
+                                {newDoc.url ? "✅ File Attached" : "Select File..."}
+                              </span>
+                              <Upload size={18} className="text-gray-400" />
+                            </div>
+                          </div>
+                          <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1 font-medium">Max size: 5MB (PDF or Image)</p>
                         </div>
                         <div className="md:col-span-1 flex items-end gap-3">
                           <div className="flex-grow">
@@ -1093,15 +1136,15 @@ export default function CandidateDashboard() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-white/5 border-t-4 border-t-brand-blue">
                       <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Total Package</p>
-                      <p className="text-3xl font-bold text-brand-blue dark:text-white">€ {profile.totalAmount || '0'}</p>
+                      <p className="text-3xl font-bold text-brand-blue dark:text-white">{CURRENCY_SYMBOLS[profile.paymentCurrency || 'EUR']} {profile.totalAmount || '0'}</p>
                     </div>
                     <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-white/5 border-t-4 border-t-green-500">
                       <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Total Paid</p>
-                      <p className="text-3xl font-bold text-green-600 dark:text-green-400">€ {profile.paidAmount || '0'}</p>
+                      <p className="text-3xl font-bold text-green-600 dark:text-green-400">{CURRENCY_SYMBOLS[profile.paymentCurrency || 'EUR']} {profile.paidAmount || '0'}</p>
                     </div>
                     <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-white/5 border-t-4 border-t-brand-gold">
                       <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Remaining</p>
-                      <p className="text-3xl font-bold text-brand-gold">€ {Number(profile.totalAmount || 0) - Number(profile.paidAmount || 0)}</p>
+                      <p className="text-3xl font-bold text-brand-gold">{CURRENCY_SYMBOLS[profile.paymentCurrency || 'EUR']} {Number(profile.totalAmount || 0) - Number(profile.paidAmount || 0)}</p>
                     </div>
                   </div>
 
@@ -1169,7 +1212,7 @@ export default function CandidateDashboard() {
                                 <tr key={i} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
                                   <td className="px-8 py-6 text-sm font-bold text-brand-blue dark:text-white">{payment.date}</td>
                                   <td className="px-8 py-6 text-sm text-gray-500 dark:text-gray-400 font-medium">{payment.method}</td>
-                                  <td className="px-8 py-6 text-sm font-bold text-green-600 dark:text-green-400">€ {payment.amount}</td>
+                                  <td className="px-8 py-6 text-sm font-bold text-green-600 dark:text-green-400">{CURRENCY_SYMBOLS[profile.paymentCurrency || 'EUR']} {payment.amount}</td>
                                   <td className="px-8 py-6 text-sm text-gray-400 dark:text-gray-500 italic font-medium">{payment.note || '-'}</td>
                                 </tr>
                               ))}
@@ -1559,6 +1602,17 @@ export default function CandidateDashboard() {
 
                   <div className="bg-white dark:bg-slate-900 p-8 md:p-10 rounded-3xl shadow-sm border border-gray-100 dark:border-white/5">
                     <form onSubmit={handleUpdateProfile} className="space-y-8">
+                      <div className="pt-4 pb-8 border-b border-gray-100 dark:border-white/5">
+                        <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4">About Me / Professional Introduction</label>
+                        <textarea 
+                          rows={4}
+                          className="w-full px-4 py-3 rounded-2xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white leading-relaxed font-medium"
+                          placeholder="Write a brief professional summary about yourself. This will appear at the top of your Europass CV..."
+                          value={profile.aboutMe || ''}
+                          onChange={(e) => setProfile({ ...profile, aboutMe: e.target.value })}
+                        />
+                      </div>
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
                           <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Full Name</label>
@@ -1655,6 +1709,19 @@ export default function CandidateDashboard() {
                               placeholder="e.g. 5 Years in Construction"
                               value={profile.experience || ''}
                               onChange={(e) => setProfile({ ...profile, experience: e.target.value })}
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Profile Intel / Metadata</label>
+                          <div className="relative">
+                            <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-600" size={20} />
+                            <input 
+                              type="text" 
+                              className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
+                              placeholder="e.g. Identity Verified, Premium Candidate"
+                              value={profile.profileIntel || ''}
+                              onChange={(e) => setProfile({ ...profile, profileIntel: e.target.value })}
                             />
                           </div>
                         </div>

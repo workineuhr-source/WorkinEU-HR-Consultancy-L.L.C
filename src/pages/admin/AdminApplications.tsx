@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, getDocs, query, orderBy, updateDoc, doc, deleteDoc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../../firebase';
 import { Application, CandidateProfile } from '../../types';
-import { Search, Filter, Eye, Download, Trash2, X, CheckCircle2, AlertCircle, Clock, FileText } from 'lucide-react';
+import { Search, Filter, Eye, Download, Trash2, X, CheckCircle2, AlertCircle, Clock, FileText, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../../lib/utils';
@@ -165,16 +165,36 @@ export default function AdminApplications() {
   }, [searchTerm, filterStatus, applications]);
 
   const handleStatusChange = async (id: string, newStatus: 'pending' | 'approved' | 'rejected') => {
+    const appToUpdate = applications.find(a => a.id === id);
+    if (!appToUpdate) return;
+    
+    const prevStatus = appToUpdate.status;
+    if (prevStatus === newStatus) return;
+
+    const historyEntry = {
+      prevStatus,
+      newStatus,
+      changedAt: Date.now(),
+      changedBy: auth.currentUser?.email || 'Admin'
+    };
+
     try {
       try {
-        await updateDoc(doc(db, 'applications', id), { status: newStatus });
+        await updateDoc(doc(db, 'applications', id), { 
+          status: newStatus,
+          statusHistory: [...(appToUpdate.statusHistory || []), historyEntry]
+        });
       } catch (err) {
         handleFirestoreError(err, OperationType.UPDATE, `applications/${id}`);
       }
       toast.success(`Application marked as ${newStatus}`);
       fetchApplications();
       if (selectedApp?.id === id) {
-        setSelectedApp({ ...selectedApp, status: newStatus });
+        setSelectedApp({ 
+          ...selectedApp, 
+          status: newStatus,
+          statusHistory: [...(selectedApp.statusHistory || []), historyEntry]
+        });
       }
     } catch (error) {
       toast.error(`Failed to update status: ${getErrorMessage(error)}`);
@@ -474,6 +494,45 @@ export default function AdminApplications() {
                       </a>
                     </div>
                   ))}
+                </div>
+              </div>
+
+              <div className="mb-8 md:mb-12">
+                <h3 className="text-lg font-bold text-brand-blue border-b border-gray-100 pb-2 mb-6">Status History</h3>
+                <div className="space-y-4">
+                  {selectedApp.statusHistory && selectedApp.statusHistory.length > 0 ? (
+                    selectedApp.statusHistory.map((log, i) => (
+                      <div key={i} className="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 relative overflow-hidden group">
+                        <div className="w-1 h-full absolute left-0 top-0 bg-brand-gold"></div>
+                        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-brand-blue shadow-sm shrink-0">
+                          <Clock size={20} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-1">
+                            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Status Change</span>
+                            <span className="text-xs text-gray-500">{new Date(log.changedAt).toLocaleString()}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-0.5 bg-gray-200 text-gray-600 rounded text-[10px] font-bold uppercase">{log.prevStatus}</span>
+                            <ArrowRight size={14} className="text-gray-300" />
+                            <span className={cn(
+                              "px-2 py-0.5 rounded text-[10px] font-bold uppercase",
+                              log.newStatus === 'approved' ? "bg-green-100 text-green-600" :
+                              log.newStatus === 'rejected' ? "bg-red-100 text-red-600" :
+                              "bg-orange-100 text-orange-600"
+                            )}>
+                              {log.newStatus}
+                            </span>
+                          </div>
+                          <p className="text-[10px] text-gray-400 mt-2 italic">Updated by: {log.changedBy}</p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 text-center italic text-gray-500 text-sm">
+                      No status changes logged yet.
+                    </div>
+                  )}
                 </div>
               </div>
 

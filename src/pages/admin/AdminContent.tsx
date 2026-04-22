@@ -207,7 +207,15 @@ export default function AdminContent() {
     professionalHrSolutionsTitle: '',
     professionalHrSolutionsDescription: '',
     professionalHrSolutionsImageUrl: '',
-    assistants: []
+    assistants: [],
+    socialLinks: {
+      facebook: '',
+      whatsapp: '',
+      linkedin: '',
+      tiktok: '',
+      instagram: '',
+      youtube: ''
+    }
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -286,9 +294,11 @@ export default function AdminContent() {
   const seedDefaults = () => {
     setContent({
       ...content,
-      heroTitle: content.heroTitle || 'Your Gateway to Europe',
-      heroCtaText: content.heroCtaText || 'Explore Opportunities',
-      heroSecondaryCtaText: content.heroSecondaryCtaText || 'Contact Expert',
+      heroTitle: content.heroTitle || 'Your Premier Bridge to Global Career Excellence',
+      heroTagline: content.heroTagline || 'Ethical Recruitment • Global Reach • Professional Success',
+      heroDescription: content.heroDescription || 'Specializing in sourcing and placing skilled talent across Europe and the Middle East. With 600+ successful placements and a presence in multiple continents, we empower your professional journey.',
+      heroCtaText: content.heroCtaText || 'Apply for Jobs',
+      heroSecondaryCtaText: content.heroSecondaryCtaText || 'Consult with Us',
       heroImageUrl: content.heroImageUrl || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=1200',
       heroImageUrls: content.heroImageUrls?.length ? content.heroImageUrls : [
         'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=1200',
@@ -297,98 +307,114 @@ export default function AdminContent() {
         'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=1200'
       ],
       ctaTitle: content.ctaTitle || 'Ready to Start Your Global Career?',
-      ctaDescription: content.ctaDescription || 'Join hundreds of successful professionals who have built their careers in Europe with our expert guidance and ethical recruitment practices.',
-      ctaButtonText: content.ctaButtonText || 'Create Candidate Profile',
-      countriesTitle: content.countriesTitle || 'Countries We Serve',
-      countriesTagline: content.countriesTagline || 'Global Reach',
-      countriesDescription: content.countriesDescription || 'We have established deep-rooted partnerships with leading companies across the European Union, offering diverse opportunities in multiple nations.',
-      aboutUs: content.aboutUs || 'WorkinEU is a premier recruitment agency dedicated to connecting skilled professionals with life-changing opportunities in Europe and the Gulf region. We believe in ethical recruitment, transparency, and building long-term success for both candidates and employers.',
-      mission: content.mission || 'To provide ethical, transparent, and efficient recruitment solutions that bridge the gap between global talent and European opportunities, ensuring sustainable growth for all stakeholders.',
-      vision: content.vision || 'To be the most trusted global partner in human resource solutions, recognized for our commitment to ethical practices and the professional success of the candidates we serve.',
-      values: content.values?.length > 0 ? content.values : [
-        { title: 'Integrity', description: 'We uphold the highest standards of honesty and ethical behavior in all our interactions.' },
-        { title: 'Transparency', description: 'Clear communication and no hidden agendas in our recruitment processes.' },
-        { title: 'Excellence', description: 'Striving for the best outcomes for our candidates and partner employers.' },
-        { title: 'Empathy', description: 'Understanding the dreams and challenges of those seeking international careers.' }
+      ctaDescription: content.ctaDescription || 'Join over 600+ successful candidates who have found their dream roles in Europe and the Gulf through our ethical and transparent recruitment process.',
+      ctaButtonText: content.ctaButtonText || 'Register as Candidate',
+      countriesTitle: content.countriesTitle || 'Our Global Reach',
+      countriesTagline: content.countriesTagline || 'International Presence',
+      countriesDescription: content.countriesDescription || 'With main operations in Dubai and branches in Nepal, Sri Lanka, India, and Africa, we connect talent to top employers in Latvia, Lithuania, Romania, and the UAE.',
+      aboutUs: content.aboutUs || 'WorkinEU Human Resources Consultancies LLC is a Dubai-based international recruitment agency specializing in sourcing and placing skilled and unskilled workers into industries across Europe and the Middle East. Backed by ethical practices and global reach, we have successfully placed over 600+ candidates.',
+      mission: content.mission || 'To empower organizations by aligning their HR strategy with business objectives, enhancing efficiency and productivity through expert workforce solutions across Europe and the Gulf.',
+      vision: content.vision || 'To be the leading HR partner for growth-minded businesses in Europe and the Gulf, driving success through strategic talent acquisition, ethical recruitment, and global workforce mobility.',
+      values: [
+        { title: 'Integrity & Transparency', description: 'We conduct all activities with honesty and openness, ensuring trust in every interaction.' },
+        { title: 'Respect & Fairness', description: 'Fostering relationships built on mutual respect and equal opportunity for all candidates.' },
+        { title: 'Accountability', description: 'We take full responsibility for our actions and maintain the highest professional standards.' },
+        { title: 'Quality & Ethics', description: 'Adherence to strict compliance and ethical recruitment practices, ensuring total client satisfaction.' }
       ],
-      services: content.services.length > 0 ? content.services : [
-        { title: 'International Recruitment', description: 'Connecting skilled workers with top employers across Europe and the Gulf with 100% transparency.' },
-        { title: 'Visa & Documentation', description: 'Expert guidance through the complex visa application and documentation process for a hassle-free experience.' },
-        { title: 'Ethical Practices', description: 'We follow strict international labor standards to ensure fair treatment and zero-cost recruitment where applicable.' },
-        { title: 'Post-Deployment Support', description: 'Our relationship doesn\'t end at deployment; we provide ongoing support in your new country.' }
+      services: [
+        { title: 'International Recruitment', description: 'Sourcing skilled and unskilled workers from Asia, Africa, and the Gulf for European industries.', imageUrl: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&q=80&w=800' },
+        { title: 'Visa & Documentation', description: 'Expert legal documentation, visa processing, and embassy coordination for smooth deployment.', imageUrl: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&q=80&w=800' },
+        { title: 'Executive Search', description: 'Customized recruitment campaigns and high-level executive search for specialized roles.', imageUrl: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=800' },
+        { title: 'Post-Placement Support', description: 'Ongoing performance tracking and support for both employers and candidates post-deployment.', imageUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800' }
       ],
-      countries: Array.from(new Set([...(content.countries || []), ...COUNTRIES])),
-      jobPositions: Array.from(new Set([...(content.jobPositions || []), ...JOB_POSITIONS])),
-      jobCategories: Array.from(new Set([...(content.jobCategories || []), ...JOB_CATEGORIES])),
-      livingSectionTitle: content.livingSectionTitle || 'Seamless European Integration',
-      globalStandardsTagline: content.globalStandardsTagline || 'Global Standards',
-      globalStandardsTitle: content.globalStandardsTitle || 'Your Success, Our Commitment',
-      globalStandardsDescription: content.globalStandardsDescription || 'At WorkinEU, we are dedicated to excellence in every placement. Our commitment is to bridge the gap between world-class talent and global opportunities, ensuring a future of shared success and professional growth through integrity, transparency, and unmatched expertise.',
-      livingSection: content.livingSection?.title ? content.livingSection : {
-        title: 'Life & Accommodation in Europe',
-        description: 'We ensure our candidates are well-settled with comfortable living conditions and comprehensive support services.',
+      stats: [
+        { label: 'Success Stories', value: '600+' },
+        { label: 'Candidates / Quarter', value: '500+' },
+        { label: 'Global Branches', value: '3+' },
+        { label: 'Countries Served', value: '15+' }
+      ],
+      branchOffices: [
+        { location: 'Dubai (Headquarters)', address: 'Mai Tower, 4th Floor Royal Zone Business Center, Al Nahda 1, Dubai, UAE', phone: '+971 55 299 7311', email: 'info@workineu.co' },
+        { location: 'Nepal Office', address: 'Singamangal-9, Kathmandu, Nepal', phone: '+977-01-4560541', email: 'info@workineu.co' },
+        { location: 'Sri Lanka Office', address: 'No.600/4A, Kandy Road, Eldeniya, Kadawatha, Sri Lanka', phone: '+94 77 841 1444', email: 'info@workineu.co' }
+      ],
+      countries: ['Latvia', 'Lithuania', 'Romania', 'Poland', 'Croatia', 'UAE', 'Saudi Arabia', 'Qatar', 'Oman'],
+      jobPositions: ['Construction Worker', 'Electrician', 'Plumber', 'Warehouse Assistant', 'Driver', 'Cook', 'Waiter', 'Security Guard', 'Accountant'],
+      jobCategories: ['Construction', 'Hospitality', 'Logistics', 'Healthcare', 'Facility Management', 'Administration'],
+      livingSectionTitle: content.livingSectionTitle || 'Life and Integration in Europe',
+      globalStandardsTagline: content.globalStandardsTagline || 'Excellence in HR',
+      globalStandardsTitle: content.globalStandardsTitle || 'Ethical Global Recruitment Standards',
+      globalStandardsDescription: content.globalStandardsDescription || 'WorkinEU is committed to excellence by bridging the gap between world-class talent and global opportunities through integrity and unmatched expertise.',
+      livingSection: {
+        title: 'Work and Life Abroad',
+        description: 'Comprehensive support for transition, including housing coordination and legal integration assistance.',
         features: [
-          { title: 'Safe Accommodation', description: 'Clean, safe, and fully furnished living spaces near your workplace.' },
-          { title: 'Local Registration', description: 'Assistance with city registration, bank accounts, and health insurance.' },
-          { title: '24/7 Support', description: 'Dedicated coordinators to help you with any issues or emergencies.' }
+          { title: 'Housing Coordination', description: 'Ensuring safe and compliant living conditions for candidates.' },
+          { title: 'Legal Path', description: 'Full assistance with work permits, city registration, and health insurance.' },
+          { title: 'Onboarding', description: 'Professional orientation to help you adapt to your new work environment.' }
         ]
       },
       ourProcess: {
-        title: 'Our Recruitment Process',
-        description: 'A transparent and efficient journey from application to deployment.',
+        title: 'Transparent Recruitment Journey',
+        description: 'A structured flowchart designed for maximum efficiency and candidate protection.',
         steps: [
-          { title: 'Job Search & Consultation', description: 'We help you find the right opportunity based on your skills and goals.' },
-          { title: 'Application & Interview', description: 'Expert guidance through the employer interview and selection process.' },
-          { title: 'Documentation & Visa', description: 'Full support in preparing your documents and securing your work visa.' },
-          { title: 'Deployment & Support', description: 'Assistance with travel arrangements and settling into your new role.' }
+          { title: 'Requirement Analysis', description: 'Deep understanding of client workforce needs and job requisition.' },
+          { title: 'Strategic Sourcing', description: 'Accessing our network of 500+ candidates to find the perfect match.' },
+          { title: 'Screening & Testing', description: 'Rigorous skill testing and interviews to ensure quality standards.' },
+          { title: 'Deployment', description: 'Full logistical support for visa processing and pre-departure orientation.' }
         ]
       },
       whyChooseUs: {
-        title: 'Why Choose WorkinEU?',
-        description: 'We offer unmatched expertise in European and Gulf recruitment, ensuring your career journey is safe, fast, and successful.',
+        title: 'Why Work with WorkinEU?',
+        description: 'Proven success, global reach, and a commitment to ethical hiring practices.',
         points: [
-          { title: 'Ethical Recruitment', description: 'We follow strict ethical guidelines and transparent processes, ensuring no hidden costs.' },
-          { title: 'Expert Guidance', description: 'Our team of specialists provides end-to-end support for your entire career journey.' },
-          { title: 'Verified Employers', description: 'We only partner with reputable and verified employers across Europe and the Gulf.' },
-          { title: 'Legal Compliance', description: 'Strict adherence to international labor laws and visa procedures for your peace of mind.' }
+          { title: '600+ Placements', description: 'A track record of success across diversified industries.' },
+          { title: 'Global Network', description: 'Presence across multiple continents with certified recruitment partners.' },
+          { title: 'Total Compliance', description: 'Full adherence to international labor laws and visa procedures.' },
+          { title: 'Client Trust', description: 'Trusted by top employers in the European Union and the Gulf region.' }
         ]
       },
-      aboutImageUrl: content.aboutImageUrl || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800',
-      servicesImageUrl: content.servicesImageUrl || 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&q=80&w=800',
-      whyChooseUsImageUrl: content.whyChooseUsImageUrl || 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&q=80&w=800',
-      guidingPrinciplesImageUrl: content.guidingPrinciplesImageUrl || 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800',
-      partners: [
-        { name: 'EU Logistics', logoUrl: 'https://images.unsplash.com/photo-1586528116311-ad86d7c71798?auto=format&fit=crop&q=80&w=200' },
-        { name: 'Global Health', logoUrl: 'https://images.unsplash.com/photo-1505751172107-573228a64227?auto=format&fit=crop&q=80&w=200' },
-        { name: 'Euro Build', logoUrl: 'https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=200' }
-      ],
+      socialLinks: {
+        facebook: 'https://www.facebook.com/workineuhr/',
+        whatsapp: '971501942811',
+        linkedin: 'https://www.linkedin.com/in/workineuhrconsultancy/',
+        tiktok: 'https://www.tiktok.com/@workineuhr',
+        instagram: 'https://www.instagram.com/workineuhr/',
+        youtube: ''
+      },
+      aboutImageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800',
+      servicesImageUrl: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&q=80&w=800',
+      whyChooseUsImageUrl: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&q=80&w=800',
+      guidingPrinciplesImageUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800',
       faqs: [
-        { question: 'What countries do you recruit for?', answer: 'We primarily recruit for various European countries including Poland, Malta, Romania, and the Gulf region.' },
-        { question: 'How long does the visa process take?', answer: 'The duration varies by country, but typically ranges from 3 to 6 months.' }
+        { question: 'How long does the visa processing take?', answer: 'The duration varies by country and job category, typically ranging from 3 to 6 months for most European roles.' },
+        { question: 'What documents are required for registration?', answer: 'You will need a valid passport, updated CV (Europass format preferred), education certificates, and experience letters.' },
+        { question: 'Do you provide guidance for the VFS appointment?', answer: 'Yes, we provide full support for VFS appointments, document legalization, and pre-interview preparation.' },
+        { question: 'Are there any upfront fees for processing?', answer: 'WorkinEU follows ethical recruitment practices. Any mandatory service fees are transparently communicated and agreed upon before processing.' }
       ],
+      partners: [
+        { name: 'Inspirado SIA', logoUrl: 'https://images.unsplash.com/photo-1586528116311-ad86d7c71798?auto=format&fit=crop&q=80&w=200' },
+        { name: 'Lamprell Energy', logoUrl: 'https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=200' },
+        { name: 'Club Militari', logoUrl: 'https://images.unsplash.com/photo-1505751172107-573228a64227?auto=format&fit=crop&q=80&w=200' },
+        { name: 'EU Logistics SIA', logoUrl: 'https://images.unsplash.com/photo-1587293852726-70cdb56c2866?auto=format&fit=crop&q=80&w=200' },
+        { name: 'Global Maritime', logoUrl: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&q=80&w=200' }
+      ],
+      professionalHrSolutionsTitle: 'Precision-Guided HR Solutions',
+      professionalHrSolutionsDescription: 'We provide end-to-end recruitment services tailored to the unique regulatory environments of Latvia, Lithuania, Romania, and the UAE. From talent discovery to full logistical deployment, we handle every detail with professional precision.',
       assistants: [
         { 
-          id: 'রাজ', 
+          id: 'raj-consultant', 
           name: 'Raj', 
-          role: 'Senior HR Consultant', 
-          photoUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400',
-          systemPrompt: 'You are RAJ, the Senior HR Consultant at WorkinEU HR Consultancy. Your tone MUST be professional, direct, knowledgeable, and polite—exactly like a senior HR professional.',
+          role: 'Senior Consultant', 
+          photoUrl: '/raj.jpg',
+          systemPrompt: 'You are Raj, a senior consultant at WorkinEU. You are an expert in European recruitment (Latvia, Romania, Poland) and Middle East staffing.',
           isActive: true,
-          color: '#1e293b'
-        },
-        { 
-          id: 'माया', 
-          name: 'Maya', 
-          role: 'Career & Documentation Advisor', 
-          photoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400',
-          systemPrompt: 'You are MAYA, a Career & Documentation Advisor at WorkinEU. You are friendly, helpful, and specialize in explaining visa processes and document requirements.',
-          isActive: true,
-          color: '#0f172a'
+          color: '#0F172A'
         }
       ]
     });
     setShowSeedConfirm(false);
-    toast.success("Default lists and services added! Don't forget to save changes.");
+    toast.success("Professional company data loaded! Please Review and Save changes.");
   };
 
   const moveItem = (field: keyof SiteContent, index: number, direction: 'up' | 'down') => {
@@ -805,6 +831,69 @@ export default function AdminContent() {
                       </div>
                     )}
                   </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Social Media Links - NEW */}
+            <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+              <h3 className="text-xl font-bold text-brand-blue mb-8 flex items-center gap-3">
+                <Globe className="text-brand-gold w-6 h-6" /> Social Media Presence
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div>
+                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Facebook URL</label>
+                  <input 
+                    className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold text-brand-blue"
+                    value={content.socialLinks?.facebook || ''}
+                    onChange={(e) => setContent({ ...content, socialLinks: { ...content.socialLinks, facebook: e.target.value } })}
+                    placeholder="https://facebook.com/..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">LinkedIn URL</label>
+                  <input 
+                    className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold text-brand-blue"
+                    value={content.socialLinks?.linkedin || ''}
+                    onChange={(e) => setContent({ ...content, socialLinks: { ...content.socialLinks, linkedin: e.target.value } })}
+                    placeholder="https://linkedin.com/in/..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Instagram URL</label>
+                  <input 
+                    className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold text-brand-blue"
+                    value={content.socialLinks?.instagram || ''}
+                    onChange={(e) => setContent({ ...content, socialLinks: { ...content.socialLinks, instagram: e.target.value } })}
+                    placeholder="https://instagram.com/..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">TikTok URL</label>
+                  <input 
+                    className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold text-brand-blue"
+                    value={content.socialLinks?.tiktok || ''}
+                    onChange={(e) => setContent({ ...content, socialLinks: { ...content.socialLinks, tiktok: e.target.value } })}
+                    placeholder="https://tiktok.com/@..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">WhatsApp Number (with country code)</label>
+                  <input 
+                    className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold text-brand-blue"
+                    value={content.socialLinks?.whatsapp || ''}
+                    onChange={(e) => setContent({ ...content, socialLinks: { ...content.socialLinks, whatsapp: e.target.value } })}
+                    placeholder="e.g. 971501942811"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">YouTube URL</label>
+                  <input 
+                    className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold text-brand-blue"
+                    value={content.socialLinks?.youtube || ''}
+                    onChange={(e) => setContent({ ...content, socialLinks: { ...content.socialLinks, youtube: e.target.value } })}
+                    placeholder="https://youtube.com/..."
+                  />
                 </div>
               </div>
             </div>
@@ -1352,6 +1441,27 @@ export default function AdminContent() {
                       onChange={(e) => setContent({ ...content, whyChooseUs: { ...(content.whyChooseUs || { title: '', description: '', points: [] }), description: e.target.value } })}
                     />
                   </div>
+                </div>
+                
+                <div className="mt-6">
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Advantage Section Heading Image (Side Photo)</label>
+                  <div className="flex gap-2">
+                    <input 
+                      className="flex-grow px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm"
+                      value={content.whyChooseUsImageUrl || ''}
+                      onChange={(e) => setContent({ ...content, whyChooseUsImageUrl: e.target.value })}
+                      placeholder="Image URL"
+                    />
+                    <label className="bg-brand-blue/5 p-3 rounded-xl cursor-pointer hover:bg-brand-blue/10 transition-all flex items-center justify-center text-brand-blue">
+                      {uploading === 'whyChooseUsImageUrl' ? <Loader2 className="animate-spin" size={20} /> : <Upload size={20} />}
+                      <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'whyChooseUsImageUrl')} />
+                    </label>
+                  </div>
+                  {content.whyChooseUsImageUrl && (
+                    <div className="mt-4 aspect-video max-h-48 bg-gray-50 rounded-2xl overflow-hidden border border-gray-100">
+                      <img src={content.whyChooseUsImageUrl} alt="Advantage Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

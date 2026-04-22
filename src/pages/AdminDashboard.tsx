@@ -43,6 +43,7 @@ import AdminAnalytics from './admin/AdminAnalytics';
 import AdminDiary from './admin/AdminDiary';
 import AdminSuccessStories from './admin/AdminSuccessStories';
 import AdminClients from './admin/AdminClients';
+import AdminCandidateDetail from './admin/AdminCandidateDetail';
 import ErrorBoundary from '../components/ErrorBoundary';
 
 export default function AdminDashboard() {
@@ -280,6 +281,7 @@ export default function AdminDashboard() {
                 <Route path="/jobs" element={<AdminJobs />} />
                 <Route path="/applications" element={<AdminApplications />} />
                 <Route path="/candidates" element={<AdminCandidates />} />
+                <Route path="/candidates/:uid" element={<AdminCandidateDetail />} />
                 <Route path="/refunds" element={<AdminRefunds />} />
                 <Route path="/content" element={<AdminContent />} />
                 <Route path="/team" element={<AdminTeam />} />

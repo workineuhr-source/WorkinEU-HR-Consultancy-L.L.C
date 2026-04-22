@@ -98,6 +98,24 @@ const Section = ({ children, id, className, title, subtitle, tagline, image, dar
                 {subtitle}
               </motion.div>}
             </div>
+            
+            {image && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                className="relative rounded-[3rem] overflow-hidden shadow-2xl aspect-video lg:aspect-square"
+              >
+                <img 
+                  src={image} 
+                  alt={title || "Section visual"} 
+                  className="w-full h-full object-cover transition-transform duration-1000 hover:scale-105"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-gradient-to-tr from-brand-teal/20 to-transparent pointer-events-none"></div>
+              </motion.div>
+            )}
           </div>
         )}
         {children}
@@ -434,7 +452,7 @@ export default function HomePage() {
   return (
     <div className="overflow-hidden bg-white">
       {/* Hero Section */}
-      <section className="relative min-h-[80vh] flex items-center pt-24 pb-12 overflow-hidden bg-white dark:bg-[#020617]">
+      <section className="relative min-h-[90vh] flex items-center pt-24 pb-12 overflow-hidden bg-white dark:bg-[#020617]">
         <div className="absolute inset-0 z-0">
           <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-brand-teal/5 rounded-full blur-[120px] -mr-96 -mt-96"></div>
           <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-brand-rose/5 rounded-full blur-[120px] -ml-72 -mb-72"></div>
@@ -523,7 +541,7 @@ export default function HomePage() {
                 transition={{ duration: 1, delay: 0.2 }}
                 className="relative z-10"
               >
-                <div className="relative aspect-square lg:aspect-[4/5] max-w-[320px] lg:max-w-[420px] mx-auto rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white dark:border-[#020617] bg-slate-100 dark:bg-white/5">
+                <div className="relative aspect-square lg:aspect-[4/5] max-w-[500px] lg:max-w-[650px] mx-auto rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white dark:border-[#020617] bg-slate-100 dark:bg-white/5">
                   <AnimatePresence mode="wait">
                     <motion.img 
                       key={currentHeroIndex}
@@ -681,9 +699,6 @@ export default function HomePage() {
 
       {/* Scientific Professional Stats Transition */}
       <section className="py-24 bg-slate-900 overflow-hidden relative">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#2ab9b0_1px,transparent_1px)] [background-size:40px_40px]"></div>
-        </div>
         <div className="max-w-[1920px] mx-auto px-4 md:px-8 relative z-10">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
             {displayStats.map((stat, i) => (
@@ -894,6 +909,7 @@ export default function HomePage() {
           tagline={content.whyChooseUs?.title || "Competitive Edge"} 
           title={content.coreStrengthsTitle || "Our Core Strengths"} 
           subtitle={content.whyChooseUs?.description || "We combine local expertise with global reach to deliver unparalleled recruitment solutions."} 
+          image={content.whyChooseUsImageUrl}
           className="bg-slate-50/50 dark:bg-transparent"
         >
           {/* Professional HR Solutions Highlight - New Section Requested */}

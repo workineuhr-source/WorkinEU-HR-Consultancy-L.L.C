@@ -19,16 +19,25 @@ import {
   Printer,
   ChevronLeft,
   Loader2,
-  FileText
+  FileText,
+  Sparkles,
+  MessageCircle
 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
+import EuropassCV from '../components/EuropassCV';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export default function CandidateProfilePage() {
   const { uid } = useParams<{ uid: string }>();
   const [profile, setProfile] = useState<CandidateProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState<'classic' | 'modern' | 'professional' | 'elegant'>('classic');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [viewMode, setViewMode] = useState<'profile' | 'cv'>('profile');
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -54,6 +63,44 @@ export default function CandidateProfilePage() {
     window.print();
   };
 
+  const handleDownload = async (theme: 'classic' | 'modern' | 'professional' | 'elegant') => {
+    if (!profile) return;
+    setIsGenerating(true);
+    setSelectedTheme(theme);
+    
+    // We'll use a small timeout to let the hidden EuropassCV render with the right theme
+    setTimeout(async () => {
+      try {
+        const element = document.getElementById('europass-cv-download-template');
+        if (!element) throw new Error("Template not found");
+
+        const canvas = await html2canvas(element, {
+          scale: 4, // 4K/HD Quality
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff',
+          windowWidth: element.scrollWidth,
+          windowHeight: element.scrollHeight
+        });
+        
+        const imgData = canvas.toDataURL('image/png', 1.0);
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`Europass_CV_${profile.fullName.replace(/\s+/g, '_')}_${theme}.pdf`);
+        
+        setShowDownloadMenu(false);
+      } catch (error) {
+        console.error("PDF Generation Error:", error);
+      } finally {
+        setIsGenerating(false);
+      }
+    }, 600);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -76,38 +123,119 @@ export default function CandidateProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50 print:bg-white pb-20 pt-28 font-sans">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className={cn("mx-auto px-4 sm:px-6 lg:px-8", viewMode === 'cv' ? 'max-w-5xl' : 'max-w-4xl')}>
         
         {/* Header Actions */}
-        <div className="flex justify-between items-center mb-8 print:hidden">
-          <Link 
-            to={isOwner ? "/candidate/dashboard" : "/"} 
-            className="flex items-center gap-2 text-gray-500 hover:text-brand-blue font-bold transition-all group"
-          >
-            <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-            {isOwner ? "Back to Dashboard" : "Back to Website"}
-          </Link>
-          <button 
-            onClick={handlePrint}
-            className="bg-white text-brand-blue border border-gray-100 px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-brand-blue hover:text-white transition-all shadow-sm"
-          >
-            <Printer size={20} /> Print CV
-          </button>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 print:hidden">
+          <div className="flex items-center gap-4">
+            <Link 
+              to={isOwner ? "/candidate/dashboard" : "/"} 
+              className="flex items-center gap-2 text-gray-500 hover:text-brand-blue font-bold transition-all group"
+            >
+              <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+              {isOwner ? "Back to Dashboard" : "Back to Website"}
+            </Link>
+            <div className="h-6 w-px bg-gray-200"></div>
+            <div className="flex bg-white p-1 rounded-xl border border-gray-100 shadow-sm">
+              <button 
+                onClick={() => setViewMode('profile')}
+                className={cn(
+                  "px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all",
+                  viewMode === 'profile' ? "bg-brand-blue text-white shadow-md" : "text-gray-400 hover:text-brand-blue"
+                )}
+              >
+                Profile View
+              </button>
+              <button 
+                onClick={() => setViewMode('cv')}
+                className={cn(
+                  "px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all",
+                  viewMode === 'cv' ? "bg-brand-gold text-brand-blue shadow-md" : "text-gray-400 hover:text-brand-gold"
+                )}
+              >
+                CV Designer (HD)
+              </button>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <div className="relative flex-grow sm:flex-none">
+              <button 
+                onClick={() => setShowDownloadMenu(!showDownloadMenu)}
+                className="w-full sm:w-auto bg-brand-gold text-brand-blue px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-brand-blue hover:text-white transition-all shadow-lg shadow-brand-gold/20"
+              >
+                {isGenerating ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                Export {viewMode === 'cv' ? 'HD CV' : 'CV'}
+              </button>
+              
+              <AnimatePresence>
+                {showDownloadMenu && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 z-[60]"
+                  >
+                    <p className="px-4 py-2 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 mb-2">
+                       {viewMode === 'cv' ? 'Preview & Switch Theme' : 'Select Theme Format'}
+                    </p>
+                    <button onClick={() => { setSelectedTheme('classic'); viewMode === 'profile' && handleDownload('classic'); setShowDownloadMenu(false); }} className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-50 text-sm font-bold text-brand-blue flex items-center justify-between group">
+                      Classic Professional
+                      <span className={cn("w-2 h-2 rounded-full transition-opacity", selectedTheme === 'classic' ? 'bg-brand-blue opacity-100' : 'bg-brand-blue opacity-0 group-hover:opacity-100')}></span>
+                    </button>
+                    <button onClick={() => { setSelectedTheme('modern'); viewMode === 'profile' && handleDownload('modern'); setShowDownloadMenu(false); }} className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-50 text-sm font-bold text-slate-800 flex items-center justify-between group">
+                      Modern Tech (Slate)
+                      <span className={cn("w-2 h-2 rounded-full transition-opacity", selectedTheme === 'modern' ? 'bg-slate-800 opacity-100' : 'bg-slate-800 opacity-0 group-hover:opacity-100')}></span>
+                    </button>
+                    <button onClick={() => { setSelectedTheme('professional'); viewMode === 'profile' && handleDownload('professional'); setShowDownloadMenu(false); }} className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-50 text-sm font-bold text-brand-blue flex items-center justify-between group">
+                      Executive Blue
+                      <span className={cn("w-2 h-2 rounded-full transition-opacity", selectedTheme === 'professional' ? 'bg-brand-blue opacity-100' : 'bg-brand-blue opacity-0 group-hover:opacity-100')}></span>
+                    </button>
+                    <button onClick={() => { setSelectedTheme('elegant'); viewMode === 'profile' && handleDownload('elegant'); setShowDownloadMenu(false); }} className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-50 text-sm font-bold text-stone-600 flex items-center justify-between group">
+                      Premium Elegant
+                      <span className={cn("w-2 h-2 rounded-full transition-opacity", selectedTheme === 'elegant' ? 'bg-stone-400 opacity-100' : 'bg-stone-400 opacity-0 group-hover:opacity-100')}></span>
+                    </button>
+                    {viewMode === 'cv' && (
+                      <div className="mt-2 pt-2 border-t border-gray-50 p-2">
+                        <button 
+                          onClick={() => handleDownload(selectedTheme)}
+                          className="w-full bg-brand-blue text-white py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-brand-teal transition-all"
+                        >
+                          Generate 4K PDF
+                        </button>
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+            
+            <button 
+              onClick={handlePrint}
+              className="bg-white text-gray-500 border border-gray-100 px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-gray-50 transition-all shadow-sm group"
+            >
+              <Printer size={20} className="group-hover:text-brand-blue transition-colors" />
+            </button>
+          </div>
         </div>
 
-        {/* CV Container */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-gray-100 p-8 md:p-12 print:shadow-none print:border-none print:p-0"
-        >
-          {/* Top Section / Header */}
-          <div className="flex flex-col md:flex-row gap-8 items-center md:items-start border-b border-gray-100 pb-12 mb-12">
-            <div className="w-40 h-40 bg-gray-100 rounded-3xl overflow-hidden shadow-lg border-4 border-white shrink-0 relative group">
+        {/* Dynamic View Switcher */}
+        <AnimatePresence mode="wait">
+          {viewMode === 'profile' ? (
+            <motion.div 
+              key="profile-view"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-gray-100 p-8 md:p-12 print:shadow-none print:border-none print:p-0"
+            >
+          {/* Top Section / Header - Enhanced Europass Style */}
+          <div className="flex flex-col lg:flex-row gap-12 items-center lg:items-end border-b-4 border-[#004494] pb-14 mb-16 relative">
+            <div className="w-56 h-56 bg-white rounded-3xl overflow-hidden shadow-2xl border-[6px] border-[#004494] shrink-0 relative group -mt-20 lg:-mt-24">
               {profile.photoUrl ? (
                 <img src={profile.photoUrl} alt={profile.fullName} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-brand-blue text-white text-5xl font-bold">
+                <div className="w-full h-full flex items-center justify-center bg-brand-blue text-white text-7xl font-black">
                   {profile.fullName.charAt(0)}
                 </div>
               )}
@@ -117,36 +245,56 @@ export default function CandidateProfilePage() {
                   state={{ activeTab: 'profile' }}
                   className="absolute inset-0 bg-brand-blue/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-bold gap-2 text-center p-2"
                 >
-                  <User size={24} />
-                  Change Photo
+                  <User size={32} />
+                  Change Professional Photo
                 </Link>
               )}
             </div>
-            <div className="flex-grow text-center md:text-left">
-              <h1 className="text-4xl font-black text-brand-blue mb-4 tracking-tight">{profile.fullName}</h1>
-              <p className="text-brand-gold font-bold text-lg uppercase tracking-widest mb-6">{profile.experience || 'Professional Candidate'}</p>
+            <div className="flex-grow text-center lg:text-left space-y-4">
+              <h1 className="text-6xl font-black text-[#004494] mb-2 tracking-tighter uppercase">{profile.fullName}</h1>
+              <p className="inline-block bg-[#f5f7f9] text-[#004494] font-black text-2xl uppercase tracking-[0.2em] px-6 py-2 rounded-2xl border border-[#e1e8ed] shadow-sm">
+                {profile.experience || 'Professional Candidate'}
+              </p>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-500 font-medium">
-                <div className="flex items-center justify-center md:justify-start gap-3">
-                  <Mail size={18} className="text-brand-blue" />
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-8 text-slate-500 font-bold pt-4">
+                <div className="flex items-center gap-3 hover:text-[#004494] transition-colors">
+                  <Mail size={20} className="text-[#004494]" />
                   <span>{profile.email}</span>
                 </div>
                 {profile.phone && (
-                  <div className="flex items-center justify-center md:justify-start gap-3">
-                    <Phone size={18} className="text-brand-blue" />
+                  <div className="flex items-center gap-3 hover:text-[#004494] transition-colors">
+                    <Phone size={20} className="text-[#004494]" />
                     <span>{profile.phone}</span>
                   </div>
                 )}
-                {profile.nationality && (
-                  <div className="flex items-center justify-center md:justify-start gap-3">
-                    <Globe size={18} className="text-brand-blue" />
-                    <span>{profile.nationality}</span>
+                {profile.whatsapp && (
+                  <div className="flex items-center gap-3 hover:text-[#004494] transition-colors">
+                    <MessageCircle size={20} className="text-emerald-500" />
+                    <span>WhatsApp: {profile.whatsapp}</span>
                   </div>
                 )}
                 {profile.address && (
-                  <div className="flex items-center justify-center md:justify-start gap-3">
-                    <MapPin size={18} className="text-brand-blue" />
+                  <div className="flex items-center gap-3 hover:text-[#004494] transition-colors">
+                    <MapPin size={20} className="text-brand-gold" />
                     <span>{profile.address}</span>
+                  </div>
+                )}
+                {profile.nationality && (
+                  <div className="flex items-center gap-3 hover:text-[#004494] transition-colors">
+                    <Globe size={20} className="text-[#004494]" />
+                    <span>{profile.nationality}</span>
+                  </div>
+                )}
+                {profile.homeCountry && (
+                  <div className="flex items-center gap-3 hover:text-[#004494] transition-colors">
+                    <Globe size={20} className="text-brand-gold" />
+                    <span className="text-[#004494]">Origin: {profile.homeCountry}</span>
+                  </div>
+                )}
+                {profile.currentCountry && (
+                  <div className="flex items-center gap-3 hover:text-[#004494] transition-colors">
+                    <MapPin size={20} className="text-brand-teal" />
+                    <span className="text-[#004494]">Current: {profile.currentCountry}</span>
                   </div>
                 )}
               </div>
@@ -235,6 +383,58 @@ export default function CandidateProfilePage() {
                     </div>
                   )}
                 </div>
+              </section>
+
+              {/* Documents Section */}
+              <section className="bg-brand-blue/5 p-10 rounded-[3rem] border border-brand-blue/10">
+                <div className="flex items-center justify-between mb-8 border-b border-brand-blue/10 pb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white text-brand-blue rounded-2xl flex items-center justify-center shadow-lg shadow-brand-blue/5">
+                      <FileText size={24} />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-black text-brand-blue uppercase tracking-widest leading-none mb-1">Document Dossier</h3>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Verified Mission Attachments</p>
+                    </div>
+                  </div>
+                </div>
+                
+                {profile.documents && profile.documents.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {profile.documents.map((doc, i) => (
+                      <div key={i} className="bg-white p-6 rounded-[2rem] border border-gray-100 flex items-center justify-between group hover:border-brand-gold transition-all shadow-sm">
+                        <div className="flex items-center gap-4 overflow-hidden">
+                          <div className="w-12 h-12 bg-slate-50 text-brand-gold rounded-xl flex items-center justify-center shrink-0">
+                            <FileText size={24} />
+                          </div>
+                          <div className="overflow-hidden">
+                            <p className="text-sm font-black text-brand-blue truncate" title={doc.name}>
+                              {doc.name}
+                            </p>
+                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-wider">
+                              Added {new Date(doc.uploadedAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <a 
+                          href={doc.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="w-10 h-10 bg-brand-blue/5 text-brand-blue rounded-xl flex items-center justify-center hover:bg-brand-blue hover:text-white transition-all shadow-sm"
+                        >
+                          <Download size={18} />
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-16 text-center">
+                     <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-gray-200">
+                        <FileText className="text-gray-200" size={40} />
+                     </div>
+                     <p className="text-gray-400 font-bold italic text-sm">No documents attached to this profile.</p>
+                  </div>
+                )}
               </section>
             </div>
 
@@ -359,6 +559,53 @@ export default function CandidateProfilePage() {
             <p className="text-gray-400 text-[10px] uppercase font-bold tracking-widest">Generated by WorkinEU HR Management System</p>
           </div>
         </motion.div>
+          ) : (
+            <motion.div 
+              key="cv-designer"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="relative"
+            >
+              <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-brand-gold text-brand-blue px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg z-10">
+                Live 4K HD Preview Mode
+              </div>
+              <div className="bg-white rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] overflow-hidden border border-gray-100">
+                <div className="transform origin-top scale-[1.0] transition-transform duration-500">
+                   <EuropassCV id="europass-cv-live-preview" candidate={profile} theme={selectedTheme} />
+                </div>
+              </div>
+              
+              <div className="mt-8 flex flex-col items-center gap-4 text-center">
+                <p className="text-gray-400 text-xs font-medium max-w-sm">
+                  This is a live high-definition preview of your CV. Every detail is rendered with maximum precision for high-quality printing.
+                </p>
+                <div className="flex gap-4">
+                  <button 
+                    onClick={() => handleDownload(selectedTheme)}
+                    className="bg-brand-blue text-white px-10 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-brand-teal transition-all shadow-xl shadow-brand-blue/20 flex items-center gap-3"
+                  >
+                    {isGenerating ? <Loader2 className="animate-spin" size={20} /> : <Download size={20} />}
+                    Download HD PDF
+                  </button>
+                  <button 
+                    onClick={() => setViewMode('profile')}
+                    className="bg-white text-gray-500 border border-gray-200 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-gray-50 transition-all"
+                  >
+                    Close Preview
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Hidden CV For Download Generation */}
+
+        {/* Hidden CV For Download Generation */}
+        <div className="fixed -left-[10000px] top-0 pointer-events-none">
+          <EuropassCV id="europass-cv-download-template" candidate={profile} theme={selectedTheme} />
+        </div>
 
         {/* Floating Call to Action */}
         {isOwner && (

@@ -63,9 +63,15 @@ export default function AdminClients() {
       const url = await getDownloadURL(storageRef);
       setNewClient({ ...newClient, logoUrl: url });
       toast.success('Company logo uploaded!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload error:', error);
-      toast.error('Failed to upload logo');
+      let errorMessage = "Failed to upload logo";
+      if (error.code === 'storage/unauthorized') {
+        errorMessage = "Permission denied. Please ensure you are logged in as an administrator.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      toast.error(errorMessage);
     } finally {
       setUploading(false);
     }
@@ -231,19 +237,31 @@ export default function AdminClients() {
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Company Logo</label>
-                    <div className="flex gap-4">
-                      <div className="w-24 h-24 bg-gray-50 rounded-2xl border border-dashed border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
-                        {newClient.logoUrl && newClient.logoUrl !== "" ? (
-                          <img src={newClient.logoUrl} className="w-full h-full object-contain p-2" />
-                        ) : (
-                          <Building2 className="text-gray-300" size={32} />
-                        )}
+                    <div className="space-y-4">
+                      <div className="flex gap-4">
+                        <div className="w-24 h-24 bg-gray-50 rounded-2xl border border-dashed border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
+                          {newClient.logoUrl && newClient.logoUrl !== "" ? (
+                            <img src={newClient.logoUrl} className="w-full h-full object-contain p-2" />
+                          ) : (
+                            <Building2 className="text-gray-300" size={32} />
+                          )}
+                        </div>
+                        <label className="flex-grow bg-brand-blue/5 border border-brand-blue/10 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-brand-blue/10 transition-all">
+                          {uploading ? <Loader2 className="animate-spin text-brand-blue" /> : <Upload className="text-brand-blue mb-1" size={20} />}
+                          <span className="text-[10px] font-bold text-brand-blue uppercase font-sans">Upload Logo</span>
+                          <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} />
+                        </label>
                       </div>
-                      <label className="flex-grow bg-brand-blue/5 border border-brand-blue/10 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-brand-blue/10 transition-all">
-                        {uploading ? <Loader2 className="animate-spin text-brand-blue" /> : <Upload className="text-brand-blue mb-1" size={20} />}
-                        <span className="text-[10px] font-bold text-brand-blue uppercase">Upload Logo</span>
-                        <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} />
-                      </label>
+                      <div className="relative">
+                        <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                        <input 
+                          type="text"
+                          className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-xs"
+                          value={newClient.logoUrl || ''}
+                          onChange={(e) => setNewClient({ ...newClient, logoUrl: e.target.value })}
+                          placeholder="Or paste direct logo URL here..."
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>

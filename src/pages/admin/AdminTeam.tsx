@@ -74,10 +74,15 @@ export default function AdminTeam() {
       const url = await getDownloadURL(snapshot.ref);
       setFormData({ ...formData, photoUrl: url });
       toast.success("Photo uploaded!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error uploading photo:", error);
-      const errorMessage = error instanceof Error ? error.message : "Upload failed";
-      toast.error(`Upload failed: ${errorMessage}`);
+      let errorMessage = "Upload failed";
+      if (error.code === 'storage/unauthorized') {
+        errorMessage = "Permission denied. Please ensure you are logged in as an administrator.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      toast.error(errorMessage);
     } finally {
       setUploading(false);
     }
@@ -211,6 +216,7 @@ export default function AdminTeam() {
                   alt={member.name} 
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
+                  loading="lazy"
                 />
               )}
               <div className="absolute inset-0 bg-black/40 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
@@ -261,20 +267,37 @@ export default function AdminTeam() {
               </button>
             </div>
             <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6 overflow-y-auto">
-              <div className="flex flex-col items-center">
-                <label className="block text-xs md:text-sm font-bold text-gray-700 mb-4 uppercase tracking-widest">Photo (Optional)</label>
-                <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-gray-100 bg-gray-50 group">
-                  {formData.photoUrl ? (
-                    <img src={formData.photoUrl} alt="Preview" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-300">
-                      <User size={40} className="md:w-12 md:h-12" />
+              <div className="flex flex-col items-center gap-6">
+                <label className="block text-xs md:text-sm font-bold text-gray-700 uppercase tracking-widest">Team Member Identity</label>
+                <div className="flex flex-col sm:flex-row items-center gap-6 w-full">
+                  <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-gray-100 bg-gray-50 group shrink-0">
+                    {formData.photoUrl ? (
+                      <img src={formData.photoUrl} alt="Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-300">
+                        <User size={40} className="md:w-12 md:h-12" />
+                      </div>
+                    )}
+                    <label className="absolute inset-0 bg-black/40 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                      {uploading ? <Loader2 className="animate-spin text-white" /> : <Upload className="text-white" />}
+                      <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} />
+                    </label>
+                  </div>
+                  
+                  <div className="flex-grow w-full space-y-2">
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Manual Photo URL</label>
+                    <div className="relative">
+                      <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={16} />
+                      <input 
+                        type="text"
+                        className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold text-xs"
+                        value={formData.photoUrl}
+                        onChange={e => setFormData({...formData, photoUrl: e.target.value})}
+                        placeholder="Or paste direct photo URL here..."
+                      />
                     </div>
-                  )}
-                  <label className="absolute inset-0 bg-black/40 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
-                    {uploading ? <Loader2 className="animate-spin text-white" /> : <Upload className="text-white" />}
-                    <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} />
-                  </label>
+                    <p className="text-[9px] text-gray-400 italic px-1">Tip: You can use direct links from Facebook, LinkedIn, or external image hosts.</p>
+                  </div>
                 </div>
               </div>
 

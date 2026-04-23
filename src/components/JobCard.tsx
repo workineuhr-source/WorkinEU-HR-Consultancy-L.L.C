@@ -147,6 +147,7 @@ export default function JobCard({ job, onQuickApply }: JobCardProps) {
             alt={job.title} 
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
             referrerPolicy="no-referrer"
+            loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/90 via-[#020617]/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-700"></div>
           

@@ -1,8 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Briefcase, LayoutDashboard, MessageCircle, Sun, Moon } from 'lucide-react';
+import { Home, Briefcase, LayoutDashboard, MessageCircle, Sun, Moon, FileText } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion } from 'motion/react';
 import { useTheme } from '../context/ThemeContext';
+import { useState, useEffect } from 'react';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '../firebase';
+import { SiteContent } from '../types';
 
 interface MobileBottomNavProps {
   isAdmin: boolean;
@@ -12,13 +16,26 @@ interface MobileBottomNavProps {
 export default function MobileBottomNav({ isAdmin, onChatClick }: MobileBottomNavProps) {
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const [companyProfileUrl, setCompanyProfileUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, 'settings', 'siteContent'), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data() as SiteContent;
+        if (data.companyProfileUrl) {
+          setCompanyProfileUrl(data.companyProfileUrl);
+        }
+      }
+    });
+    return () => unsub();
+  }, []);
 
   const navItems = [
     { name: 'Home', path: '/', icon: <Home size={22} /> },
     { name: 'Jobs', path: '/jobs', icon: <Briefcase size={22} /> },
-    { name: 'Dashboard', path: isAdmin ? '/admin' : '/candidate/dashboard', icon: <LayoutDashboard size={22} /> },
-    { name: 'Theme', path: '#', icon: theme === 'dark' ? <Sun size={22} /> : <Moon size={22} />, onClick: toggleTheme },
+    { name: 'Profile', path: companyProfileUrl || '#', icon: <FileText size={22} />, external: true },
     { name: 'Chat', path: '#', icon: <MessageCircle size={22} />, onClick: onChatClick },
+    { name: 'Dashboard', path: isAdmin ? '/admin' : '/candidate/dashboard', icon: <LayoutDashboard size={22} /> },
   ];
 
   return (
@@ -49,7 +66,7 @@ export default function MobileBottomNav({ isAdmin, onChatClick }: MobileBottomNa
                 {item.icon}
               </div>
               <span className={cn(
-                "text-[9px] font-black uppercase tracking-[0.2em] relative z-10 transition-colors mt-1", 
+                "text-[9px] font-black uppercase tracking-[0.2em] relative z-10 transition-colors mt-1 items-center justify-center text-center", 
                 isActive ? "text-brand-gold" : "text-white/40 group-hover:text-white/60"
               )}>
                 {item.name}
@@ -67,6 +84,20 @@ export default function MobileBottomNav({ isAdmin, onChatClick }: MobileBottomNa
                 {content}
               </button>
             );
+          }
+
+          if (item.external) {
+            return (
+              <a
+                key={item.name}
+                href={item.path}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center justify-center p-3 rounded-2xl transition-all relative flex-1 min-w-0"
+              >
+                {content}
+              </a>
+            )
           }
 
           return (

@@ -217,42 +217,43 @@ export default function JobsPage() {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 min-h-screen py-32 relative overflow-hidden transition-colors duration-500">
+    <div className="bg-white dark:bg-[#020617] min-h-screen py-32 relative overflow-hidden transition-colors duration-500">
       {/* Background elements */}
-      <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-10 dark:opacity-20 pointer-events-none"></div>
-      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-brand-gold/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2 animate-pulse"></div>
+      <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-[0.03] dark:opacity-[0.05] pointer-events-none"></div>
+      <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-brand-teal/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2 animate-pulse"></div>
+      <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-brand-rose/5 rounded-full blur-[150px] translate-y-1/2 -translate-x-1/2 animate-pulse" style={{ animationDelay: '2s' }}></div>
       
-      <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-10 relative z-10">
+      <div className="max-w-[1920px] mx-auto px-4 md:px-12 lg:px-16 relative z-10">
         {/* Header */}
-        <div className="mb-32 text-center max-w-5xl mx-auto relative">
+        <div className="mb-32 text-center max-w-5xl mx-auto relative pt-10">
           <motion.div
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="absolute -top-20 left-1/2 -translate-x-1/2 w-40 h-40 bg-brand-gold/10 rounded-full blur-3xl pointer-events-none"
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            className="absolute -top-32 left-1/2 -translate-x-1/2 w-80 h-80 bg-brand-teal/10 rounded-full blur-[100px] pointer-events-none"
           ></motion.div>
           
           <motion.span 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-brand-gold font-bold uppercase tracking-[0.6em] mb-10 block text-sm"
+            className="text-brand-teal font-black uppercase tracking-[0.5em] mb-10 block text-[10px] md:text-xs"
           >
-            Premium Career Network
+            Verified Global Network
           </motion.span>
           <motion.h1 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-9xl lg:text-[10rem] font-bold text-slate-900 dark:text-white mb-8 md:mb-12 tracking-tighter leading-none"
+            className="text-6xl md:text-8xl lg:text-[10rem] font-black text-slate-900 dark:text-white mb-10 tracking-tight leading-[0.85]"
           >
-            Job <span className="text-brand-gold italic font-serif">Portal</span>
+            Job <span className="text-brand-teal italic font-serif">Market</span>
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-lg md:text-3xl font-light leading-relaxed mb-12 md:mb-16 max-w-4xl mx-auto text-slate-500 dark:text-slate-300"
+            className="text-lg md:text-2xl font-medium leading-relaxed mb-16 max-w-3xl mx-auto text-slate-600 dark:text-slate-300"
           >
-            Your gateway to the European labor market. Discover verified opportunities across 24+ countries.
+            Precision-guided international recruitment. Discover premium opportunities curated from across Europe and the Middle East.
           </motion.p>
 
           {/* Prominent Search Bar */}
@@ -263,40 +264,40 @@ export default function JobsPage() {
             className="max-w-5xl mx-auto mb-16 relative group px-4 md:px-0"
           >
             <div className="absolute -inset-1 bg-gradient-to-r from-brand-gold via-brand-gold/50 to-brand-gold rounded-3xl md:rounded-[3rem] blur-xl opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-            <div className="relative flex items-center bg-white dark:bg-slate-800/80 backdrop-blur-md rounded-3xl md:rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(15,23,42,0.1)] border border-slate-100 dark:border-white/10 overflow-hidden p-2 md:p-3">
-              <div className="pl-4 md:pl-8 text-slate-300 group-focus-within:text-brand-gold transition-colors">
-                <Search size={24} className="md:w-9 md:h-9" />
+            <div className="relative flex items-center bg-white dark:bg-[#0f172a]/80 backdrop-blur-3xl rounded-3xl md:rounded-[4rem] shadow-[0_60px_120px_-20px_rgba(15,23,42,0.15)] border border-slate-100 dark:border-white/5 overflow-hidden p-2 md:p-4">
+              <div className="pl-6 md:pl-12 text-slate-300 dark:text-slate-600 group-focus-within:text-brand-teal transition-colors">
+                <Search size={24} className="md:w-10 md:h-10" />
               </div>
               <input 
                 type="text" 
-                placeholder="Search jobs..."
-                className="w-full px-4 md:px-6 py-4 md:py-10 outline-none text-lg md:text-3xl font-medium text-slate-900 dark:text-white placeholder:text-slate-300 bg-transparent transition-colors"
+                placeholder="What career are you seeking?"
+                className="w-full px-6 md:px-10 py-6 md:py-12 outline-none text-xl md:text-4xl font-black text-slate-900 dark:text-white placeholder:text-slate-200 dark:placeholder:text-slate-700 bg-transparent transition-colors"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
               
-              <div className="flex items-center gap-4 pr-4">
+              <div className="flex items-center gap-4 pr-6">
                 {searchTerm && (
                   <button 
                     onClick={() => setSearchTerm('')}
-                    className="p-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-full text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                    className="p-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-3xl text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                   >
-                    <X size={24} />
+                    <X size={28} />
                   </button>
                 )}
-                <div className="h-12 w-px bg-slate-100 dark:bg-white/10 block"></div>
+                <div className="h-16 w-px bg-slate-100 dark:bg-white/10 hidden md:block"></div>
                 <div>
                   <motion.button 
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setShowFilters(!showFilters)}
                     className={cn(
-                      "px-6 md:px-12 py-4 md:py-7 rounded-2xl font-black text-sm md:text-xl transition-all flex items-center gap-2 md:gap-4 shadow-xl",
-                      showFilters ? "bg-brand-gold text-slate-900" : "bg-slate-900 dark:bg-brand-gold/10 text-white dark:text-brand-gold hover:bg-slate-800 dark:hover:bg-brand-gold/20"
+                      "px-8 md:px-16 py-6 md:py-10 rounded-[2.5rem] font-black text-xs md:text-sm transition-all flex items-center gap-3 md:gap-6 shadow-2xl uppercase tracking-[0.2em]",
+                      showFilters ? "bg-brand-teal text-white" : "bg-[#020617] dark:bg-brand-teal/10 text-white dark:text-brand-teal hover:bg-slate-800 dark:hover:bg-brand-teal/20"
                     )}
                   >
-                    <SlidersHorizontal size={18} className="md:w-7 md:h-7" />
-                    <span className="hidden sm:inline">Filters</span>
+                    <SlidersHorizontal size={20} className="md:w-6 md:h-6" />
+                    <span className="hidden sm:inline">Advanced Filters</span>
                   </motion.button>
                 </div>
               </div>

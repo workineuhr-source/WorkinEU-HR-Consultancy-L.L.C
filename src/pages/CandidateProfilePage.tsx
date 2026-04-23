@@ -273,8 +273,8 @@ export default function CandidateProfilePage() {
             </div>
             
             <div className="flex-grow text-center lg:text-left pt-4 overflow-hidden w-full">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#004494] mb-3 tracking-tighter uppercase whitespace-nowrap overflow-hidden text-ellipsis">
-                {profile.fullName}
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#004494] mb-3 tracking-tighter uppercase break-words">
+                {profile.fullName || 'Candidate Name'}
               </h1>
               
               <div className="inline-block bg-[#f5f7f9] text-[#004494] font-black text-lg lg:text-2xl uppercase tracking-widest px-6 py-2 rounded-2xl border border-[#e1e8ed] mb-6">

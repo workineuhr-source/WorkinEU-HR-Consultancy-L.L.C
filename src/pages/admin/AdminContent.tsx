@@ -700,7 +700,7 @@ export default function AdminContent() {
               { id: 'about', label: '8. Our Story & Legacy', icon: <Info size={18} /> },
               { id: 'partners', label: '9. Industry Leaders', icon: <Users2 size={18} /> },
               { id: 'contact', label: '10. Contact & Offices', icon: <Phone size={18} /> },
-              { id: 'visibility', label: '11. Visibility Controls', icon: <LayoutGrid size={18} /> },
+              { id: 'visibility', label: '11. Commander View', icon: <LayoutGrid size={18} /> },
               { id: 'styles', label: '12. Visual Styles', icon: <Zap size={18} /> },
               { id: 'assistants', label: '13. AI Support Bot', icon: <Bot size={18} /> },
             ].map((tab) => (

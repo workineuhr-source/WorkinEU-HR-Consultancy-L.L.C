@@ -6,6 +6,8 @@ import { Toaster } from 'sonner';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { SiteContent } from './types';
 
+import ScrollToTop from './components/ScrollToTop';
+
 // Pages
 import HomePage from './pages/HomePage';
 import JobsPage from './pages/JobsPage';
@@ -94,6 +96,20 @@ export default function App() {
         // Check default admin email
         if (currentUser.email === 'workineuhr@gmail.com') {
           setIsAdmin(true);
+          // Ensure they exist in the users collection with admin role
+          try {
+            const userRef = doc(db, 'users', currentUser.uid);
+            const userDoc = await getDoc(userRef);
+            if (!userDoc.exists() || userDoc.data().role !== 'admin') {
+              await setDoc(userRef, {
+                email: currentUser.email,
+                role: 'admin',
+                updatedAt: new Date()
+              }, { merge: true });
+            }
+          } catch (e) {
+            console.error("Auto-provisioning admin failed", e);
+          }
         } else {
           // Check role in Firestore
           try {
@@ -147,6 +163,7 @@ export default function App() {
   return (
     <ThemeProvider>
       <Router>
+        <ScrollToTop />
         <AppLayout user={user} isAdmin={isAdmin} />
         <Toaster position="top-right" richColors />
       </Router>

@@ -64,9 +64,15 @@ export default function AdminSuccessStories() {
       }
       
       toast.success(`${type === 'photo' ? 'Candidate photo' : 'Visa image'} uploaded!`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload error:', error);
-      toast.error('Failed to upload image');
+      let errorMessage = "Failed to upload image";
+      if (error.code === 'storage/unauthorized') {
+        errorMessage = "Permission denied. Please ensure you are logged in as an administrator.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      toast.error(errorMessage);
     } finally {
       setUploading(null);
     }
@@ -229,36 +235,55 @@ export default function AdminSuccessStories() {
                 <div className="space-y-6">
                   <div>
                     <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Candidate Photo</label>
-                    <div className="flex gap-4">
-                      <div className="w-24 h-24 bg-gray-50 rounded-2xl border border-dashed border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
-                        {newStory.candidatePhotoUrl && newStory.candidatePhotoUrl !== "" ? (
-                          <img src={newStory.candidatePhotoUrl} className="w-full h-full object-cover" />
-                        ) : (
-                          <ImageIcon className="text-gray-300" size={32} />
-                        )}
+                    <div className="space-y-3">
+                      <div className="flex gap-4">
+                        <div className="w-20 h-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
+                          {newStory.candidatePhotoUrl && newStory.candidatePhotoUrl !== "" ? (
+                            <img src={newStory.candidatePhotoUrl} className="w-full h-full object-cover" />
+                          ) : (
+                            <ImageIcon className="text-gray-300" size={24} />
+                          )}
+                        </div>
+                        <label className="flex-grow bg-brand-blue/5 border border-brand-blue/10 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-brand-blue/10 transition-all">
+                          {uploading === 'photo' ? <Loader2 className="animate-spin text-brand-blue" /> : <Upload className="text-brand-blue mb-1" size={18} />}
+                          <span className="text-[9px] font-bold text-brand-blue uppercase">Upload Photo</span>
+                          <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'photo')} />
+                        </label>
                       </div>
-                      <label className="flex-grow bg-brand-blue/5 border border-brand-blue/10 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-brand-blue/10 transition-all">
-                        {uploading === 'photo' ? <Loader2 className="animate-spin text-brand-blue" /> : <Upload className="text-brand-blue mb-1" size={20} />}
-                        <span className="text-[10px] font-bold text-brand-blue uppercase">Upload Photo</span>
-                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'photo')} />
-                      </label>
+                      <input 
+                        type="text"
+                        className="w-full px-3 py-2 rounded-xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-[10px]"
+                        value={newStory.candidatePhotoUrl || ''}
+                        onChange={(e) => setNewStory({ ...newStory, candidatePhotoUrl: e.target.value })}
+                        placeholder="Or Candidate Photo URL..."
+                      />
                     </div>
                   </div>
+
                   <div>
                     <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Visa Image</label>
-                    <div className="flex gap-4">
-                      <div className="w-24 h-24 bg-gray-50 rounded-2xl border border-dashed border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
-                        {newStory.visaImageUrl && newStory.visaImageUrl !== "" ? (
-                          <img src={newStory.visaImageUrl} className="w-full h-full object-cover" />
-                        ) : (
-                          <FileText className="text-gray-300" size={32} />
-                        )}
+                    <div className="space-y-3">
+                      <div className="flex gap-4">
+                        <div className="w-20 h-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
+                          {newStory.visaImageUrl && newStory.visaImageUrl !== "" ? (
+                            <img src={newStory.visaImageUrl} className="w-full h-full object-cover" />
+                          ) : (
+                            <FileText className="text-gray-300" size={24} />
+                          )}
+                        </div>
+                        <label className="flex-grow bg-brand-gold/5 border border-brand-gold/10 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-brand-gold/10 transition-all">
+                          {uploading === 'visa' ? <Loader2 className="animate-spin text-brand-gold" /> : <Upload className="text-brand-gold mb-1" size={18} />}
+                          <span className="text-[9px] font-bold text-brand-gold uppercase">Upload Visa</span>
+                          <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'visa')} />
+                        </label>
                       </div>
-                      <label className="flex-grow bg-brand-gold/5 border border-brand-gold/10 rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-brand-gold/10 transition-all">
-                        {uploading === 'visa' ? <Loader2 className="animate-spin text-brand-gold" /> : <Upload className="text-brand-gold mb-1" size={20} />}
-                        <span className="text-[10px] font-bold text-brand-gold uppercase">Upload Visa</span>
-                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'visa')} />
-                      </label>
+                      <input 
+                        type="text"
+                        className="w-full px-3 py-2 rounded-xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-[10px]"
+                        value={newStory.visaImageUrl || ''}
+                        onChange={(e) => setNewStory({ ...newStory, visaImageUrl: e.target.value })}
+                        placeholder="Or Visa Image URL..."
+                      />
                     </div>
                   </div>
                 </div>

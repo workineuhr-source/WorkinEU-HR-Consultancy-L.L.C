@@ -45,26 +45,26 @@ export default function AboutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pt-40 pb-32 relative overflow-hidden">
+    <div className="min-h-screen bg-white dark:bg-[#020617] pt-40 pb-32 relative overflow-hidden transition-colors duration-500">
       {/* Background elements */}
-      <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-20 pointer-events-none"></div>
-      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-brand-gold/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2 animate-pulse"></div>
-
+      <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-[0.03] dark:opacity-[0.05] pointer-events-none"></div>
+      <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-brand-teal/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2 animate-pulse"></div>
+      
       {/* Hero Section */}
       <section className="relative py-20 overflow-hidden z-10">
         <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 lg:gap-32 items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <span className="text-brand-gold font-bold uppercase tracking-[0.5em] mb-8 block text-xs">About WorkinEU</span>
-              <h1 className="text-6xl md:text-8xl font-bold text-slate-900 mb-10 tracking-tighter leading-none">
-                Empowering Global <br /> <span className="text-brand-gold italic">Careers</span>
+              <span className="text-brand-teal font-black uppercase tracking-[0.5em] mb-10 block text-[10px] md:text-xs">The WorkinEU Identity</span>
+              <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-slate-900 dark:text-white mb-12 tracking-tight leading-[0.85]">
+                Dubai Heart, <br /> <span className="text-brand-teal italic font-serif">Global</span> Reach
               </h1>
-              <p className="text-slate-500 text-2xl font-light leading-relaxed mb-12">
-                {content?.aboutUs || "WorkinEU is a premier recruitment agency dedicated to connecting skilled professionals with life-changing opportunities in Europe and the Gulf region. We believe in ethical recruitment, transparency, and building long-term success for both candidates and employers."}
+              <p className="text-slate-600 dark:text-slate-300 text-xl md:text-2xl font-medium leading-relaxed mb-16 max-w-2xl">
+                {content?.aboutUs || "WorkinEU Human Resources Consultancies LLC is a premier recruitment agency dedicated to connecting skilled professionals with life-changing opportunities across Europe and the Middle East."}
               </p>
               <div className="flex flex-wrap gap-6">
                 <Link to="/jobs" className="bg-slate-900 text-white px-12 py-6 rounded-2xl font-bold hover:bg-brand-gold hover:text-slate-900 transition-all shadow-2xl flex items-center gap-3 text-lg group">
@@ -81,23 +81,24 @@ export default function AboutPage() {
               transition={{ duration: 0.8 }}
               className="relative"
             >
-              <div className="aspect-square rounded-[5rem] overflow-hidden shadow-[0_60px_120px_-20px_rgba(15,23,42,0.3)] border-[16px] border-white relative z-10 group perspective-1000">
+              <div className="aspect-square lg:aspect-[4/5] rounded-[4rem] overflow-hidden shadow-[0_80px_160px_-30px_rgba(15,23,42,0.4)] border-[12px] border-white dark:border-[#0f172a] relative z-10 group bg-slate-100 dark:bg-white/5">
                 <img 
                   src={content?.aboutImageUrl || "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&q=80&w=1200"} 
                   alt="About Us" 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                   referrerPolicy="no-referrer"
+                  loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/60 via-transparent to-transparent"></div>
               </div>
               <motion.div 
                 animate={{ y: [0, -20, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -bottom-12 -left-12 bg-brand-gold p-12 rounded-[3rem] shadow-2xl z-20 hidden md:block border border-white/20"
+                className="absolute -bottom-16 -left-16 bg-brand-teal p-12 md:p-16 rounded-[3rem] shadow-2xl z-20 hidden md:block border-8 border-white dark:border-[#020617]"
               >
-                <div className="text-slate-900">
-                  <span className="text-6xl font-bold block mb-2 tracking-tighter">10+</span>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.3em]">Years of Expertise</span>
+                <div className="text-white">
+                  <span className="text-7xl font-black block mb-2 tracking-tighter">12+</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em]">Years of Excellence</span>
                 </div>
               </motion.div>
             </motion.div>
@@ -141,13 +142,14 @@ export default function AboutPage() {
       </section>
 
       {/* Values */}
-      <section className="py-40 bg-white relative z-10">
-        <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-12">
-          <div className="text-center max-w-4xl mx-auto mb-24">
-            <span className="text-brand-gold font-bold uppercase tracking-[0.5em] mb-8 block text-xs">Our Foundation</span>
-            <h2 className="text-5xl md:text-8xl font-bold text-slate-900 tracking-tighter">Core Values</h2>
+      <section className="py-40 bg-white dark:bg-[#020617]/50 relative z-10 overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-brand-teal/5 rounded-full blur-[150px] pointer-events-none"></div>
+        <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-12 relative">
+          <div className="text-center max-w-4xl mx-auto mb-32">
+            <span className="text-brand-teal font-black uppercase tracking-[0.5em] mb-10 block text-[10px] md:text-xs">Our Foundation</span>
+            <h2 className="text-6xl md:text-9xl font-black text-slate-900 dark:text-white tracking-tight">Core Values</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
             {(content?.values || [
               { title: 'Integrity', description: 'We uphold the highest standards of honesty and ethical behavior in all our interactions.' },
               { title: 'Transparency', description: 'Clear communication and no hidden agendas in our recruitment processes.' },
@@ -157,13 +159,14 @@ export default function AboutPage() {
               <motion.div 
                 key={i} 
                 whileHover={{ y: -10 }}
-                className="p-10 bg-slate-50 rounded-[3rem] border border-slate-100 hover:bg-white hover:shadow-2xl transition-all duration-500 group"
+                className="p-12 bg-slate-50 dark:bg-white/5 rounded-[4rem] border border-slate-100 dark:border-white/10 hover:bg-white dark:hover:bg-slate-900 hover:shadow-premium transition-all duration-700 group overflow-hidden"
               >
-                <div className="w-14 h-14 bg-white text-slate-900 rounded-2xl flex items-center justify-center mb-8 shadow-sm group-hover:bg-slate-900 group-hover:text-white transition-all">
-                  <CheckCircle2 size={28} />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-teal/5 rounded-bl-[4rem] -mr-10 -mt-10 group-hover:bg-brand-teal/10 transition-all"></div>
+                <div className="w-20 h-20 bg-[#020617] dark:bg-brand-teal text-white dark:text-[#020617] rounded-[1.5rem] flex items-center justify-center mb-12 shadow-xl group-hover:scale-110 transition-transform duration-500">
+                  <CheckCircle2 size={32} />
                 </div>
-                <h4 className="text-2xl font-bold text-slate-900 mb-4 tracking-tight">{value.title}</h4>
-                <p className="text-slate-500 text-base leading-relaxed font-light">{value.description}</p>
+                <h4 className="text-2xl font-black text-slate-900 dark:text-white mb-6 uppercase tracking-tight">{value.title}</h4>
+                <p className="text-slate-600 dark:text-slate-300 text-base leading-relaxed font-semibold">{value.description}</p>
               </motion.div>
             ))}
           </div>

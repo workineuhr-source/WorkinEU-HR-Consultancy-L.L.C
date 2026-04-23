@@ -36,14 +36,16 @@ import {
   Link,
   ArrowUp,
   Upload,
-  Camera
+  Camera,
+  Heart,
+  Baby
 } from 'lucide-react';
 import JobCard from '../components/JobCard';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { signOut } from 'firebase/auth';
+import { signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export default function CandidateDashboard() {
@@ -92,6 +94,55 @@ export default function CandidateDashboard() {
   const [newAlert, setNewAlert] = useState({ country: '', category: '', keywords: '' });
   const [categories, setCategories] = useState<string[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [whatsappLink, setWhatsappLink] = useState('https://wa.me/971501942811');
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [updatingPassword, setUpdatingPassword] = useState(false);
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+    
+    if (passwordData.newPassword.length < 6) {
+      toast.error("Password should be at least 6 characters");
+      return;
+    }
+
+    setUpdatingPassword(true);
+    const toastId = toast.loading("Updating password...");
+
+    try {
+      const user = auth.currentUser;
+      if (!user || !user.email) throw new Error("No user found");
+
+      // Re-authenticate
+      const credential = EmailAuthProvider.credential(user.email, passwordData.currentPassword);
+      await reauthenticateWithCredential(user, credential);
+
+      // Update password
+      await updatePassword(user, passwordData.newPassword);
+      
+      toast.success("Password updated successfully!", { id: toastId });
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (error: any) {
+      console.error("Password update error:", error);
+      let message = "Failed to update password";
+      if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        message = "Current password is incorrect";
+      } else if (error.code === 'auth/too-many-requests') {
+        message = "Too many failed attempts. Please try again later.";
+      }
+      toast.error(message, { id: toastId });
+    } finally {
+      setUpdatingPassword(false);
+    }
+  };
 
   const EDUCATION_LEVELS = [
     "High School",
@@ -122,6 +173,14 @@ export default function CandidateDashboard() {
         }
         if (data.jobCategories?.length) {
           setCategories(data.jobCategories);
+        }
+        if (data.whatsappNumber) {
+          // Robustly handle formatting - strip any non-numeric characters for the link
+          const cleanNumber = data.whatsappNumber.replace(/\D/g, '');
+          setWhatsappLink(`https://wa.me/${cleanNumber}`);
+        } else if (data.socialLinks?.whatsapp) {
+          const cleanNumber = data.socialLinks.whatsapp.replace(/\D/g, '');
+          setWhatsappLink(`https://wa.me/${cleanNumber}`);
         }
       }
     } catch (error) {
@@ -442,24 +501,28 @@ export default function CandidateDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 pt-20 pb-20 transition-colors duration-500">
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-10">
+    <div className="min-h-screen bg-white dark:bg-[#020617] pt-20 pb-20 transition-colors duration-500 relative overflow-hidden">
+      {/* Background elements */}
+      <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-[0.03] dark:opacity-[0.05] pointer-events-none"></div>
+      <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-brand-teal/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2 animate-pulse"></div>
+
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
         
         {/* Mobile Header */}
-        <div className="lg:hidden flex items-center justify-between mb-8 px-2">
+        <div className="lg:hidden flex items-center justify-between mb-8 px-2 pt-10">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-white dark:bg-slate-900 rounded-xl flex items-center justify-center shadow-lg border border-gray-100 dark:border-white/5 group-active:scale-95 transition-all">
-              <Home size={20} className="text-brand-teal" />
+            <div className="w-12 h-12 bg-white dark:bg-[#0f172a] rounded-2xl flex items-center justify-center shadow-2xl border border-slate-100 dark:border-white/5 group-active:scale-95 transition-all">
+              <Home size={22} className="text-brand-teal" />
             </div>
-            <span className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">Return Home</span>
+            <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-[0.2em]">Return Home</span>
           </Link>
           <div className="flex items-center gap-4">
-             <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-brand-teal/20 shadow-md">
+             <div className="w-12 h-12 rounded-2xl overflow-hidden border-4 border-brand-teal/20 shadow-2xl">
                 {profile.photoUrl ? (
                   <img src={profile.photoUrl} alt="User" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-brand-blue flex items-center justify-center text-white font-bold text-xs">
-                    {profile.fullName.charAt(0)}
+                  <div className="w-full h-full bg-[#020617] dark:bg-brand-teal flex items-center justify-center text-white dark:text-[#020617] font-black text-lg">
+                    {(profile.fullName || 'C').charAt(0)}
                   </div>
                 )}
              </div>
@@ -467,8 +530,8 @@ export default function CandidateDashboard() {
         </div>
 
         {/* Mobile Tab Selector */}
-        <div className="lg:hidden mb-6 overflow-x-auto no-scrollbar">
-          <div className="flex gap-2 min-w-max pb-2">
+        <div className="lg:hidden mb-10 overflow-x-auto no-scrollbar">
+          <div className="flex gap-3 min-w-max pb-2 px-2">
             {[
               { id: 'overview', name: 'Overview', icon: <User size={18} /> },
               { id: 'documents', name: 'Documents', icon: <FileText size={18} /> },
@@ -489,10 +552,10 @@ export default function CandidateDashboard() {
                   }
                 }}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-full transition-all font-bold text-xs whitespace-nowrap",
+                  "flex items-center gap-3 px-6 py-4 rounded-2xl transition-all font-black text-[10px] uppercase tracking-widest whitespace-nowrap border shadow-2xl",
                   activeTab === item.id 
-                    ? "bg-brand-gold text-brand-blue shadow-md" 
-                    : "bg-white dark:bg-slate-900 text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-white/5"
+                    ? "bg-brand-teal text-[#020617] border-brand-teal/20" 
+                    : "bg-white dark:bg-[#0f172a] text-slate-500 dark:text-slate-400 border-slate-100 dark:border-white/5"
                 )}
               >
                 {item.icon}
@@ -512,12 +575,12 @@ export default function CandidateDashboard() {
                 <div className="relative z-10">
                   <div className="w-28 h-28 bg-white dark:bg-slate-800 rounded-[2rem] flex items-center justify-center mx-auto mb-6 text-4xl font-black overflow-hidden border-4 border-brand-teal/20 shadow-2xl">
                     {profile.photoUrl ? (
-                      <img src={profile.photoUrl} alt={profile.fullName} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      <img src={profile.photoUrl} alt={profile.fullName || 'Candidate'} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
-                      profile.fullName.charAt(0)
+                      (profile.fullName || 'C').charAt(0)
                     )}
                   </div>
-                  <h2 className="text-2xl font-black tracking-tight">{profile.fullName}</h2>
+                  <h2 className="text-2xl font-black tracking-tight">{profile.fullName || 'Candidate Name'}</h2>
                   <p className="text-brand-teal text-[10px] font-black uppercase tracking-[0.2em] mt-2">Candidate Profile</p>
                 </div>
               </div>
@@ -579,7 +642,7 @@ export default function CandidateDashboard() {
                 <p className="text-brand-teal font-black text-[10px] uppercase tracking-[0.3em] mb-4">Support Center</p>
                 <h3 className="text-2xl font-black mb-4 tracking-tight">Need Help?</h3>
                 <p className="text-slate-200 text-sm mb-8 font-medium leading-relaxed">Our world-class support team is here to assist your global journey.</p>
-                <a href="https://wa.me/971501942811" className="w-full bg-white text-[#020617] px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-brand-teal hover:text-white transition-all shadow-xl">
+                <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="w-full bg-white text-[#020617] px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-brand-teal hover:text-white transition-all shadow-xl">
                   <Globe size={18} /> WhatsApp Support
                 </a>
               </div>
@@ -595,45 +658,45 @@ export default function CandidateDashboard() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  className="space-y-8"
+                  className="space-y-10"
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="md:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-white/5 relative overflow-hidden group">
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-brand-gold/10 transition-all"></div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="md:col-span-2 bg-white dark:bg-[#0f172a] p-10 rounded-[3rem] shadow-premium border border-slate-100 dark:border-white/5 relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-brand-teal/5 rounded-full -mr-32 -mt-32 blur-[80px] group-hover:bg-brand-teal/10 transition-all"></div>
                       <div className="relative z-10">
-                        <div className="flex justify-between items-end mb-4">
+                        <div className="flex justify-between items-end mb-8">
                           <div>
-                            <p className="text-[10px] font-black text-slate-500 dark:text-slate-300 uppercase tracking-widest mb-1">CV Readiness</p>
-                            <h4 className="text-2xl font-black text-brand-blue dark:text-white">Profile Strength</h4>
+                            <p className="text-[10px] font-black text-slate-400 dark:text-brand-teal uppercase tracking-[0.3em] mb-2">Talent Readiness Index</p>
+                            <h4 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight">Profile Integrity</h4>
                           </div>
-                          <p className="text-4xl font-black text-brand-gold">{calculateCompleteness()}%</p>
+                          <p className="text-5xl md:text-7xl font-black text-brand-teal">{calculateCompleteness()}%</p>
                         </div>
-                        <div className="w-full h-4 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden mb-6 shadow-inner">
+                        <div className="w-full h-6 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-10 shadow-inner">
                           <motion.div 
                             initial={{ width: 0 }}
                             animate={{ width: `${calculateCompleteness()}%` }}
-                            transition={{ duration: 1, ease: "easeOut" }}
-                            className="h-full bg-gradient-to-r from-brand-blue to-brand-gold shadow-lg"
+                            transition={{ duration: 1.5, ease: "easeOut" }}
+                            className="h-full bg-brand-teal shadow-[0_0_20px_rgba(45,212,191,0.5)]"
                           />
                         </div>
-                        <div className="flex flex-wrap gap-3">
+                        <div className="flex flex-wrap gap-4 items-center">
                           {calculateCompleteness() < 100 ? (
-                            <p className="text-sm font-medium text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                              <Sparkles size={16} className="text-brand-gold" />
-                              Tip: {calculateCompleteness() < 50 ? "Add your work & education history" : "Add some skills and a photo"} to stand out!
+                            <p className="text-sm font-bold text-slate-600 dark:text-slate-300 flex items-center gap-3">
+                              <Sparkles size={20} className="text-brand-teal animate-pulse" />
+                              Strategic Insight: {calculateCompleteness() < 50 ? "Finalize experience metadata" : "Add professional skills and imagery"} to optimize discovery.
                             </p>
                           ) : (
-                            <p className="text-sm font-bold text-green-500 flex items-center gap-2">
-                              <CheckCircle2 size={16} />
-                              Excellent! Your profile is highly competitive.
+                            <p className="text-sm font-black text-brand-teal flex items-center gap-3 uppercase tracking-widest">
+                              <CheckCircle2 size={24} />
+                              Profile is Enterprise-Ready
                             </p>
                           )}
                           {calculateCompleteness() < 100 && (
                             <button 
                               onClick={() => setActiveTab('profile')}
-                              className="text-xs font-black text-brand-blue dark:text-brand-gold uppercase tracking-widest hover:underline"
+                              className="text-[10px] font-black text-brand-teal uppercase tracking-[0.2em] px-4 py-2 bg-brand-teal/10 rounded-xl hover:bg-brand-teal hover:text-white transition-all ml-auto"
                             >
-                              Complete Now →
+                              Optimize Now
                             </button>
                           )}
                         </div>
@@ -641,15 +704,15 @@ export default function CandidateDashboard() {
                     </div>
                     <Link 
                       to={`/candidate/profile/${profile?.uid}`}
-                      className="relative bg-brand-blue dark:bg-brand-gold p-8 rounded-3xl shadow-xl flex flex-col items-center justify-center text-center transition-all hover:scale-[1.02] active:scale-95 group overflow-hidden"
+                      className="relative bg-[#020617] dark:bg-brand-teal p-10 rounded-[3rem] shadow-premium flex flex-col items-center justify-center text-center transition-all hover:scale-[1.02] active:scale-95 group overflow-hidden border border-white/5"
                     >
-                      <div className="absolute inset-0 bg-mesh opacity-10"></div>
+                      <div className="absolute inset-0 bg-mesh opacity-20"></div>
                       <div className="relative z-10 flex flex-col items-center">
-                        <div className="w-16 h-16 bg-white/20 text-white dark:text-brand-blue rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg backrop-blur-md">
-                          <User size={32} />
+                        <div className="w-20 h-20 bg-white/10 text-white dark:text-[#020617] rounded-[1.5rem] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-2xl backdrop-blur-xl border border-white/20">
+                          <Download size={36} />
                         </div>
-                        <h4 className="text-white dark:text-brand-blue font-black text-xs uppercase tracking-widest">Live Profile</h4>
-                        <p className="text-white/80 dark:text-brand-blue/80 text-[10px] font-bold mt-1">View your full CV page</p>
+                        <h4 className="text-white dark:text-[#020617] font-black text-[10px] uppercase tracking-[0.4em] mb-1">Export Identity</h4>
+                        <p className="text-brand-teal dark:text-[#020617]/70 text-[10px] font-black uppercase tracking-widest">View Europass CV</p>
                       </div>
                     </Link>
                   </div>
@@ -1551,17 +1614,17 @@ export default function CandidateDashboard() {
                   exit={{ opacity: 0, y: -20 }}
                   className="space-y-8"
                 >
-                  <h3 className="text-2xl font-bold text-brand-blue">Edit Profile</h3>
+                  <h3 className="text-2xl font-bold text-brand-blue dark:text-white">Edit Profile</h3>
                   
                   {/* Photo Upload Section */}
                   <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-white/5">
                     <div className="flex flex-col md:flex-row items-center gap-8">
                       <div className="relative group">
-                        <div className="w-32 h-32 bg-gray-100 dark:bg-slate-800 rounded-3xl flex items-center justify-center text-4xl font-bold text-gray-400 dark:text-gray-500 overflow-hidden border-2 border-gray-100 dark:border-slate-700 group-hover:border-brand-gold transition-all">
+                        <div className="w-32 h-32 bg-gray-100 dark:bg-slate-800 rounded-3xl flex items-center justify-center text-4xl font-bold text-gray-400 dark:text-white overflow-hidden border-2 border-gray-100 dark:border-slate-700 group-hover:border-brand-gold transition-all">
                           {profile.photoUrl ? (
-                            <img src={profile.photoUrl} alt={profile.fullName} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                            <img src={profile.photoUrl} alt={profile.fullName || 'Candidate'} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                           ) : (
-                            profile.fullName.charAt(0)
+                            (profile.fullName || 'C').charAt(0)
                           )}
                           {uploadingPhoto && (
                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
@@ -1635,7 +1698,7 @@ export default function CandidateDashboard() {
                   <div className="bg-white dark:bg-slate-900 p-8 md:p-10 rounded-3xl shadow-sm border border-gray-100 dark:border-white/5">
                     <form onSubmit={handleUpdateProfile} className="space-y-8">
                       <div className="pt-4 pb-8 border-b border-gray-100 dark:border-white/5">
-                        <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4">About Me / Professional Introduction</label>
+                        <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4">About Me / Professional Introduction</label>
                         <textarea 
                           rows={4}
                           className="w-full px-4 py-3 rounded-2xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white leading-relaxed font-medium"
@@ -1647,7 +1710,7 @@ export default function CandidateDashboard() {
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
-                          <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Full Name</label>
+                          <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Full Name</label>
                           <div className="relative">
                             <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-600" size={20} />
                             <input 
@@ -1660,7 +1723,7 @@ export default function CandidateDashboard() {
                           </div>
                         </div>
                         <div>
-                          <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Email Address</label>
+                          <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Email Address</label>
                           <div className="relative">
                             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-600" size={20} />
                             <input 
@@ -1672,7 +1735,7 @@ export default function CandidateDashboard() {
                           </div>
                         </div>
                         <div>
-                          <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Phone Number</label>
+                          <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Phone Number</label>
                           <div className="relative">
                             <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-600" size={20} />
                             <input 
@@ -1685,20 +1748,7 @@ export default function CandidateDashboard() {
                           </div>
                         </div>
                         <div>
-                          <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Passport Number</label>
-                          <div className="relative">
-                            <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-600" size={20} />
-                            <input 
-                              type="text" 
-                              className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
-                              placeholder="A1234567"
-                              value={profile.passportNumber || ''}
-                              onChange={(e) => setProfile({ ...profile, passportNumber: e.target.value })}
-                            />
-                          </div>
-                        </div>
-                        <div>
-                          <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Nationality</label>
+                          <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Nationality</label>
                           <div className="relative">
                             <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-600" size={20} />
                             <input 
@@ -1715,7 +1765,7 @@ export default function CandidateDashboard() {
                           </div>
                         </div>
                         <div>
-                          <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Highest Education</label>
+                          <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Highest Education</label>
                           <div className="relative">
                             <FileText className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-600" size={20} />
                             <input 
@@ -1732,7 +1782,7 @@ export default function CandidateDashboard() {
                           </div>
                         </div>
                         <div>
-                          <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Experience</label>
+                          <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Experience</label>
                           <div className="relative">
                             <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-600" size={20} />
                             <input 
@@ -1749,7 +1799,7 @@ export default function CandidateDashboard() {
                           </div>
                         </div>
                         <div>
-                          <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Profile Intel / Metadata</label>
+                          <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Profile Intel / Metadata</label>
                           <div className="relative">
                             <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-600" size={20} />
                             <input 
@@ -1762,13 +1812,34 @@ export default function CandidateDashboard() {
                           </div>
                         </div>
                       </div>
-
-                      {/* Identity & Family Section */}
+                                 {/* Identity & Family Section */}
                       <div className="pt-8 border-t border-gray-100 dark:border-white/5">
-                        <h4 className="text-lg font-bold text-brand-blue dark:text-white mb-6">Identity & Family Details</h4>
+                        <div className="flex items-center gap-4 mb-8">
+                          <div className="p-3 bg-purple-50 dark:bg-purple-500/10 text-purple-500 rounded-2xl">
+                            <ShieldCheck size={20} />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-black text-slate-800 dark:text-white">Identity & Family Details</h3>
+                            <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Passport & Family Information</p>
+                          </div>
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                           <div>
-                            <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Passport Issue Date</label>
+                            <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Passport Number</label>
+                            <div className="relative">
+                              <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-600" size={20} />
+                              <input 
+                                type="text" 
+                                className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
+                                placeholder="A1234567"
+                                value={profile.passportNumber || ''}
+                                onChange={(e) => setProfile({ ...profile, passportNumber: e.target.value })}
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Passport Issue Date</label>
                             <input 
                               type="date" 
                               className="w-full px-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
@@ -1777,7 +1848,7 @@ export default function CandidateDashboard() {
                             />
                           </div>
                           <div>
-                            <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Passport Expiry Date</label>
+                            <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Passport Expiry Date</label>
                             <input 
                               type="date" 
                               className="w-full px-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
@@ -1786,18 +1857,21 @@ export default function CandidateDashboard() {
                             />
                           </div>
                           <div>
-                            <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Passport Issue Country</label>
-                            <input 
-                              type="text" 
-                              list="nationality-options"
-                              className="w-full px-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
-                              placeholder="e.g. Nepal"
-                              value={profile.passportIssueCountry || ''}
-                              onChange={(e) => setProfile({ ...profile, passportIssueCountry: e.target.value })}
-                            />
+                            <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Passport Issue Country</label>
+                            <div className="relative">
+                              <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-600" size={20} />
+                              <input 
+                                type="text" 
+                                list="country-options"
+                                className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
+                                placeholder="e.g. Nepal"
+                                value={profile.passportIssueCountry || ''}
+                                onChange={(e) => setProfile({ ...profile, passportIssueCountry: e.target.value })}
+                              />
+                            </div>
                           </div>
                           <div>
-                            <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Father's Name</label>
+                            <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Father's Name</label>
                             <input 
                               type="text" 
                               className="w-full px-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
@@ -1807,7 +1881,7 @@ export default function CandidateDashboard() {
                             />
                           </div>
                           <div>
-                            <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Mother's Name</label>
+                            <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Mother's Name</label>
                             <input 
                               type="text" 
                               className="w-full px-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
@@ -1815,6 +1889,62 @@ export default function CandidateDashboard() {
                               value={profile.motherName || ''}
                               onChange={(e) => setProfile({ ...profile, motherName: e.target.value })}
                             />
+                          </div>
+
+                          {/* New Family Fields */}
+                          <div>
+                            <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Wife's Full Name</label>
+                            <div className="relative">
+                              <Heart className="absolute left-4 top-1/2 -translate-y-1/2 text-rose-500" size={20} />
+                              <input 
+                                type="text" 
+                                className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
+                                placeholder="Wife's Name"
+                                value={profile.wifeName || ''}
+                                onChange={(e) => setProfile({ ...profile, wifeName: e.target.value })}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="md:col-span-2 lg:col-span-3">
+                            <div className="flex justify-between items-center mb-4">
+                              <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Children's Names</label>
+                              <button 
+                                type="button"
+                                onClick={() => setProfile({ ...profile, childrenNames: [...(profile.childrenNames || []), ''] })}
+                                className="text-brand-gold font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:underline"
+                              >
+                                <Plus size={14} /> Add Child
+                              </button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {(profile.childrenNames || []).map((child, idx) => (
+                                <div key={idx} className="relative">
+                                  <Baby className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-teal" size={18} />
+                                  <input 
+                                    type="text" 
+                                    className="w-full pl-12 pr-10 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white text-sm"
+                                    placeholder={`Child #${idx + 1}`}
+                                    value={child}
+                                    onChange={(e) => {
+                                      const newChildren = [...(profile.childrenNames || [])];
+                                      newChildren[idx] = e.target.value;
+                                      setProfile({ ...profile, childrenNames: newChildren });
+                                    }}
+                                  />
+                                  <button 
+                                    type="button"
+                                    onClick={() => {
+                                      const newChildren = (profile.childrenNames || []).filter((_, i) => i !== idx);
+                                      setProfile({ ...profile, childrenNames: newChildren });
+                                    }}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors"
+                                  >
+                                    <X size={14} />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -1927,7 +2057,7 @@ export default function CandidateDashboard() {
                                   ))}
                                 </select>
                                 <div className="flex flex-col gap-2">
-                                  <div className="flex justify-between items-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                  <div className="flex justify-between items-center text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                                     <span>Proficiency</span>
                                     <span className="text-brand-blue dark:text-brand-gold">{lang.proficiency || 0}%</span>
                                   </div>
@@ -2172,31 +2302,31 @@ export default function CandidateDashboard() {
                         <h4 className="text-lg font-bold text-brand-blue dark:text-white mb-6">Processing & Deployment Information</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                           <div>
-                            <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Document Processing</label>
+                            <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Document Processing</label>
                             <div className="px-4 py-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-white/5 text-brand-blue dark:text-white font-bold capitalize">
                               {profile.documentProcessingStatus || 'Pending'}
                             </div>
                           </div>
                           <div>
-                            <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Work Permit Status</label>
+                            <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Work Permit Status</label>
                             <div className="px-4 py-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-white/5 text-brand-blue dark:text-white font-bold capitalize">
                               {profile.workPermitStatus || 'Pending'}
                             </div>
                           </div>
                           <div>
-                            <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Visa Status</label>
+                            <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Visa Status</label>
                             <div className="px-4 py-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-white/5 text-brand-blue dark:text-white font-bold capitalize">
                               {profile.visaStatus || 'Pending'}
                             </div>
                           </div>
                           <div>
-                            <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Joining Date</label>
+                            <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Joining Date</label>
                             <div className="px-4 py-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-white/5 text-brand-blue dark:text-white font-bold">
                               {profile.joiningDate || 'To be announced'}
                             </div>
                           </div>
                           <div>
-                            <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Expected Arrival</label>
+                            <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Expected Arrival</label>
                             <div className="px-4 py-3 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-white/5 text-brand-blue dark:text-white font-bold">
                               {profile.expectedArrivalDate || 'To be announced'}
                             </div>
@@ -2212,6 +2342,59 @@ export default function CandidateDashboard() {
                           className="bg-brand-blue dark:bg-brand-gold text-white dark:text-brand-blue px-12 py-4 rounded-xl font-black uppercase tracking-[0.2em] hover:scale-105 transition-all shadow-xl disabled:opacity-50 active:scale-95"
                         >
                           {isUpdating ? <Loader2 className="animate-spin" size={24} /> : 'Save Changes'}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+
+                  {/* Security & Password Section */}
+                  <div className="bg-white dark:bg-slate-900 p-8 md:p-10 rounded-3xl shadow-sm border border-gray-100 dark:border-white/5 mt-8">
+                    <h3 className="text-xl font-bold text-brand-blue dark:text-white mb-6 flex items-center gap-2">
+                      <ShieldCheck className="text-brand-gold" size={24} /> Security & Password
+                    </h3>
+                    <form onSubmit={handlePasswordChange} className="space-y-6 max-w-xl">
+                      <div>
+                        <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Current Password</label>
+                        <input 
+                          type="password" 
+                          required
+                          className="w-full px-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
+                          value={passwordData.currentPassword}
+                          onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                          placeholder="••••••••"
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">New Password</label>
+                          <input 
+                            type="password" 
+                            required
+                            className="w-full px-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
+                            value={passwordData.newPassword}
+                            onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                            placeholder="Min. 6 chars"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Confirm New Password</label>
+                          <input 
+                            type="password" 
+                            required
+                            className="w-full px-4 py-3 rounded-xl border border-gray-100 dark:border-white/5 bg-transparent outline-none focus:border-brand-gold transition-all dark:text-white"
+                            value={passwordData.confirmPassword}
+                            onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                            placeholder="Confirm password"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex justify-end pt-4">
+                        <button 
+                          type="submit"
+                          disabled={updatingPassword}
+                          className="bg-brand-blue dark:bg-brand-gold text-white dark:text-brand-blue px-10 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] md:text-xs hover:scale-105 transition-all shadow-lg active:scale-95 disabled:opacity-50"
+                        >
+                          {updatingPassword ? <Loader2 className="animate-spin" size={20} /> : 'Update Password'}
                         </button>
                       </div>
                     </form>

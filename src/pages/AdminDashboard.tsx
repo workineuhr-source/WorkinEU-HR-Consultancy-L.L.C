@@ -20,7 +20,8 @@ import {
   Globe,
   RotateCcw,
   BarChart3,
-  Home
+  Home,
+  Lock
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
@@ -45,6 +46,7 @@ import AdminSuccessStories from './admin/AdminSuccessStories';
 import AdminClients from './admin/AdminClients';
 import AdminCandidateDetail from './admin/AdminCandidateDetail';
 import AdminSystemSettings from './admin/AdminSystemSettings';
+import AdminAccount from './admin/AdminAccount';
 import ErrorBoundary from '../components/ErrorBoundary';
 
 export default function AdminDashboard() {
@@ -118,6 +120,7 @@ export default function AdminDashboard() {
     { name: 'User Reviews', path: '/admin/reviews', icon: <Clock size={20} /> },
     { name: 'Contact Messages', path: '/admin/messages', icon: <MessageCircle size={20} /> },
     { name: 'Manage Team', path: '/admin/team', icon: <Users size={20} /> },
+    { name: 'My Account', path: '/admin/account', icon: <Lock size={20} /> },
     { name: 'System Settings', path: '/admin/settings', icon: <Settings size={20} /> },
   ];
 
@@ -261,7 +264,7 @@ export default function AdminDashboard() {
             
             <div className="h-10 w-px bg-gray-100 dark:bg-white/5 hidden sm:block"></div>
 
-            <div className="flex items-center gap-4 group cursor-pointer">
+            <Link to="/admin/account" className="flex items-center gap-4 group cursor-pointer">
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-bold text-brand-blue dark:text-white group-hover:text-brand-gold transition-colors">WorkinEU Admin</p>
                 <p className="text-[10px] text-brand-gold font-bold uppercase tracking-widest">Super Admin</p>
@@ -269,7 +272,7 @@ export default function AdminDashboard() {
               <div className="w-12 h-12 bg-gradient-to-br from-brand-blue to-blue-900 dark:from-brand-gold dark:to-yellow-700 text-white dark:text-brand-blue rounded-2xl flex items-center justify-center font-bold shadow-xl shadow-brand-blue/20 dark:shadow-brand-gold/10 group-hover:scale-105 transition-transform">
                 WA
               </div>
-            </div>
+            </Link>
           </div>
         </header>
 
@@ -292,6 +295,7 @@ export default function AdminDashboard() {
                 <Route path="/clients" element={<AdminClients />} />
                 <Route path="/reviews" element={<AdminReviews />} />
                 <Route path="/messages" element={<AdminContactMessages />} />
+                <Route path="/account" element={<AdminAccount />} />
                 <Route path="/settings" element={<AdminSystemSettings />} />
               </Routes>
             </ErrorBoundary>

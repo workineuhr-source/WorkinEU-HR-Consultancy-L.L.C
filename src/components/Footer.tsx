@@ -52,6 +52,9 @@ export default function Footer() {
           whatsapp: data.whatsappNumber?.replace(/\D/g, '') || '971501942811',
           branchOffices: data.branchOffices || []
         });
+        if (data.socialLinks) {
+          setSocialLinks(data.socialLinks);
+        }
       }
     }, (err) => console.error("Footer site content listener error:", err));
 

@@ -129,6 +129,8 @@ export interface CandidateProfile {
   passportIssueCountry?: string;
   fatherName?: string;
   motherName?: string;
+  wifeName?: string;
+  childrenNames?: string[];
   nationality?: string;
   experience?: string;
   education?: string;

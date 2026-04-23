@@ -116,53 +116,49 @@ export default function EuropassCV({ candidate, id, theme = 'classic' }: Europas
              </div>
           )}
           <h1 className={cn(
-            "text-6xl font-black mb-3 uppercase tracking-tight leading-none", 
+            "text-4xl md:text-5xl font-black mb-4 uppercase tracking-tight leading-none whitespace-nowrap", 
             theme === 'professional' ? 'text-white' : styles.accentText
           )}>
-            {candidate.fullName}
+            {candidate.fullName || 'Professional Candidate'}
           </h1>
-          <div className="flex flex-col gap-1">
-            <p className={cn("text-2xl font-black py-1 rounded-lg inline-block uppercase tracking-widest", theme === 'professional' ? 'text-blue-100' : 'text-[#004494]')}>
+          
+          <div className="flex flex-col gap-3">
+            <p className={cn("text-xl font-black py-1 rounded-lg inline-block uppercase tracking-widest", theme === 'professional' ? 'text-blue-100' : 'text-[#004494]')}>
               {candidate.experience || 'Professional Candidate'}
             </p>
-            {/* Direct Contact info under Title for better flow */}
-            <div className={cn("flex flex-wrap gap-x-6 gap-y-3 mt-4", theme === 'professional' ? 'text-blue-50' : 'text-slate-500 font-bold text-sm')}>
-               <div className="flex items-center gap-2">
-                 <Mail size={16} className={theme === 'professional' ? 'text-white' : styles.accentText} />
+            
+            {/* Direct Contact info block - Consolidated for Europass Look */}
+            <div className={cn("flex flex-wrap gap-x-5 gap-y-2 mt-2 max-w-2xl", theme === 'professional' ? 'text-blue-50' : 'text-slate-600 font-bold text-[11px]')}>
+               <div className="flex items-center gap-1.5 min-w-fit">
+                 <Mail size={14} className={theme === 'professional' ? 'text-white' : styles.accentText} />
                  <span>{candidate.email}</span>
                </div>
-               <div className="flex items-center gap-2">
-                 <Phone size={16} className={theme === 'professional' ? 'text-white' : styles.accentText} />
+               <div className="flex items-center gap-1.5 min-w-fit">
+                 <Phone size={14} className={theme === 'professional' ? 'text-white' : styles.accentText} />
                  <span>{candidate.phone}</span>
                </div>
                {candidate.whatsapp && (
-                 <div className="flex items-center gap-2">
-                   <MessageCircle size={16} className="text-emerald-500" />
-                   <span>WA: {candidate.whatsapp}</span>
+                 <div className="flex items-center gap-1.5 min-w-fit">
+                   <MessageCircle size={14} className="text-emerald-500" />
+                   <span>+WA: {candidate.whatsapp}</span>
                  </div>
                )}
                {candidate.address && (
-                 <div className="flex items-center gap-2">
-                   <MapPin size={16} className={theme === 'professional' ? 'text-white' : styles.accentText} />
+                 <div className="flex items-center gap-1.5 min-w-fit">
+                   <MapPin size={14} className={theme === 'professional' ? 'text-white' : styles.accentText} />
                    <span>{candidate.address}</span>
                  </div>
                )}
-               {candidate.nationality && (
-                 <div className="flex items-center gap-2">
-                   <Globe size={16} className={theme === 'professional' ? 'text-white' : styles.accentText} />
-                   <span>{candidate.nationality}</span>
-                 </div>
-               )}
-               {candidate.homeCountry && (
-                 <div className="flex items-center gap-2">
-                   <Globe size={16} className="text-brand-gold" />
-                   <span>Origin: {candidate.homeCountry}</span>
-                 </div>
-               )}
                {candidate.currentCountry && (
-                 <div className="flex items-center gap-2 border-l-2 border-slate-200 pl-4 ml-2">
-                   <MapPin size={16} className="text-brand-teal" />
+                 <div className="flex items-center gap-1.5 min-w-fit">
+                   <Globe size={14} className={theme === 'professional' ? 'text-white' : styles.accentText} />
                    <span>Currently in: {candidate.currentCountry}</span>
+                 </div>
+               )}
+               {candidate.passportNumber && (
+                 <div className="flex items-center gap-1.5 min-w-fit bg-slate-900/5 dark:bg-white/5 px-2 py-0.5 rounded border border-slate-900/10">
+                   <CreditCard size={14} className={theme === 'professional' ? 'text-white' : styles.accentText} />
+                   <span className="font-black uppercase">Passport: {candidate.passportNumber}</span>
                  </div>
                )}
             </div>
@@ -304,7 +300,7 @@ export default function EuropassCV({ candidate, id, theme = 'classic' }: Europas
                 </div>
               )}
 
-              {(candidate.fatherName || candidate.motherName) && (
+              {(candidate.fatherName || candidate.motherName || candidate.wifeName || (candidate.childrenNames && candidate.childrenNames.length > 0)) && (
                 <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-tiny">
                   <p className="text-[8px] font-black text-emerald-600 uppercase tracking-widest mb-1">Family Relations</p>
                   <div className="space-y-2">
@@ -318,6 +314,18 @@ export default function EuropassCV({ candidate, id, theme = 'classic' }: Europas
                       <div className="flex flex-col">
                         <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.1em]">Mother's Name</span>
                         <span className="text-[10px] font-bold text-slate-700">{candidate.motherName}</span>
+                      </div>
+                    )}
+                    {candidate.wifeName && (
+                      <div className="flex flex-col">
+                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.1em]">Wife's Name</span>
+                        <span className="text-[10px] font-bold text-slate-700">{candidate.wifeName}</span>
+                      </div>
+                    )}
+                    {candidate.childrenNames && candidate.childrenNames.length > 0 && (
+                      <div className="flex flex-col">
+                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.1em]">Children</span>
+                        <span className="text-[10px] font-bold text-slate-700">{candidate.childrenNames.join(', ')}</span>
                       </div>
                     )}
                   </div>

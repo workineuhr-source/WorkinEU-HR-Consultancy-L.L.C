@@ -85,9 +85,17 @@ export default function LoginPage() {
 
         // Check if admin
         const adminDoc = await getDoc(doc(db, 'users', user.uid));
-        const isAdmin = (adminDoc.exists() && adminDoc.data().role === 'admin') || (user.email === 'workineuhr@gmail.com');
+        const isAdmin = (adminDoc.exists() && adminDoc.data().role === 'admin') || (user.email?.toLowerCase() === 'workineuhr@gmail.com');
 
         if (isAdmin) {
+          // Force set role in database if it's the primary admin email
+          if (user.email?.toLowerCase() === 'workineuhr@gmail.com' && (!adminDoc.exists() || adminDoc.data().role !== 'admin')) {
+            await setDoc(doc(db, 'users', user.uid), {
+              email: user.email,
+              role: 'admin',
+              updatedAt: serverTimestamp()
+            }, { merge: true });
+          }
           toast.success("Admin login successful!");
           navigate('/admin');
         } else {

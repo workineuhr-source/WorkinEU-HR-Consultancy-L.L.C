@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ArrowRight, 
@@ -112,6 +112,7 @@ const Section = ({ children, id, className, title, subtitle, tagline, image, dar
                   alt={title || "Section visual"} 
                   className="w-full h-full object-cover transition-transform duration-1000 hover:scale-105"
                   referrerPolicy="no-referrer"
+                  loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-tr from-brand-teal/20 to-transparent pointer-events-none"></div>
               </motion.div>
@@ -126,6 +127,7 @@ const Section = ({ children, id, className, title, subtitle, tagline, image, dar
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [featuredJobs, setFeaturedJobs] = useState<Job[]>([]);
   const [diaryPosts, setDiaryPosts] = useState<DiaryPost[]>([]);
   const [successStories, setSuccessStories] = useState<VisaSuccessStory[]>([]);
@@ -553,6 +555,7 @@ export default function HomePage() {
                       transition={{ duration: 1.2, ease: "easeOut" }}
                       className="absolute inset-0 w-full h-full object-cover"
                       referrerPolicy="no-referrer"
+                      loading="lazy"
                     />
                   </AnimatePresence>
                   <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/40 to-transparent pointer-events-none"></div>
@@ -792,6 +795,7 @@ export default function HomePage() {
 
       {/* About Section - Premium Dubai Identity */}
       <Section 
+        id="our-identity"
         tagline={content.companyStoryTagline || "Our Identity"} 
         title={content.companyStoryTitle || "Dubai Heart, European Reach"} 
         subtitle={content.aboutUs}

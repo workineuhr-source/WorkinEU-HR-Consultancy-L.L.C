@@ -1,5 +1,4 @@
 import express from "express";
-import { GoogleGenAI } from "@google/genai";
 import OpenAI from "openai";
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
@@ -74,14 +73,9 @@ app.post("/api/ai/recommend", async (req, res) => {
       const content = response.choices[0].message.content;
       recommendedIds = JSON.parse(content || "{}").ids || [];
     } else {
-      // Default to Gemini
-      const genAI = new GoogleGenAI({ apiKey });
-      const model = (genAI as any).getGenerativeModel({ model: modelName });
-      const result = await model.generateContent(prompt);
-      const text = result.response.text();
-      // Extract array from text if it's not pure JSON
-      const match = text.match(/\[.*\]/s);
-      recommendedIds = match ? JSON.parse(match[0]) : [];
+      // Gemini should be handled on the frontend per platform guidelines.
+      // If we reach here for gemini, it means the frontend fallback failed or was bypassed.
+      return res.status(400).json({ error: "Gemini provider must be handled client-side" });
     }
 
     res.json({ recommendedIds });

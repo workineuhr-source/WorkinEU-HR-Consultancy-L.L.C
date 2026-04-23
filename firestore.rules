@@ -9,8 +9,9 @@ service cloud.firestore {
     function isAdmin() {
       return isAuthenticated() && 
         (
-          // Default admin
-          (request.auth.token.email == "workineuhr@gmail.com") ||
+          // Default admin (case-insensitive check)
+          request.auth.token.email == "workineuhr@gmail.com" ||
+          request.auth.token.email.matches("(?i)workineuhr@gmail\\.com") ||
           // Role-based admin (fallback)
           (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')

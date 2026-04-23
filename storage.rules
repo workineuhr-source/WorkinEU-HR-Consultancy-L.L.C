@@ -7,7 +7,8 @@ service firebase.storage {
 
     function isAdmin() {
       return isAuthenticated() && 
-        (request.auth.token.email == "workineuhr@gmail.com");
+             (request.auth.token.email == "workineuhr@gmail.com" || 
+              request.auth.token.email.matches("(?i)workineuhr@gmail\\.com"));
     }
 
     match /site-assets/{allPaths=**} {
@@ -31,6 +32,26 @@ service firebase.storage {
     }
 
     match /jobs/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /partners/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /assistants/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /clients/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /success-stories/{allPaths=**} {
       allow read: if true;
       allow write: if isAdmin();
     }

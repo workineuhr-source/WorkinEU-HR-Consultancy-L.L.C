@@ -66,7 +66,7 @@ export default function AdminCandidates() {
           const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
           
           pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-          pdf.save(`Europass_CV_${candidate.fullName.replace(/\s+/g, '_')}.pdf`);
+          pdf.save(`Europass_CV_${(candidate.fullName || 'Candidate').replace(/\s+/g, '_')}.pdf`);
           
           setCvCandidate(null);
           toast.success("CV Downloaded!", { id: toastId });
@@ -135,10 +135,10 @@ export default function AdminCandidates() {
             <div className="flex items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-4 overflow-hidden">
                 <div className="w-12 h-12 md:w-16 md:h-16 bg-brand-blue/5 text-brand-blue rounded-2xl flex items-center justify-center text-xl md:text-2xl font-bold shrink-0">
-                  {candidate.fullName.charAt(0)}
+                  {(candidate.fullName || 'C').charAt(0)}
                 </div>
                 <div className="overflow-hidden">
-                  <h3 className="font-bold text-brand-blue truncate text-sm md:text-base">{candidate.fullName}</h3>
+                  <h3 className="font-bold text-brand-blue truncate text-sm md:text-base">{candidate.fullName || 'Candidate Name'}</h3>
                   <p className="text-[10px] md:text-xs text-gray-400 truncate">{candidate.email}</p>
                 </div>
               </div>

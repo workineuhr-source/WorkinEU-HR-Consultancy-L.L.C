@@ -25,6 +25,7 @@ export default function Navbar({ user }: NavbarProps) {
   });
   const [isAdmin, setIsAdmin] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [companyProfileUrl, setCompanyProfileUrl] = useState<string | null>(null);
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
 
@@ -42,6 +43,9 @@ export default function Navbar({ user }: NavbarProps) {
         const data = snap.data() as SiteContent;
         if (data.logoUrl) {
           setLogoUrl(data.logoUrl);
+        }
+        if (data.companyProfileUrl) {
+          setCompanyProfileUrl(data.companyProfileUrl);
         }
         setNavLabels({
           home: data.navHome || 'Home',
@@ -112,8 +116,13 @@ export default function Navbar({ user }: NavbarProps) {
     { name: navLabels.jobs, path: '/jobs' },
     { name: navLabels.diary, path: '/diary' },
     { name: navLabels.about, path: '/about' },
+    { name: 'Company Profile', path: companyProfileUrl || '#', external: true },
     { name: navLabels.contact, path: '/#contact' },
   ];
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <nav className={cn(
@@ -125,7 +134,7 @@ export default function Navbar({ user }: NavbarProps) {
       <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-12">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center gap-4 group">
+            <Link to="/" onClick={scrollToTop} className="flex items-center gap-4 group">
               <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-2xl group-hover:rotate-6 transition-transform overflow-hidden">
                 <img src={logoUrl || "/logo.png"} alt="WorkinEU HR" className="w-full h-full object-contain p-1" referrerPolicy="no-referrer" />
               </div>
@@ -144,17 +153,33 @@ export default function Navbar({ user }: NavbarProps) {
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-12">
             {navLinks.map((link, i) => (
-              <Link 
-                key={`${link.path}-${i}`} 
-                to={link.path} 
-                className={cn(
-                  "transition-all duration-300 font-bold text-[11px] uppercase tracking-widest relative group",
-                  theme === 'dark' ? "text-white/80 hover:text-brand-teal" : "text-slate-900 hover:text-brand-teal"
-                )}
-              >
-                {link.name}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-teal transition-all group-hover:w-full rounded-full"></span>
-              </Link>
+              link.external ? (
+                <a 
+                  key={`${link.path}-${i}`} 
+                  href={link.path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    "transition-all duration-300 font-bold text-[11px] uppercase tracking-widest relative group",
+                    theme === 'dark' ? "text-white/80 hover:text-brand-teal" : "text-slate-900 hover:text-brand-teal"
+                  )}
+                >
+                  {link.name}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-teal transition-all group-hover:w-full rounded-full"></span>
+                </a>
+              ) : (
+                <Link 
+                  key={`${link.path}-${i}`} 
+                  to={link.path} 
+                  className={cn(
+                    "transition-all duration-300 font-bold text-[11px] uppercase tracking-widest relative group",
+                    theme === 'dark' ? "text-white/80 hover:text-brand-teal" : "text-slate-900 hover:text-brand-teal"
+                  )}
+                >
+                  {link.name}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-teal transition-all group-hover:w-full rounded-full"></span>
+                </Link>
+              )
             ))}
             
             <div className="flex items-center gap-6 pl-6 border-l border-gray-200 dark:border-white/10">

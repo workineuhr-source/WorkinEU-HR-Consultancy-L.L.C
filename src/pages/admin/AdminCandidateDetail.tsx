@@ -27,7 +27,9 @@ import {
   Zap,
   Download,
   Camera,
-  Upload
+  Upload,
+  Heart,
+  Baby
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'motion/react';
@@ -353,7 +355,7 @@ export default function AdminCandidateDetail() {
                   {editingProfile.photoUrl ? (
                     <img src={editingProfile.photoUrl} alt="Candidate" className="w-full h-full object-cover" />
                   ) : (
-                    candidate?.fullName.charAt(0)
+                    (editingProfile.fullName || 'C').charAt(0)
                   )}
                 </div>
                 <label className="absolute inset-0 bg-black/60 text-white rounded-3xl flex flex-col items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-all cursor-pointer">
@@ -362,7 +364,7 @@ export default function AdminCandidateDetail() {
                   <input type="file" className="hidden" accept="image/*" onChange={handlePhotoUpload} />
                 </label>
               </div>
-              <h2 className="text-2xl font-black text-brand-blue mb-2">{editingProfile.fullName}</h2>
+              <h2 className="text-2xl font-black text-brand-blue mb-2">{editingProfile.fullName || 'Candidate Name'}</h2>
               <p className="text-gray-400 font-bold text-sm mb-6 uppercase tracking-widest">{editingProfile.email}</p>
               
               <div className="w-full grid grid-cols-2 gap-4">
@@ -492,6 +494,19 @@ export default function AdminCandidateDetail() {
                 </div>
                 
                 <div className="space-y-4">
+                  <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest">Nationality</label>
+                  <div className="relative">
+                    <Globe size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-brand-gold" />
+                    <input 
+                      list="all-countries"
+                      className="w-full pl-14 pr-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold"
+                      value={editingProfile.nationality || ''}
+                      onChange={(e) => setEditingProfile({ ...editingProfile, nationality: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
                   <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest">Home Country (Origin)</label>
                   <div className="relative">
                     <Globe size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-brand-gold" />
@@ -532,7 +547,7 @@ export default function AdminCandidateDetail() {
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                 <div className="space-y-4">
                   <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest">WhatsApp Number</label>
                   <div className="relative">
                     <Phone size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-500" />
@@ -544,32 +559,6 @@ export default function AdminCandidateDetail() {
                     />
                   </div>
                 </div>
-               <div className="space-y-4">
-                 <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest">Passport Number</label>
-                 <div className="relative">
-                   <CreditCard size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-brand-gold" />
-                   <input 
-                     className="w-full pl-14 pr-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold"
-                     value={editingProfile.passportNumber || ''}
-                     onChange={(e) => setEditingProfile({ ...editingProfile, passportNumber: e.target.value })}
-                   />
-                 </div>
-               </div>
-               <div className="space-y-4">
-                 <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest">Nationality</label>
-                 <div className="relative">
-                   <Globe size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-brand-gold" />
-                   <input 
-                     list="all-countries"
-                     className="w-full pl-14 pr-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold"
-                     value={editingProfile.nationality || ''}
-                     onChange={(e) => setEditingProfile({ ...editingProfile, nationality: e.target.value })}
-                   />
-                   <datalist id="all-countries">
-                     {ALL_COUNTRIES.map(c => <option key={c} value={c} />)}
-                   </datalist>
-                 </div>
-               </div>
                <div className="space-y-4">
                  <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest">Date of Birth</label>
                  <div className="relative">
@@ -624,6 +613,17 @@ export default function AdminCandidateDetail() {
              
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div className="space-y-4">
+                  <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest">Passport Number</label>
+                  <div className="relative">
+                    <CreditCard size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-brand-gold" />
+                    <input 
+                      className="w-full pl-14 pr-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold"
+                      value={editingProfile.passportNumber || ''}
+                      onChange={(e) => setEditingProfile({ ...editingProfile, passportNumber: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-4">
                   <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest">Passport Issue Date</label>
                   <input 
                     type="date"
@@ -646,7 +646,7 @@ export default function AdminCandidateDetail() {
                   <input 
                     list="all-countries"
                     className="w-full px-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold"
-                    value={editingProfile.passportIssueCountry || ''}
+                    value={editingProfile.passportIssueCountry || editingProfile.currentCountry || ''}
                     onChange={(e) => setEditingProfile({ ...editingProfile, passportIssueCountry: e.target.value })}
                     placeholder="e.g. Nepal"
                   />
@@ -670,6 +670,58 @@ export default function AdminCandidateDetail() {
                     onChange={(e) => setEditingProfile({ ...editingProfile, motherName: e.target.value })}
                     placeholder="Mother's Name"
                   />
+                </div>
+                <div className="space-y-4">
+                  <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest">Wife's Full Name</label>
+                  <div className="relative">
+                    <Heart size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-rose-500" />
+                    <input 
+                      type="text"
+                      className="w-full pl-14 pr-6 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold"
+                      value={editingProfile.wifeName || ''}
+                      onChange={(e) => setEditingProfile({ ...editingProfile, wifeName: e.target.value })}
+                      placeholder="Wife's Name"
+                    />
+                  </div>
+                </div>
+
+                <div className="md:col-span-2 lg:col-span-3 space-y-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest">Children's Names</label>
+                    <button 
+                      onClick={() => setEditingProfile({ ...editingProfile, childrenNames: [...(editingProfile.childrenNames || []), ''] })}
+                      className="text-brand-gold font-black text-[10px] uppercase flex items-center gap-2 hover:underline"
+                    >
+                      <Plus size={14} /> Add Child
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {(editingProfile.childrenNames || []).map((child, idx) => (
+                      <div key={idx} className="relative group/child">
+                        <Baby size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-brand-teal" />
+                        <input 
+                          type="text"
+                          className="w-full pl-14 pr-12 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold"
+                          value={child}
+                          onChange={(e) => {
+                            const newChildren = [...(editingProfile.childrenNames || [])];
+                            newChildren[idx] = e.target.value;
+                            setEditingProfile({ ...editingProfile, childrenNames: newChildren });
+                          }}
+                          placeholder={`Child #${idx + 1}`}
+                        />
+                        <button 
+                          onClick={() => {
+                            const newChildren = (editingProfile.childrenNames || []).filter((_, i) => i !== idx);
+                            setEditingProfile({ ...editingProfile, childrenNames: newChildren });
+                          }}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-red-500 transition-colors"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
              </div>
           </div>

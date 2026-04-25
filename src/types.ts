@@ -68,6 +68,8 @@ export interface Application {
   }[];
   skills?: { name: string; level: string }[];
   status: 'pending' | 'approved' | 'rejected';
+  assignedBatch?: string;
+  assignedCompany?: string;
   statusHistory?: {
     prevStatus: string;
     newStatus: string;
@@ -175,6 +177,10 @@ export interface CandidateProfile {
     uploadedAt: number;
   }[];
   // Payment Tracking
+  assignedCountry?: string;
+  assignedBatch?: string;
+  assignedCompany?: string;
+  cvTemplate?: string;
   paymentStatus?: 'pending' | 'partially-paid' | 'fully-paid';
   totalAmount?: string;
   initialPay?: string;

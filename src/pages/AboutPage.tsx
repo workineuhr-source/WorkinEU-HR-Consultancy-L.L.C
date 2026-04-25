@@ -17,6 +17,7 @@ import {
 import { Link } from 'react-router-dom';
 
 import BottomCTA from '../components/BottomCTA';
+import SEO from '../components/SEO';
 
 export default function AboutPage() {
   const [content, setContent] = useState<SiteContent | null>(null);
@@ -46,6 +47,7 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#020617] pt-40 pb-32 relative overflow-hidden transition-colors duration-500">
+      <SEO title="About Us | Ethical EU Recruitment" description="Learn about WorkinEU HR, the premier ethical recruitment agency connecting talented professionals with top European employers." />
       {/* Background elements */}
       <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-[0.03] dark:opacity-[0.05] pointer-events-none"></div>
       <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-brand-teal/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2 animate-pulse"></div>

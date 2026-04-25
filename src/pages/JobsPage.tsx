@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
 import { toast } from 'sonner';
 import BottomCTA from '../components/BottomCTA';
+import SEO from '../components/SEO';
 
 const JOBS_PER_PAGE = 24;
 
@@ -218,6 +219,7 @@ export default function JobsPage() {
 
   return (
     <div className="bg-white dark:bg-[#020617] min-h-screen py-32 relative overflow-hidden transition-colors duration-500">
+      <SEO title="Find High Paying EU Jobs | Europe Job Vacancies" />
       {/* Background elements */}
       <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-[0.03] dark:opacity-[0.05] pointer-events-none"></div>
       <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-brand-teal/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2 animate-pulse"></div>

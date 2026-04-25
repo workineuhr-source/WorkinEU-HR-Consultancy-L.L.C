@@ -265,8 +265,11 @@ function DiaryModal({ post, onClose, onSuccess }: DiaryModalProps) {
         contents: `Write a professional blog post/diary entry for an HR consultancy called WorkinEU. 
         The title is "${formData.title}". 
         The category is "${formData.category}".
-        Return the response in JSON format with a single key "content" (string). 
-        Make it engaging, professional, and informative.`,
+        IMPORTANT RULES:
+        - Do NOT use markdown headings (no '#' symbols).
+        - Use bold text (**like this**) for important key points instead of headings.
+        - Make it sound natural, human-written, engaging, professional, and informative.
+        Return the response in JSON format with a single key "content" (string).`,
         config: {
           responseMimeType: "application/json"
         }

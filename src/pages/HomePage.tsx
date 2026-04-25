@@ -1,5 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
+import SEO from '../components/SEO';
 import { 
   ArrowRight, 
   CheckCircle2, 
@@ -453,6 +454,7 @@ export default function HomePage() {
 
   return (
     <div className="overflow-hidden bg-white">
+      <SEO title="Jobs in Europe for Nepalese | HR Recruitment Agency" />
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center pt-24 pb-12 overflow-hidden bg-white dark:bg-[#020617]">
         <div className="absolute inset-0 z-0">

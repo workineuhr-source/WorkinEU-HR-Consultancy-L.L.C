@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { CandidateProfile } from '../../types';
+import { CandidateProfile, Application } from '../../types';
 import { 
   ArrowLeft, 
   Save, 
@@ -29,7 +29,11 @@ import {
   Camera,
   Upload,
   Heart,
-  Baby
+  Baby,
+  Users, 
+  Plane, 
+  FolderOpen, 
+  LayoutTemplate
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'motion/react';
@@ -38,13 +42,29 @@ import { COUNTRIES, JOB_POSITIONS, CURRENCY_SYMBOLS } from '../../constants';
 import { cn } from '../../lib/utils';
 import EuropassCV from '../../components/EuropassCV';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 
 export default function AdminCandidateDetail() {
   const { uid } = useParams<{ uid: string }>();
   const navigate = useNavigate();
   const [candidate, setCandidate] = useState<CandidateProfile | null>(null);
   const [editingProfile, setEditingProfile] = useState<Partial<CandidateProfile>>({});
+  const [activeTab, setActiveTab] = useState('profile');
+
+  const TABS = [
+    { id: 'profile', label: 'Profile Summary', icon: User },
+    { id: 'cv-theme', label: 'CV Theme Core', icon: LayoutTemplate },
+    { id: 'target-placement', label: 'Target Placement', icon: Globe },
+    { id: 'eligibility', label: 'Eligibility Core', icon: ShieldCheck },
+    { id: 'identity-core', label: 'Identity Core', icon: User },
+    { id: 'identity-family', label: 'Identity & Family Intel', icon: Heart },
+    { id: 'portfolio', label: 'Portfolio & Expertise', icon: Briefcase },
+    { id: 'financial', label: 'Financial Intelligence', icon: CreditCard },
+    { id: 'applications', label: 'Mission Applications', icon: Briefcase },
+    { id: 'documents', label: 'Documents & Supporting Files', icon: FolderOpen },
+    { id: 'deployment', label: 'Mission Deployment Core', icon: Plane }
+  ];
+  const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isGeneratingAi, setIsGeneratingAi] = useState(false);
@@ -68,8 +88,20 @@ export default function AdminCandidateDetail() {
   useEffect(() => {
     if (uid) {
       fetchCandidate();
+      fetchApplications();
     }
   }, [uid]);
+
+  const fetchApplications = async () => {
+    try {
+      const q = query(collection(db, 'applications'), where('candidateUid', '==', uid));
+      const querySnapshot = await getDocs(q);
+      const apps = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Application));
+      setApplications(apps);
+    } catch (error) {
+      console.error("Error fetching applications:", error);
+    }
+  };
 
   const fetchCandidate = async () => {
     try {
@@ -194,8 +226,12 @@ export default function AdminCandidateDetail() {
       "suggestedLanguages" (string array),
       "suggestedWorkHistory" (array of objects: {company: string, position: string, startDate: "YYYY-MM-DD", endDate: "YYYY-MM-DD", description: string})
       
-      Ensure all dates are strictly in YYYY-MM-DD format.
-      Do not include any Markdown formatting, only the JSON.`;
+      IMPORTANT RULES:
+      - Ensure all dates are strictly in YYYY-MM-DD format.
+      - Do NOT use any Markdown headings (no '#' symbols).
+      - Use bold text (**like this**) for important key points.
+      - Make the tone natural and human-written.
+      - Do not include any Markdown formatting like \`\`\`json, only the raw JSON.`;
 
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
@@ -247,42 +283,107 @@ export default function AdminCandidateDetail() {
         const element = document.getElementById('europass-cv-full-template');
         if (!element) throw new Error("Template not found");
 
-        const canvas = await html2canvas(element, {
-          scale: 2,
-          useCORS: true,
-          logging: false,
-          backgroundColor: '#ffffff',
-          windowWidth: 794 // Force A4 pixel width during capture
+        // --- PAGINATION AUTO-ADJUST LOGIC ---
+        const elemWidth = element.offsetWidth;
+        const mmToPx = elemWidth / 210; // A4 width is 210mm
+        
+        const topMarginMm = 10;
+        const bottomMarginMm = 15;
+        
+        const firstPageContentPx = (297 - bottomMarginMm) * mmToPx;
+        const otherPageContentPx = (297 - topMarginMm - bottomMarginMm) * mmToPx;
+        
+        const getPageForOffset = (y: number) => {
+          if (y < firstPageContentPx) return 0;
+          return 1 + Math.floor((y - firstPageContentPx) / otherPageContentPx);
+        };
+        
+        const getPageStartPx = (page: number) => {
+          if (page === 0) return 0;
+          return firstPageContentPx + (page - 1) * otherPageContentPx;
+        };
+        
+        const avoidBreakElements = element.querySelectorAll('.page-break-inside-avoid');
+        
+        // Reset any previous modifications
+        avoidBreakElements.forEach((el) => {
+          (el as HTMLElement).style.marginTop = '0px';
+        });
+
+        // Iteratively shift elements that straddle a page boundary
+        avoidBreakElements.forEach((el) => {
+          const htmlEl = el as HTMLElement;
+          const rect = htmlEl.getBoundingClientRect();
+          const docRect = element.getBoundingClientRect();
+          
+          const topInDoc = rect.top - docRect.top;
+          const bottomInDoc = topInDoc + rect.height;
+          
+          const startPage = getPageForOffset(topInDoc + 5); 
+          const endPage = getPageForOffset(bottomInDoc - 5); 
+          
+          if (endPage > startPage && startPage >= 0) {
+            const targetTop = getPageStartPx(startPage + 1);
+            const shiftAmount = targetTop - topInDoc;
+            const currentMargin = parseFloat(window.getComputedStyle(htmlEl).marginTop) || 0;
+            
+            htmlEl.style.marginTop = `${currentMargin + shiftAmount + (20 * mmToPx)}px`;
+          }
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 50));
+        // ------------------------------------
+
+        const imgData = await toPng(element, {
+           quality: 1.0,
+           pixelRatio: 3, // For HD quality
+           backgroundColor: '#ffffff',
+           style: {
+             transform: 'scale(1)',
+             transformOrigin: 'top left'
+           }
         });
         
-        const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF('p', 'mm', 'a4');
         const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const pageHeight = pdf.internal.pageSize.getHeight();
         
-        const canvasWidth = canvas.width;
-        const canvasHeight = canvas.height;
+        const finalHeight = element.offsetHeight;
+        const ratio = pdfWidth / elemWidth; 
+        const imgHeightInPdf = finalHeight * ratio;
         
-        // Ratio of PDF mm per Canvas pixel
-        const ratio = pdfWidth / (canvasWidth / 2); // Divide by scale=2
-        const imgHeightInPdf = (canvasHeight / 2) * ratio;
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeightInPdf, undefined, 'FAST');
         
-        let heightLeft = imgHeightInPdf;
-        let position = 0;
+        const drawFooter = () => {
+           pdf.setFillColor(255, 255, 255);
+           pdf.rect(0, pageHeight - bottomMarginMm, pdfWidth, bottomMarginMm, 'F');
+           pdf.setFontSize(8);
+           pdf.setTextColor(150, 150, 150);
+           const footerText = `GENERATED VIA WORKINEU HR EUROPASS PROTOCOL ${selectedCvTheme.toUpperCase()} DESIGN`;
+           pdf.text(footerText, pdfWidth / 2, pageHeight - 6, { align: 'center' });
+        };
+        
+        drawFooter();
 
-        // Add first page
-        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
-        heightLeft -= pdfHeight;
+        let heightRenderedInMm = pageHeight - bottomMarginMm;
+        let heightLeftMm = imgHeightInPdf - heightRenderedInMm;
 
-        // Slice into more pages if needed
-        while (heightLeft >= 0) {
-          position = heightLeft - imgHeightInPdf;
+        while (heightLeftMm > 5) {
           pdf.addPage();
-          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeightInPdf, undefined, 'FAST');
-          heightLeft -= pdfHeight;
+          
+          const yPos = topMarginMm - heightRenderedInMm;
+          pdf.addImage(imgData, 'PNG', 0, yPos, pdfWidth, imgHeightInPdf, undefined, 'FAST');
+          
+          pdf.setFillColor(255, 255, 255);
+          pdf.rect(0, 0, pdfWidth, topMarginMm, 'F');
+          
+          drawFooter();
+          
+          heightRenderedInMm += (pageHeight - topMarginMm - bottomMarginMm);
+          heightLeftMm = imgHeightInPdf - heightRenderedInMm;
         }
 
-        pdf.save(`Europass_CV_${candidate.fullName.replace(/\s+/g, '_')}.pdf`);
+        pdf.save(`Europass_CV_${candidate.fullName.replace(/\s+/g, '_')}_${selectedCvTheme}.pdf`);
         
         setCvCandidate(null);
         toast.success("CV Downloaded!", { id: toastId });
@@ -343,11 +444,31 @@ export default function AdminCandidateDetail() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Sidebar Info */}
-        <div className="lg:col-span-4 space-y-8">
+      <div className="flex flex-col lg:flex-row gap-8 items-start">
+        {/* Left Navigation Sidebar */}
+        <div className="w-full lg:w-[280px] shrink-0 space-y-2 sticky top-28 bg-white p-4 rounded-3xl border border-gray-100 shadow-sm z-40">
+          <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-4 mb-4">Core Modules</h3>
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-bold text-left",
+                activeTab === tab.id
+                  ? "bg-brand-blue text-white shadow-md"
+                  : "text-slate-500 hover:bg-slate-50 hover:text-brand-blue"
+              )}
+            >
+              <tab.icon size={18} />
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Right Main Content Area */}
+        <div className="flex-1 w-full space-y-8">
           {/* Main User Card */}
-          <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden relative">
+          <div className={cn("bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden relative", activeTab !== 'profile' && 'hidden')}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-brand-teal/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
             <div className="relative z-10 flex flex-col items-center text-center">
               <div className="relative group w-24 h-24 mb-6">
@@ -407,7 +528,7 @@ export default function AdminCandidateDetail() {
           </div>
 
           {/* Quick CV Download Section */}
-          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden relative">
+          <div className={cn("bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden relative", activeTab !== 'cv-theme' && 'hidden')}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-brand-teal/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
             <h3 className="text-sm font-black uppercase tracking-widest mb-6 flex items-center gap-2 text-brand-blue relative z-10">
               <FileText className="text-brand-teal" size={20} /> CV Theme Core
@@ -436,8 +557,64 @@ export default function AdminCandidateDetail() {
             </div>
           </div>
 
+          {/* Target Placement / Assignment */}
+          <div className={cn("bg-white p-8 rounded-[2.5rem] shadow-sm border border-brand-gold/30 relative overflow-hidden", activeTab !== 'target-placement' && 'hidden')}>
+             <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+             <h3 className="text-sm font-black text-brand-blue uppercase tracking-widest mb-6 flex items-center gap-2 relative z-10">
+               <Globe className="text-brand-gold" size={20} /> Target Placement
+             </h3>
+             <div className="space-y-5 relative z-10">
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Target Country</label>
+                  <input 
+                    list="country-options"
+                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 outline-none focus:bg-white focus:border-brand-gold text-sm font-bold text-brand-blue"
+                    value={editingProfile.assignedCountry || ''}
+                    onChange={(e) => setEditingProfile({ ...editingProfile, assignedCountry: e.target.value })}
+                    placeholder="e.g. Romania, Poland"
+                  />
+                  <datalist id="country-options">
+                    <option value="Romania" />
+                    <option value="Poland" />
+                    <option value="Croatia" />
+                    <option value="Serbia" />
+                    <option value="Czech Republic" />
+                    <option value="Slovakia" />
+                    <option value="Hungary" />
+                  </datalist>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Enrolled Batch</label>
+                  <input 
+                    list="batch-options"
+                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 outline-none focus:bg-white focus:border-brand-gold text-sm font-bold text-brand-blue"
+                    value={editingProfile.assignedBatch || ''}
+                    onChange={(e) => setEditingProfile({ ...editingProfile, assignedBatch: e.target.value })}
+                    placeholder="e.g. Batch 1"
+                  />
+                  <datalist id="batch-options">
+                    <option value="Batch 1" />
+                    <option value="Batch 2" />
+                    <option value="Batch 3" />
+                  </datalist>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Target Company</label>
+                  <input 
+                    list="company-options"
+                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 outline-none focus:bg-white focus:border-brand-gold text-sm font-bold text-brand-blue"
+                    value={editingProfile.assignedCompany || ''}
+                    onChange={(e) => setEditingProfile({ ...editingProfile, assignedCompany: e.target.value })}
+                    placeholder="e.g. ConstructorTech SRL"
+                  />
+                  <datalist id="company-options">
+                  </datalist>
+                </div>
+             </div>
+          </div>
+
           {/* Verification Status */}
-          <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
+          <div className={cn("bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100", activeTab !== 'eligibility' && 'hidden')}>
              <h3 className="text-sm font-black text-brand-blue uppercase tracking-widest mb-6 flex items-center gap-2">
                <ShieldCheck className="text-green-500" size={20} /> Eligibility Core
              </h3>
@@ -459,19 +636,20 @@ export default function AdminCandidateDetail() {
                     onChange={(e) => setEditingProfile({ ...editingProfile, workPermitStatus: e.target.value as any })}
                   >
                     <option value="Review Pending">Review Pending</option>
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
+                    <option value="Documents Submitted">Documents Submitted</option>
+                    <option value="In Processing">In Processing</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                    <option value="Appealed">Appealed</option>
+                    <option value="Expired">Expired</option>
                   </select>
                 </div>
              </div>
           </div>
-        </div>
-
-        {/* Main Form Area */}
-        <div className="lg:col-span-8 space-y-8">
+        {/* Form Sections */}
+        {/* Merging into same container */}
           {/* Identity & Background */}
-          <div className="bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100">
+          <div className={cn("bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100", activeTab !== 'identity-core' && 'hidden')}>
              <div className="flex items-center gap-4 mb-10 border-b border-gray-50 pb-6">
                 <div className="p-4 bg-brand-gold/10 rounded-2xl text-brand-gold">
                   <User size={24} />
@@ -600,7 +778,7 @@ export default function AdminCandidateDetail() {
           </div>
 
           {/* Identity & Family Details Admin Section */}
-          <div className="bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100 mb-8">
+          <div className={cn("bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100 mb-8", activeTab !== 'identity-family' && 'hidden')}>
              <div className="flex items-center gap-4 mb-10 border-b border-gray-50 pb-6">
                 <div className="p-4 bg-purple-50 text-purple-600 rounded-2xl">
                   <ShieldCheck size={24} />
@@ -727,7 +905,7 @@ export default function AdminCandidateDetail() {
           </div>
 
           {/* Professional Portfolio */}
-          <div className="bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100">
+          <div className={cn("bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100", activeTab !== 'portfolio' && 'hidden')}>
              <div className="flex items-center gap-4 mb-10 border-b border-gray-50 pb-6">
                 <div className="p-4 bg-brand-blue/10 rounded-2xl text-brand-blue">
                   <Briefcase size={24} />
@@ -1019,7 +1197,7 @@ export default function AdminCandidateDetail() {
           </div>
 
           {/* Payment & Financial Intelligence */}
-          <div className="bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100">
+          <div className={cn("bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100", activeTab !== 'financial' && 'hidden')}>
              <div className="flex items-center gap-4 mb-10 border-b border-gray-50 pb-6">
                 <div className="p-4 bg-green-100 rounded-2xl text-green-600">
                   <CreditCard size={24} />
@@ -1034,7 +1212,7 @@ export default function AdminCandidateDetail() {
                 <div className="bg-green-50/50 p-10 rounded-[3rem] border border-green-100 shadow-inner-soft">
                   <label className="block text-[11px] font-black text-brand-blue uppercase mb-6 tracking-[0.2em] text-center">Total Package Architecture</label>
                   <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-                     <div className="bg-white px-8 py-4 rounded-3xl shadow-sm border border-green-100 flex items-center gap-4">
+                     <div className="bg-white px-8 py-4 rounded-3xl shadow-sm border border-green-100 flex items-center gap-4 max-w-full overflow-x-auto no-scrollbar">
                         <select 
                           className="text-4xl font-black text-brand-blue outline-none bg-transparent cursor-pointer"
                           value={editingProfile.paymentCurrency || 'EUR'}
@@ -1047,7 +1225,9 @@ export default function AdminCandidateDetail() {
                           <option value="USD">$</option>
                         </select>
                         <input 
-                          className="text-5xl font-black text-brand-blue outline-none w-48 bg-transparent"
+                          type="text"
+                          className="text-3xl md:text-5xl font-black text-brand-blue outline-none w-[150px] md:w-full min-w-[150px] bg-transparent flex-1"
+                          style={{ width: `${Math.max(4, (editingProfile.totalAmount || '').length)}ch` }}
                           value={editingProfile.totalAmount || ''}
                           onChange={(e) => setEditingProfile({ ...editingProfile, totalAmount: e.target.value })}
                           placeholder="0000"
@@ -1177,8 +1357,78 @@ export default function AdminCandidateDetail() {
              </div>
           </div>
 
+          {/* Candidate Applications */}
+          <div className={cn("bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100 relative overflow-hidden mb-8", activeTab !== 'applications' && 'hidden')}>
+             <div className="flex items-center gap-4 mb-10 border-b border-gray-50 pb-6">
+                <div className="p-4 bg-brand-blue/10 rounded-2xl text-brand-blue">
+                  <Briefcase size={24} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-brand-blue">Mission Applications</h3>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Jobs Applied By Candidate</p>
+                </div>
+             </div>
+
+             {applications.length > 0 ? (
+               <div className="overflow-x-auto">
+                 <table className="w-full text-left border-collapse">
+                   <thead className="bg-slate-50 text-slate-400 text-[10px] uppercase font-black tracking-widest">
+                     <tr>
+                       <th className="px-6 py-4 rounded-l-2xl">Target Role</th>
+                       <th className="px-6 py-4">Status & Action</th>
+                       <th className="px-6 py-4 rounded-r-2xl text-right">Applied Date</th>
+                     </tr>
+                   </thead>
+                   <tbody className="divide-y divide-gray-50">
+                     {applications.map((app) => (
+                       <tr key={app.id} className="hover:bg-slate-50/50 transition-colors">
+                         <td className="px-6 py-4">
+                           <p className="text-sm font-bold text-brand-blue">{app.jobTitle}</p>
+                           <div className="flex items-center gap-2 mt-1">
+                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">
+                               Orig: {app.originalCountry || app.appliedCountry || 'N/A'}
+                             </span>
+                             {app.targetCountry && app.targetCountry !== (app.originalCountry || app.appliedCountry) && (
+                               <>
+                                 <span className="text-slate-300">|</span>
+                                 <span className="text-[10px] font-bold text-brand-gold uppercase tracking-widest leading-none">
+                                   Target: {app.targetCountry}
+                                 </span>
+                               </>
+                             )}
+                           </div>
+                         </td>
+                         <td className="px-6 py-4 flex items-center gap-2">
+                           <span className={cn(
+                              "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm border",
+                              app.status === 'approved' ? 'bg-green-50 text-green-600 border-green-100' : 
+                              app.status === 'rejected' ? 'bg-red-50 text-red-600 border-red-100' : 
+                              'bg-brand-gold/10 text-brand-gold border-brand-gold/20'
+                           )}>
+                             {app.status}
+                           </span>
+                           <Link to="/admin/applications" className="text-brand-blue hover:text-brand-gold transition-colors" title="Manage Application">
+                             <ArrowLeft className="rotate-180" size={16} />
+                           </Link>
+                         </td>
+                         <td className="px-6 py-4 text-right text-xs font-bold text-slate-500">
+                           {new Date(app.createdAt).toLocaleDateString()}
+                         </td>
+                       </tr>
+                     ))}
+                   </tbody>
+                 </table>
+               </div>
+             ) : (
+                <div className="text-center py-12 bg-slate-50/50 rounded-[2.5rem] border-2 border-dashed border-slate-100">
+                  <Briefcase className="mx-auto text-slate-200 mb-2" size={48} />
+                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest">No applications submitted yet.</p>
+                </div>
+             )}
+          </div>
+
           {/* Mission Deployment Core */}
-          <div className="bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100 relative overflow-hidden mb-8">
+          <div className={cn("bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100 relative overflow-hidden mb-8", activeTab !== 'documents' && 'hidden')}>
              <div className="flex items-center justify-between mb-10 border-b border-gray-50 pb-6">
                 <div className="flex items-center gap-4">
                   <div className="p-4 bg-brand-gold/10 rounded-2xl text-brand-gold">
@@ -1204,7 +1454,7 @@ export default function AdminCandidateDetail() {
                          <FileText size={18} />
                        </div>
                        <div>
-                         <p className="text-[10px] font-black text-brand-blue truncate max-w-[150px]">{doc.name}</p>
+                         <p className="text-[10px] font-black text-brand-blue break-all max-w-[150px]">{doc.name}</p>
                          <p className="text-[8px] font-black text-gray-400 uppercase">{new Date(doc.uploadedAt).toLocaleDateString()}</p>
                        </div>
                      </div>
@@ -1231,7 +1481,7 @@ export default function AdminCandidateDetail() {
           </div>
 
           {/* Visa & Deployment Master */}
-          <div className="bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100 relative overflow-hidden">
+          <div className={cn("bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100 relative overflow-hidden", activeTab !== 'deployment' && 'hidden')}>
              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-brand-blue/5 to-transparent pointer-events-none"></div>
              <div className="flex items-center gap-4 mb-10 border-b border-gray-50 pb-6">
                 <div className="p-4 bg-brand-teal/10 rounded-2xl text-brand-teal">
@@ -1253,8 +1503,13 @@ export default function AdminCandidateDetail() {
                         onChange={(e) => setEditingProfile({ ...editingProfile, visaStatus: e.target.value as any })}
                       >
                          <option value="pending">PENDING APPROVAL</option>
+                         <option value="application_submitted">APPLICATION SUBMITTED</option>
+                         <option value="embassy_appointment">EMBASSY APPOINTMENT SCHEDULED</option>
+                         <option value="under_review">UNDER REVIEW BY EMBASSY</option>
                          <option value="approved">MISSION APPROVED (VISA OK)</option>
                          <option value="rejected">MISSION REJECTED</option>
+                         <option value="appealed">APPEALED</option>
+                         <option value="expired">EXPIRED</option>
                       </select>
                    </div>
                    <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100">

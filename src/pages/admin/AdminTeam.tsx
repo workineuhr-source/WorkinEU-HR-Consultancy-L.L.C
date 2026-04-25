@@ -4,7 +4,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../../firebase';
 import { TeamMember } from '../../types';
 import { toast } from 'sonner';
-import { Plus, Trash2, Edit2, Save, X, Upload, Loader2, Phone, Briefcase, User, Mail } from 'lucide-react';
+import { Plus, Trash2, Edit2, Save, X, Upload, Loader2, Phone, Briefcase, User, Mail, ImageIcon } from 'lucide-react';
 
 const HR_POSITIONS = [
   "CEO & Founder",

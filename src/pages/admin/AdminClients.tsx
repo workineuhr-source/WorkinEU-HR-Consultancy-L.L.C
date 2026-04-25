@@ -11,7 +11,8 @@ import {
   Save,
   X,
   Quote,
-  AlertTriangle
+  AlertTriangle,
+  ImageIcon
 } from 'lucide-react';
 import { db } from '../../firebase';
 import { collection, query, orderBy, onSnapshot, doc, setDoc, deleteDoc, addDoc } from 'firebase/firestore';

@@ -306,11 +306,13 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: `Generate a professional job description, responsibilities (list), and requirements (list) for the position of "${formData.title}" in ${formData.country}. 
+        IMPORTANT RULES:
+        - Do NOT use markdown headings (no '#' symbols).
+        - Use bold text for key points and make the tone natural and professional for an HR consultancy portal.
         Return the response in JSON format with the following keys: 
         "description" (string), 
         "responsibilities" (array of strings), 
-        "requirements" (array of strings). 
-        Make it professional and suitable for an HR consultancy portal.`,
+        "requirements" (array of strings).`,
         config: {
           responseMimeType: "application/json"
         }

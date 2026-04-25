@@ -111,10 +111,10 @@ export default function ApplicationForm({ job, onSuccess, autoFillIntent }: Appl
 
   // Handle auto-fill if intent was specified and profile is loaded
   useEffect(() => {
-    if (autoFillIntent && candidateProfile && step === 1) {
+    if (autoFillIntent && candidateProfile && step === 1 && auth.currentUser) {
       applyProfileData();
     }
-  }, [candidateProfile, autoFillIntent]);
+  }, [candidateProfile, autoFillIntent, step]);
 
   const applyProfileData = async () => {
     if (!candidateProfile) return;

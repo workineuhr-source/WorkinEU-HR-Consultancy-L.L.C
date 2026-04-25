@@ -910,7 +910,22 @@ export default function CandidateDashboard() {
                             <tbody className="divide-y divide-gray-50 dark:divide-white/5">
                               {applications.slice(0, 5).map((app) => (
                                 <tr key={app.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
-                                  <td className="px-8 py-6 font-bold text-brand-blue dark:text-white">{app.jobTitle}</td>
+                                  <td className="px-8 py-6">
+                                    <p className="font-bold text-brand-blue dark:text-white">{app.jobTitle}</p>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-none">
+                                        Orig: {app.originalCountry || app.appliedCountry || 'N/A'}
+                                      </span>
+                                      {app.targetCountry && app.targetCountry !== (app.originalCountry || app.appliedCountry) && (
+                                        <>
+                                          <span className="text-gray-300 dark:text-gray-600">|</span>
+                                          <span className="text-[10px] font-bold text-brand-blue dark:text-brand-gold uppercase tracking-widest leading-none">
+                                            Target: {app.targetCountry}
+                                          </span>
+                                        </>
+                                      )}
+                                    </div>
+                                  </td>
                                   <td className="px-8 py-6">
                                     <span className={cn(
                                       "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest",

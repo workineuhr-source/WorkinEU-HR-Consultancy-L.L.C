@@ -150,6 +150,7 @@ ${jobs.map(j => `- ${j.title} in ${j.country}. Category: ${j.category}. Salary: 
       5. Use the provided context to answer questions about documents, processing times, and fees.
       6. PROCESSING TIME: 3 to 6 months for European work visas.
       7. REQUIRED DOCUMENTS: Passport, European format CV, Education certificates, Experience letters.
+      8. IMPORTANT: Do NOT use markdown headings (no '#' symbols). Use bold text (**like this**) for important points. Make it sound natural and human-written.
       
       Respond to the user's message as ${selectedAssistant.name}. Keep it concise but professional.
       

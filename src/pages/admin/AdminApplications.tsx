@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, getDocs, query, orderBy, updateDoc, doc, deleteDoc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../../firebase';
 import { Application, CandidateProfile } from '../../types';
-import { Search, Filter, Eye, Download, Trash2, X, CheckCircle2, AlertCircle, Clock, FileText, ArrowRight } from 'lucide-react';
+import { Search, Filter, Eye, Download, Trash2, X, CheckCircle2, AlertCircle, Clock, FileText, ArrowRight, Loader2, Globe, Calendar, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../../lib/utils';
@@ -164,12 +164,33 @@ export default function AdminApplications() {
     setFilteredApps(result);
   }, [searchTerm, filterStatus, applications]);
 
+  const [approvalModalApp, setApprovalModalApp] = useState<Application | null>(null);
+  const [approvalData, setApprovalData] = useState({ country: '', batch: '', company: '' });
+  const [isApproving, setIsApproving] = useState(false);
+
   const handleStatusChange = async (id: string, newStatus: 'pending' | 'approved' | 'rejected') => {
     const appToUpdate = applications.find(a => a.id === id);
     if (!appToUpdate) return;
     
+    if (newStatus === 'approved' && appToUpdate.status !== 'approved') {
+      setApprovalData({ 
+        country: appToUpdate.targetCountry || appToUpdate.appliedCountry || '', 
+        batch: '', 
+        company: '' 
+      });
+      setApprovalModalApp(appToUpdate);
+      return;
+    }
+
+    await performStatusUpdate(id, newStatus);
+  };
+
+  const performStatusUpdate = async (id: string, newStatus: 'pending' | 'approved' | 'rejected', additionalData?: { country: string, batch: string, company: string }) => {
+    const appToUpdate = applications.find(a => a.id === id);
+    if (!appToUpdate) return;
+    
     const prevStatus = appToUpdate.status;
-    if (prevStatus === newStatus) return;
+    if (prevStatus === newStatus && !additionalData) return;
 
     const historyEntry = {
       prevStatus,
@@ -180,10 +201,28 @@ export default function AdminApplications() {
 
     try {
       try {
-        await updateDoc(doc(db, 'applications', id), { 
+        const updatePayload: any = { 
           status: newStatus,
           statusHistory: [...(appToUpdate.statusHistory || []), historyEntry]
-        });
+        };
+
+        if (additionalData) {
+          updatePayload.targetCountry = additionalData.country;
+          updatePayload.assignedBatch = additionalData.batch;
+          updatePayload.assignedCompany = additionalData.company;
+        }
+
+        await updateDoc(doc(db, 'applications', id), updatePayload);
+
+        // Also update Candidate Profile if applicable and if approving
+        if (newStatus === 'approved' && appToUpdate.candidateUid && additionalData) {
+          await updateDoc(doc(db, 'candidates', appToUpdate.candidateUid), {
+            assignedCountry: additionalData.country,
+            assignedBatch: additionalData.batch,
+            assignedCompany: additionalData.company,
+            updatedAt: Date.now()
+          });
+        }
       } catch (err) {
         handleFirestoreError(err, OperationType.UPDATE, `applications/${id}`);
       }
@@ -193,12 +232,22 @@ export default function AdminApplications() {
         setSelectedApp({ 
           ...selectedApp, 
           status: newStatus,
-          statusHistory: [...(selectedApp.statusHistory || []), historyEntry]
-        });
+          statusHistory: [...(selectedApp.statusHistory || []), historyEntry],
+          ...(additionalData ? { targetCountry: additionalData.country, assignedBatch: additionalData.batch, assignedCompany: additionalData.company } : {})
+        } as Application);
       }
     } catch (error) {
       toast.error(`Failed to update status: ${getErrorMessage(error)}`);
     }
+  };
+
+  const submitApproval = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!approvalModalApp) return;
+    setIsApproving(true);
+    await performStatusUpdate(approvalModalApp.id, 'approved', approvalData);
+    setIsApproving(false);
+    setApprovalModalApp(null);
   };
 
   const handleCountryShift = async () => {
@@ -373,13 +422,19 @@ export default function AdminApplications() {
               <div className="flex justify-between items-start mb-8 md:mb-10">
                 <div>
                   <h2 className="text-2xl md:text-3xl font-bold text-brand-blue mb-2">{selectedApp.fullName}</h2>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm md:text-base text-gray-500">
+                  <div className="flex flex-col gap-2 text-sm md:text-base text-gray-500">
                     <p>Applied for: <span className="text-brand-gold font-bold">{selectedApp.jobTitle}</span></p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-400">|</span>
+                    <div className="flex flex-wrap items-center gap-2">
                       <p>Original: <span className="font-bold">{selectedApp.originalCountry || selectedApp.appliedCountry || 'N/A'}</span></p>
                       <span className="text-gray-400">|</span>
                       <p>Target: <span className="text-brand-blue font-bold">{selectedApp.targetCountry || selectedApp.appliedCountry || 'N/A'}</span></p>
+                      {(selectedApp.assignedBatch || selectedApp.assignedCompany) && (
+                         <>
+                           <span className="text-gray-400">|</span>
+                           {selectedApp.assignedBatch && <span className="bg-brand-gold/10 text-brand-gold px-2 py-0.5 rounded-md font-bold text-xs uppercase"><Calendar size={12} className="inline mr-1 -mt-0.5" />{selectedApp.assignedBatch}</span>}
+                           {selectedApp.assignedCompany && <span className="bg-brand-blue/10 text-brand-blue px-2 py-0.5 rounded-md font-bold text-xs"><Building2 size={12} className="inline mr-1 -mt-0.5" />{selectedApp.assignedCompany}</span>}
+                         </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -594,6 +649,90 @@ export default function AdminApplications() {
             </motion.div>
           </div>
         )}
+        {/* Approval Assignment Modal */}
+        {approvalModalApp && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-brand-blue/60 backdrop-blur-sm"
+              onClick={() => !isApproving && setApprovalModalApp(null)}
+            ></motion.div>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white rounded-3xl shadow-2xl w-full max-w-md relative z-10 p-6 md:p-8"
+            >
+              <div className="flex justify-between items-center mb-6">
+                 <div>
+                   <h3 className="text-xl font-bold text-brand-blue">Approve Application</h3>
+                   <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Assign Placement</p>
+                 </div>
+                 <button onClick={() => !isApproving && setApprovalModalApp(null)} className="p-2 bg-gray-50 text-gray-400 hover:text-brand-blue rounded-full transition-colors">
+                   <X size={18} />
+                 </button>
+              </div>
+
+              <form onSubmit={submitApproval} className="space-y-5">
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5"><Globe size={12} className="text-brand-gold"/> Target Country</label>
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="e.g. Romania, Poland"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-gold outline-none text-sm font-semibold text-slate-700 bg-gray-50 focus:bg-white"
+                    value={approvalData.country}
+                    onChange={(e) => setApprovalData({...approvalData, country: e.target.value})}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5"><Calendar size={12} className="text-brand-gold"/> Batch</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. Batch 1"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-gold outline-none text-sm font-semibold text-slate-700 bg-gray-50 focus:bg-white"
+                      value={approvalData.batch}
+                      onChange={(e) => setApprovalData({...approvalData, batch: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5"><Building2 size={12} className="text-brand-gold"/> Company</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. Client X"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-gold outline-none text-sm font-semibold text-slate-700 bg-gray-50 focus:bg-white"
+                      value={approvalData.company}
+                      onChange={(e) => setApprovalData({...approvalData, company: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-4 flex gap-4 mt-6">
+                  <button 
+                    type="button"
+                    onClick={() => setApprovalModalApp(null)}
+                    disabled={isApproving}
+                    className="flex-grow px-6 py-3.5 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-all border border-gray-200 text-xs uppercase tracking-widest"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit"
+                    disabled={isApproving}
+                    className="flex-grow flex justify-center items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-white bg-green-500 hover:bg-green-600 transition-all shadow-lg shadow-green-500/20 text-xs uppercase tracking-widest"
+                  >
+                    {isApproving ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
+                    Approve
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+
         {/* Delete Confirmation Modal */}
         {deleteAppId && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">

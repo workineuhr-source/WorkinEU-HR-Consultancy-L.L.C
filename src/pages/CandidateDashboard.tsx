@@ -500,6 +500,12 @@ export default function CandidateDashboard() {
     );
   }
 
+  const calcTotalAmount = parseFloat(profile.totalAmount || '0') || 0;
+  const calcRiskAmount = profile.riskAmount || 0;
+  const calcRawPaidAmount = (profile.paymentHistory || []).reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0);
+  const calcActualPaidAmount = calcRawPaidAmount - calcRiskAmount;
+  const calcRemainingAmount = Math.max(0, calcTotalAmount - calcActualPaidAmount);
+
   return (
     <div className="min-h-screen bg-white dark:bg-[#020617] pt-20 pb-20 transition-colors duration-500 relative overflow-hidden">
       {/* Background elements */}
@@ -1211,18 +1217,22 @@ export default function CandidateDashboard() {
                 >
                   <h3 className="text-2xl font-bold text-brand-blue dark:text-white">My Payments</h3>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-white/5 border-t-4 border-t-brand-blue">
                       <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Total Package</p>
-                      <p className="text-3xl font-bold text-brand-blue dark:text-white">{CURRENCY_SYMBOLS[profile.paymentCurrency || 'EUR']} {profile.totalAmount || '0'}</p>
+                      <p className="text-3xl font-bold text-brand-blue dark:text-white">{CURRENCY_SYMBOLS[profile.paymentCurrency || 'EUR']} {calcTotalAmount}</p>
                     </div>
                     <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-white/5 border-t-4 border-t-green-500">
                       <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Total Paid</p>
-                      <p className="text-3xl font-bold text-green-600 dark:text-green-400">{CURRENCY_SYMBOLS[profile.paymentCurrency || 'EUR']} {profile.paidAmount || '0'}</p>
+                      <p className="text-3xl font-bold text-green-600 dark:text-green-400">{CURRENCY_SYMBOLS[profile.paymentCurrency || 'EUR']} {calcRawPaidAmount}</p>
                     </div>
-                    <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-white/5 border-t-4 border-t-brand-gold">
+                    <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-white/5 border-t-4 border-t-orange-500">
+                      <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Ris (Refund/Risk)</p>
+                      <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">{CURRENCY_SYMBOLS[profile.paymentCurrency || 'EUR']} {calcRiskAmount}</p>
+                    </div>
+                    <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-white/5 border-t-4 border-t-rose-500">
                       <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Remaining</p>
-                      <p className="text-3xl font-bold text-brand-gold">{CURRENCY_SYMBOLS[profile.paymentCurrency || 'EUR']} {Number(profile.totalAmount || 0) - Number(profile.paidAmount || 0)}</p>
+                      <p className="text-3xl font-bold text-rose-500">{CURRENCY_SYMBOLS[profile.paymentCurrency || 'EUR']} {calcRemainingAmount}</p>
                     </div>
                   </div>
 

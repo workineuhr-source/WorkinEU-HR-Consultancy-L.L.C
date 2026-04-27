@@ -45,6 +45,7 @@ import AdminDiary from './admin/AdminDiary';
 import AdminSuccessStories from './admin/AdminSuccessStories';
 import AdminClients from './admin/AdminClients';
 import AdminCandidateDetail from './admin/AdminCandidateDetail';
+import AdminFinancialAccounts from './admin/AdminFinancialAccounts';
 import AdminSystemSettings from './admin/AdminSystemSettings';
 import AdminAccount from './admin/AdminAccount';
 import ErrorBoundary from '../components/ErrorBoundary';
@@ -112,6 +113,7 @@ export default function AdminDashboard() {
     { name: 'Manage Jobs', path: '/admin/jobs', icon: <Briefcase size={20} /> },
     { name: 'Applications', path: '/admin/applications', icon: <Users size={20} /> },
     { name: 'Candidates', path: '/admin/candidates', icon: <Users size={20} /> },
+    { name: 'Finance & Accounts', path: '/admin/finance', icon: <BarChart3 size={20} /> },
     { name: 'Refund Requests', path: '/admin/refunds', icon: <RotateCcw size={20} /> },
     { name: 'Site Content', path: '/admin/content', icon: <Settings size={20} /> },
     { name: 'Our Diary', path: '/admin/diary', icon: <Sparkles size={20} /> },
@@ -287,6 +289,7 @@ export default function AdminDashboard() {
                 <Route path="/applications" element={<AdminApplications />} />
                 <Route path="/candidates" element={<AdminCandidates />} />
                 <Route path="/candidates/:uid" element={<AdminCandidateDetail />} />
+                <Route path="/finance" element={<AdminFinancialAccounts />} />
                 <Route path="/refunds" element={<AdminRefunds />} />
                 <Route path="/content" element={<AdminContent />} />
                 <Route path="/team" element={<AdminTeam />} />

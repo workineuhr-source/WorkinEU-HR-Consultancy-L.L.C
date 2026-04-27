@@ -53,16 +53,16 @@ export default function AdminCandidateDetail() {
 
   const TABS = [
     { id: 'profile', label: 'Profile Summary', icon: User },
-    { id: 'cv-theme', label: 'CV Theme Core', icon: LayoutTemplate },
-    { id: 'target-placement', label: 'Target Placement', icon: Globe },
-    { id: 'eligibility', label: 'Eligibility Core', icon: ShieldCheck },
     { id: 'identity-core', label: 'Identity Core', icon: User },
     { id: 'identity-family', label: 'Identity & Family Intel', icon: Heart },
     { id: 'portfolio', label: 'Portfolio & Expertise', icon: Briefcase },
+    { id: 'target-placement', label: 'Target Placement', icon: Globe },
+    { id: 'deployment', label: 'Mission Deployment Core', icon: Plane },
     { id: 'financial', label: 'Financial Intelligence', icon: CreditCard },
-    { id: 'applications', label: 'Mission Applications', icon: Briefcase },
+    { id: 'cv-theme', label: 'CV Theme Core', icon: LayoutTemplate },
     { id: 'documents', label: 'Documents & Supporting Files', icon: FolderOpen },
-    { id: 'deployment', label: 'Mission Deployment Core', icon: Plane }
+    { id: 'applications', label: 'Mission Applications', icon: Briefcase },
+    { id: 'eligibility', label: 'Eligibility Core', icon: ShieldCheck }
   ];
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
@@ -403,8 +403,22 @@ export default function AdminCandidateDetail() {
     );
   }
 
+  const calcTotalAmount = parseFloat(editingProfile.totalAmount || '0') || 0;
+  const calcRiskAmount = editingProfile.riskAmount || 0;
+  const calcRawPaidAmount = (editingProfile.paymentHistory || []).reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0);
+  const calcActualPaidAmount = calcRawPaidAmount - calcRiskAmount;
+  const calcRemainingAmount = Math.max(0, calcTotalAmount - calcActualPaidAmount);
+
   return (
     <div className="max-w-6xl mx-auto pb-24">
+      {/* Global Datalists for Autocomplete */}
+      <datalist id="all-countries">
+        {ALL_COUNTRIES.map(c => <option key={c} value={c} />)}
+      </datalist>
+      <datalist id="job-position-options">
+        {JOB_POSITIONS.map(jp => <option key={jp} value={jp} />)}
+      </datalist>
+
       {/* Top Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
         <div className="flex items-center gap-6">
@@ -527,127 +541,7 @@ export default function AdminCandidateDetail() {
             </div>
           </div>
 
-          {/* Quick CV Download Section */}
-          <div className={cn("bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden relative", activeTab !== 'cv-theme' && 'hidden')}>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-brand-teal/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
-            <h3 className="text-sm font-black uppercase tracking-widest mb-6 flex items-center gap-2 text-brand-blue relative z-10">
-              <FileText className="text-brand-teal" size={20} /> CV Theme Core
-            </h3>
-            <div className="space-y-4 relative z-10">
-               <div>
-                 <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">Select Layout Style</label>
-                 <select 
-                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 outline-none focus:border-brand-teal text-sm font-bold appearance-none cursor-pointer"
-                    value={selectedCvTheme}
-                    onChange={(e) => setSelectedCvTheme(e.target.value as any)}
-                  >
-                    <option value="classic">Classic Professional</option>
-                    <option value="modern">Modern Tech</option>
-                    <option value="professional">Executive Blue</option>
-                    <option value="elegant">Premium Elegant</option>
-                  </select>
-               </div>
-               <button 
-                onClick={downloadEuropassCV}
-                className="w-full py-4 bg-brand-gold rounded-2xl text-brand-blue font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-brand-gold/20 flex items-center justify-center gap-3 hover:translate-y-[-2px] transition-all"
-               >
-                 <Download size={18} />
-                 Execute Download
-               </button>
-            </div>
-          </div>
-
-          {/* Target Placement / Assignment */}
-          <div className={cn("bg-white p-8 rounded-[2.5rem] shadow-sm border border-brand-gold/30 relative overflow-hidden", activeTab !== 'target-placement' && 'hidden')}>
-             <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
-             <h3 className="text-sm font-black text-brand-blue uppercase tracking-widest mb-6 flex items-center gap-2 relative z-10">
-               <Globe className="text-brand-gold" size={20} /> Target Placement
-             </h3>
-             <div className="space-y-5 relative z-10">
-                <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Target Country</label>
-                  <input 
-                    list="country-options"
-                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 outline-none focus:bg-white focus:border-brand-gold text-sm font-bold text-brand-blue"
-                    value={editingProfile.assignedCountry || ''}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, assignedCountry: e.target.value })}
-                    placeholder="e.g. Romania, Poland"
-                  />
-                  <datalist id="country-options">
-                    <option value="Romania" />
-                    <option value="Poland" />
-                    <option value="Croatia" />
-                    <option value="Serbia" />
-                    <option value="Czech Republic" />
-                    <option value="Slovakia" />
-                    <option value="Hungary" />
-                  </datalist>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Enrolled Batch</label>
-                  <input 
-                    list="batch-options"
-                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 outline-none focus:bg-white focus:border-brand-gold text-sm font-bold text-brand-blue"
-                    value={editingProfile.assignedBatch || ''}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, assignedBatch: e.target.value })}
-                    placeholder="e.g. Batch 1"
-                  />
-                  <datalist id="batch-options">
-                    <option value="Batch 1" />
-                    <option value="Batch 2" />
-                    <option value="Batch 3" />
-                  </datalist>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Target Company</label>
-                  <input 
-                    list="company-options"
-                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 outline-none focus:bg-white focus:border-brand-gold text-sm font-bold text-brand-blue"
-                    value={editingProfile.assignedCompany || ''}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, assignedCompany: e.target.value })}
-                    placeholder="e.g. ConstructorTech SRL"
-                  />
-                  <datalist id="company-options">
-                  </datalist>
-                </div>
-             </div>
-          </div>
-
-          {/* Verification Status */}
-          <div className={cn("bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100", activeTab !== 'eligibility' && 'hidden')}>
-             <h3 className="text-sm font-black text-brand-blue uppercase tracking-widest mb-6 flex items-center gap-2">
-               <ShieldCheck className="text-green-500" size={20} /> Eligibility Core
-             </h3>
-             <div className="space-y-6">
-                <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Profile Intel (Metadata)</label>
-                  <input 
-                    className="w-full bg-blue-50/50 border border-blue-100/50 rounded-2xl px-4 py-3 outline-none focus:bg-white focus:border-brand-gold text-xs font-black text-brand-blue"
-                    value={editingProfile.profileIntel || ''}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, profileIntel: e.target.value })}
-                    placeholder="e.g. High Performance"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Work Permit Monitoring</label>
-                  <select 
-                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 outline-none focus:bg-white focus:border-brand-gold text-xs font-black"
-                    value={editingProfile.workPermitStatus || 'Review Pending'}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, workPermitStatus: e.target.value as any })}
-                  >
-                    <option value="Review Pending">Review Pending</option>
-                    <option value="Documents Submitted">Documents Submitted</option>
-                    <option value="In Processing">In Processing</option>
-                    <option value="Approved">Approved</option>
-                    <option value="Rejected">Rejected</option>
-                    <option value="Appealed">Appealed</option>
-                    <option value="Expired">Expired</option>
-                  </select>
-                </div>
-             </div>
-          </div>
-        {/* Form Sections */}
-        {/* Merging into same container */}
+          
           {/* Identity & Background */}
           <div className={cn("bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100", activeTab !== 'identity-core' && 'hidden')}>
              <div className="flex items-center gap-4 mb-10 border-b border-gray-50 pb-6">
@@ -994,6 +888,7 @@ export default function AdminCandidateDetail() {
                           <div>
                             <label className="block text-[10px] font-black text-gray-400 uppercase mb-2">Job Title / Role</label>
                             <input 
+                              list="job-position-options"
                               className="w-full bg-white px-5 py-3 rounded-xl border border-slate-100 outline-none focus:border-brand-gold text-sm font-bold"
                               value={work.position}
                               onChange={(e) => {
@@ -1196,7 +1091,118 @@ export default function AdminCandidateDetail() {
              </div>
           </div>
 
-          {/* Payment & Financial Intelligence */}
+          {/* Target Placement / Assignment */}
+          <div className={cn("bg-white p-8 rounded-[2.5rem] shadow-sm border border-brand-gold/30 relative overflow-hidden", activeTab !== 'target-placement' && 'hidden')}>
+             <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+             <h3 className="text-sm font-black text-brand-blue uppercase tracking-widest mb-6 flex items-center gap-2 relative z-10">
+               <Globe className="text-brand-gold" size={20} /> Target Placement
+             </h3>
+             <div className="space-y-5 relative z-10">
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Target Country</label>
+                  <input 
+                    list="all-countries"
+                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 outline-none focus:bg-white focus:border-brand-gold text-sm font-bold text-brand-blue"
+                    value={editingProfile.assignedCountry || ''}
+                    onChange={(e) => setEditingProfile({ ...editingProfile, assignedCountry: e.target.value })}
+                    placeholder="e.g. Romania, Poland"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Enrolled Batch</label>
+                  <input 
+                    list="batch-options"
+                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 outline-none focus:bg-white focus:border-brand-gold text-sm font-bold text-brand-blue"
+                    value={editingProfile.assignedBatch || ''}
+                    onChange={(e) => setEditingProfile({ ...editingProfile, assignedBatch: e.target.value })}
+                    placeholder="e.g. Batch 1"
+                  />
+                  <datalist id="batch-options">
+                    <option value="Batch 1" />
+                    <option value="Batch 2" />
+                    <option value="Batch 3" />
+                  </datalist>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Target Company</label>
+                  <input 
+                    list="company-options"
+                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 outline-none focus:bg-white focus:border-brand-gold text-sm font-bold text-brand-blue"
+                    value={editingProfile.assignedCompany || ''}
+                    onChange={(e) => setEditingProfile({ ...editingProfile, assignedCompany: e.target.value })}
+                    placeholder="e.g. ConstructorTech SRL"
+                  />
+                  <datalist id="company-options">
+                  </datalist>
+                </div>
+             </div>
+          </div>
+
+          {/* Visa & Deployment Master */}
+          <div className={cn("bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100 relative overflow-hidden", activeTab !== 'deployment' && 'hidden')}>
+             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-brand-blue/5 to-transparent pointer-events-none"></div>
+             <div className="flex items-center gap-4 mb-10 border-b border-gray-50 pb-6">
+                <div className="p-4 bg-brand-teal/10 rounded-2xl text-brand-teal">
+                  <Zap size={24} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-brand-blue">Mission Deployment Core</h3>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Visa Authorization & Arrival Intelligence</p>
+                </div>
+             </div>
+
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div className="space-y-6">
+                   <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100">
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Global Visa Authorization</label>
+                      <select 
+                        className="w-full bg-transparent outline-none font-bold text-sm text-brand-blue"
+                        value={editingProfile.visaStatus || 'pending'}
+                        onChange={(e) => setEditingProfile({ ...editingProfile, visaStatus: e.target.value as any })}
+                      >
+                         <option value="pending">PENDING APPROVAL</option>
+                         <option value="application_submitted">APPLICATION SUBMITTED</option>
+                         <option value="embassy_appointment">EMBASSY APPOINTMENT SCHEDULED</option>
+                         <option value="under_review">UNDER REVIEW BY EMBASSY</option>
+                         <option value="approved">MISSION APPROVED (VISA OK)</option>
+                         <option value="rejected">MISSION REJECTED</option>
+                         <option value="appealed">APPEALED</option>
+                         <option value="expired">EXPIRED</option>
+                      </select>
+                   </div>
+                   <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100">
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Deployment (Joining) Date</label>
+                      <input 
+                        type="text"
+                        className="w-full bg-transparent outline-none font-bold text-sm text-brand-blue"
+                        value={editingProfile.joiningDate || ''}
+                        onChange={(e) => setEditingProfile({ ...editingProfile, joiningDate: e.target.value })}
+                        placeholder="e.g. 25th May 2026"
+                      />
+                   </div>
+                </div>
+
+                <div className="bg-brand-teal/5 p-8 rounded-[3rem] border border-brand-teal/10">
+                   <h4 className="text-[10px] font-black text-brand-teal uppercase tracking-widest mb-6">Strategic Arrival Intel</h4>
+                   <div className="space-y-6">
+                      <div className="flex items-center justify-between border-b border-brand-teal/10 pb-3">
+                         <span className="text-xs font-bold text-slate-400">Target Arrival</span>
+                         <input className="bg-transparent text-right text-xs font-black outline-none w-24 text-brand-blue" value={editingProfile.expectedArrivalDate || ''} onChange={e => setEditingProfile({ ...editingProfile, expectedArrivalDate: e.target.value })} placeholder="Date..." />
+                      </div>
+                      <div className="flex items-center justify-between border-b border-brand-teal/10 pb-3">
+                         <span className="text-xs font-bold text-slate-400">Destination Position</span>
+                         <input className="bg-transparent text-right text-xs font-black outline-none w-32 text-brand-blue" value={editingProfile.interviewPosition || ''} onChange={e => setEditingProfile({ ...editingProfile, interviewPosition: e.target.value })} placeholder="Position..." />
+                      </div>
+                      <div className="flex items-center justify-between font-bold">
+                         <span className="text-xs font-bold text-slate-400">Operation Country</span>
+                         <input className="bg-transparent text-right text-xs font-black outline-none w-24 text-brand-blue" value={editingProfile.interviewCountry || ''} onChange={e => setEditingProfile({ ...editingProfile, interviewCountry: e.target.value })} placeholder="Country..." />
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+
+      {/* Payment & Financial Intelligence */}
           <div className={cn("bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100", activeTab !== 'financial' && 'hidden')}>
              <div className="flex items-center gap-4 mb-10 border-b border-gray-50 pb-6">
                 <div className="p-4 bg-green-100 rounded-2xl text-green-600">
@@ -1245,6 +1251,35 @@ export default function AdminCandidateDetail() {
                           <option value="partially-paid">⏳ Partially Collected</option>
                           <option value="fully-paid">✅ Fully Paid</option>
                         </select>
+                     </div>
+                  </div>
+
+                  {/* Financial Counters */}
+                  <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+                     <div className="bg-white p-4 rounded-2xl border border-green-100/50 shadow-sm text-center">
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Gross Received</p>
+                        <p className="text-xl font-black text-brand-blue">{CURRENCY_SYMBOLS[editingProfile.paymentCurrency || 'EUR']} {calcRawPaidAmount}</p>
+                     </div>
+                     <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100 shadow-sm text-center">
+                        <p className="text-[10px] font-black text-orange-400 uppercase tracking-widest mb-1">Ris (Risk) Amount</p>
+                        <div className="flex items-center justify-center gap-1">
+                          <span className="text-sm font-black text-orange-600">{CURRENCY_SYMBOLS[editingProfile.paymentCurrency || 'EUR']}</span>
+                          <input 
+                            type="number"
+                            className="bg-transparent text-xl font-black text-orange-600 outline-none w-20 text-center"
+                            value={editingProfile.riskAmount || ''}
+                            onChange={(e) => setEditingProfile({ ...editingProfile, riskAmount: parseFloat(e.target.value) || 0 })}
+                            placeholder="0"
+                          />
+                        </div>
+                     </div>
+                     <div className="bg-brand-blue/5 p-4 rounded-2xl border border-brand-blue/10 shadow-sm text-center">
+                        <p className="text-[10px] font-black text-brand-blue uppercase tracking-widest mb-1">Net Paid (After Ris)</p>
+                        <p className="text-xl font-black text-brand-blue">{CURRENCY_SYMBOLS[editingProfile.paymentCurrency || 'EUR']} {calcActualPaidAmount}</p>
+                     </div>
+                     <div className="bg-red-50 p-4 rounded-2xl border border-red-100 shadow-sm text-center">
+                        <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-1">Remaining Due</p>
+                        <p className="text-xl font-black text-red-600">{CURRENCY_SYMBOLS[editingProfile.paymentCurrency || 'EUR']} {calcRemainingAmount}</p>
                      </div>
                   </div>
                 </div>
@@ -1337,24 +1372,117 @@ export default function AdminCandidateDetail() {
                               }}>
                                 <option>Cash</option>
                                 <option>Bank Transfer</option>
+                                <option>Online Payment Gateway</option>
                                 <option>E-Sewa</option>
                                 <option>Khalti</option>
+                                <option>IME Pay</option>
+                                <option>Cheque</option>
+                                <option>Credit Card</option>
                                 <option>Other</option>
                               </select>
                            </div>
                            <div>
                               <label className="block text-[8px] font-black text-gray-400 mb-1 uppercase">Notes</label>
-                              <input className="w-full text-xs font-bold outline-none italic" value={p.note} onChange={e => {
+                              <input list="payment-note-options" className="w-full text-xs font-bold outline-none italic" value={p.note} onChange={e => {
                                 const newH = [...(editingProfile.paymentHistory || [])];
                                 newH[i] = { ...p, note: e.target.value };
                                 setEditingProfile({ ...editingProfile, paymentHistory: newH });
                               }} placeholder="Optional memo..." />
+                              <datalist id="payment-note-options">
+                                <option value="Initial" />
+                                <option value="After WP" />
+                                <option value="After Visa" />
+                                <option value="Ris (Risk) Amount" />
+                              </datalist>
                            </div>
                         </div>
                       ))}
                    </div>
                 </div>
              </div>
+          </div>
+
+          {/* Quick CV Download Section */}
+          <div className={cn("bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden relative", activeTab !== 'cv-theme' && 'hidden')}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-brand-teal/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
+            <h3 className="text-sm font-black uppercase tracking-widest mb-6 flex items-center gap-2 text-brand-blue relative z-10">
+              <FileText className="text-brand-teal" size={20} /> CV Theme Core
+            </h3>
+            <div className="space-y-4 relative z-10">
+               <div>
+                 <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">Select Layout Style</label>
+                 <select 
+                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 outline-none focus:border-brand-teal text-sm font-bold appearance-none cursor-pointer"
+                    value={selectedCvTheme}
+                    onChange={(e) => setSelectedCvTheme(e.target.value as any)}
+                  >
+                    <option value="classic">Classic Professional</option>
+                    <option value="modern">Modern Tech</option>
+                    <option value="professional">Executive Blue</option>
+                    <option value="elegant">Premium Elegant</option>
+                  </select>
+               </div>
+               <button 
+                onClick={downloadEuropassCV}
+                className="w-full py-4 bg-brand-gold rounded-2xl text-brand-blue font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-brand-gold/20 flex items-center justify-center gap-3 hover:translate-y-[-2px] transition-all"
+               >
+                 <Download size={18} />
+                 Execute Download
+               </button>
+            </div>
+          </div>
+
+          {/* Documents & Supporting Files */}
+          <div className={cn("bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100 relative overflow-hidden mb-8", activeTab !== 'documents' && 'hidden')}>
+             <div className="flex items-center justify-between mb-10 border-b border-gray-50 pb-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 bg-brand-gold/10 rounded-2xl text-brand-gold">
+                    <FileText size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-brand-blue">Documents & Supporting Files</h3>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Passport, Certificates, and CV Dossier</p>
+                  </div>
+                </div>
+                <label className="bg-brand-blue text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 cursor-pointer hover:bg-brand-teal transition-all shadow-lg shadow-brand-blue/20">
+                  <Upload size={14} /> Upload File
+                  <input type="file" className="hidden" onChange={handleDocumentUpload} />
+                </label>
+             </div>
+
+             {editingProfile.documents && editingProfile.documents.length > 0 ? (
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 {editingProfile.documents.map((doc, i) => (
+                   <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 group">
+                     <div className="flex items-center gap-3">
+                       <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-brand-gold shadow-sm">
+                         <FileText size={18} />
+                       </div>
+                       <div>
+                         <p className="text-[10px] font-black text-brand-blue break-all max-w-[150px]">{doc.name}</p>
+                         <p className="text-[8px] font-black text-gray-400 uppercase">{new Date(doc.uploadedAt).toLocaleDateString()}</p>
+                       </div>
+                     </div>
+                     <div className="flex items-center gap-2">
+                       <a href={doc.url} target="_blank" rel="noopener noreferrer" className="p-2 bg-white text-brand-blue rounded-lg opacity-0 group-hover:opacity-100 hover:text-brand-teal transition-all shadow-sm">
+                         <Download size={14} />
+                       </a>
+                       <button 
+                         onClick={() => setEditingProfile(prev => ({ ...prev, documents: prev.documents?.filter((_, idx) => idx !== i) }))}
+                         className="p-2 bg-white text-red-500 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-50 transition-all shadow-sm"
+                       >
+                         <Trash size={14} />
+                       </button>
+                     </div>
+                   </div>
+                 ))}
+               </div>
+             ) : (
+               <div className="text-center py-12 bg-slate-50/50 rounded-[2.5rem] border-2 border-dashed border-slate-100">
+                 <FileText className="mx-auto text-slate-200 mb-2" size={48} />
+                 <p className="text-xs font-black text-slate-400 uppercase tracking-widest">No documents attached to this mission.</p>
+               </div>
+             )}
           </div>
 
           {/* Candidate Applications */}
@@ -1427,126 +1555,42 @@ export default function AdminCandidateDetail() {
              )}
           </div>
 
-          {/* Mission Deployment Core */}
-          <div className={cn("bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100 relative overflow-hidden mb-8", activeTab !== 'documents' && 'hidden')}>
-             <div className="flex items-center justify-between mb-10 border-b border-gray-50 pb-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-4 bg-brand-gold/10 rounded-2xl text-brand-gold">
-                    <FileText size={24} />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-black text-brand-blue">Documents & Supporting Files</h3>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Passport, Certificates, and CV Dossier</p>
-                  </div>
-                </div>
-                <label className="bg-brand-blue text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 cursor-pointer hover:bg-brand-teal transition-all shadow-lg shadow-brand-blue/20">
-                  <Upload size={14} /> Upload File
-                  <input type="file" className="hidden" onChange={handleDocumentUpload} />
-                </label>
-             </div>
-
-             {editingProfile.documents && editingProfile.documents.length > 0 ? (
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                 {editingProfile.documents.map((doc, i) => (
-                   <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 group">
-                     <div className="flex items-center gap-3">
-                       <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-brand-gold shadow-sm">
-                         <FileText size={18} />
-                       </div>
-                       <div>
-                         <p className="text-[10px] font-black text-brand-blue break-all max-w-[150px]">{doc.name}</p>
-                         <p className="text-[8px] font-black text-gray-400 uppercase">{new Date(doc.uploadedAt).toLocaleDateString()}</p>
-                       </div>
-                     </div>
-                     <div className="flex items-center gap-2">
-                       <a href={doc.url} target="_blank" rel="noopener noreferrer" className="p-2 bg-white text-brand-blue rounded-lg opacity-0 group-hover:opacity-100 hover:text-brand-teal transition-all shadow-sm">
-                         <Download size={14} />
-                       </a>
-                       <button 
-                         onClick={() => setEditingProfile(prev => ({ ...prev, documents: prev.documents?.filter((_, idx) => idx !== i) }))}
-                         className="p-2 bg-white text-red-500 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-50 transition-all shadow-sm"
-                       >
-                         <Trash size={14} />
-                       </button>
-                     </div>
-                   </div>
-                 ))}
-               </div>
-             ) : (
-               <div className="text-center py-12 bg-slate-50/50 rounded-[2.5rem] border-2 border-dashed border-slate-100">
-                 <FileText className="mx-auto text-slate-200 mb-2" size={48} />
-                 <p className="text-xs font-black text-slate-400 uppercase tracking-widest">No documents attached to this mission.</p>
-               </div>
-             )}
-          </div>
-
-          {/* Visa & Deployment Master */}
-          <div className={cn("bg-white p-8 md:p-12 rounded-[3.5rem] shadow-sm border border-gray-100 relative overflow-hidden", activeTab !== 'deployment' && 'hidden')}>
-             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-brand-blue/5 to-transparent pointer-events-none"></div>
-             <div className="flex items-center gap-4 mb-10 border-b border-gray-50 pb-6">
-                <div className="p-4 bg-brand-teal/10 rounded-2xl text-brand-teal">
-                  <Zap size={24} />
+          {/* Verification Status */}
+          <div className={cn("bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100", activeTab !== 'eligibility' && 'hidden')}>
+             <h3 className="text-sm font-black text-brand-blue uppercase tracking-widest mb-6 flex items-center gap-2">
+               <ShieldCheck className="text-green-500" size={20} /> Eligibility Core
+             </h3>
+             <div className="space-y-6">
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Profile Intel (Metadata)</label>
+                  <input 
+                    className="w-full bg-blue-50/50 border border-blue-100/50 rounded-2xl px-4 py-3 outline-none focus:bg-white focus:border-brand-gold text-xs font-black text-brand-blue"
+                    value={editingProfile.profileIntel || ''}
+                    onChange={(e) => setEditingProfile({ ...editingProfile, profileIntel: e.target.value })}
+                    placeholder="e.g. High Performance"
+                  />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black text-brand-blue">Mission Deployment Core</h3>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Visa Authorization & Arrival Intelligence</p>
-                </div>
-             </div>
-
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <div className="space-y-6">
-                   <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100">
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Global Visa Authorization</label>
-                      <select 
-                        className="w-full bg-transparent outline-none font-bold text-sm text-brand-blue"
-                        value={editingProfile.visaStatus || 'pending'}
-                        onChange={(e) => setEditingProfile({ ...editingProfile, visaStatus: e.target.value as any })}
-                      >
-                         <option value="pending">PENDING APPROVAL</option>
-                         <option value="application_submitted">APPLICATION SUBMITTED</option>
-                         <option value="embassy_appointment">EMBASSY APPOINTMENT SCHEDULED</option>
-                         <option value="under_review">UNDER REVIEW BY EMBASSY</option>
-                         <option value="approved">MISSION APPROVED (VISA OK)</option>
-                         <option value="rejected">MISSION REJECTED</option>
-                         <option value="appealed">APPEALED</option>
-                         <option value="expired">EXPIRED</option>
-                      </select>
-                   </div>
-                   <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100">
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Deployment (Joining) Date</label>
-                      <input 
-                        type="text"
-                        className="w-full bg-transparent outline-none font-bold text-sm text-brand-blue"
-                        value={editingProfile.joiningDate || ''}
-                        onChange={(e) => setEditingProfile({ ...editingProfile, joiningDate: e.target.value })}
-                        placeholder="e.g. 25th May 2026"
-                      />
-                   </div>
-                </div>
-
-                <div className="bg-brand-teal/5 p-8 rounded-[3rem] border border-brand-teal/10">
-                   <h4 className="text-[10px] font-black text-brand-teal uppercase tracking-widest mb-6">Strategic Arrival Intel</h4>
-                   <div className="space-y-6">
-                      <div className="flex items-center justify-between border-b border-brand-teal/10 pb-3">
-                         <span className="text-xs font-bold text-slate-400">Target Arrival</span>
-                         <input className="bg-transparent text-right text-xs font-black outline-none w-24 text-brand-blue" value={editingProfile.expectedArrivalDate || ''} onChange={e => setEditingProfile({ ...editingProfile, expectedArrivalDate: e.target.value })} placeholder="Date..." />
-                      </div>
-                      <div className="flex items-center justify-between border-b border-brand-teal/10 pb-3">
-                         <span className="text-xs font-bold text-slate-400">Destination Position</span>
-                         <input className="bg-transparent text-right text-xs font-black outline-none w-32 text-brand-blue" value={editingProfile.interviewPosition || ''} onChange={e => setEditingProfile({ ...editingProfile, interviewPosition: e.target.value })} placeholder="Position..." />
-                      </div>
-                      <div className="flex items-center justify-between font-bold">
-                         <span className="text-xs font-bold text-slate-400">Operation Country</span>
-                         <input className="bg-transparent text-right text-xs font-black outline-none w-24 text-brand-blue" value={editingProfile.interviewCountry || ''} onChange={e => setEditingProfile({ ...editingProfile, interviewCountry: e.target.value })} placeholder="Country..." />
-                      </div>
-                   </div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Work Permit Monitoring</label>
+                  <select 
+                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 outline-none focus:bg-white focus:border-brand-gold text-xs font-black"
+                    value={editingProfile.workPermitStatus || 'Review Pending'}
+                    onChange={(e) => setEditingProfile({ ...editingProfile, workPermitStatus: e.target.value as any })}
+                  >
+                    <option value="Review Pending">Review Pending</option>
+                    <option value="Documents Submitted">Documents Submitted</option>
+                    <option value="In Processing">In Processing</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                    <option value="Appealed">Appealed</option>
+                    <option value="Expired">Expired</option>
+                  </select>
                 </div>
              </div>
           </div>
         </div>
       </div>
-
-      {/* CV Preview & Render hidden used for PDF generation */}
+        {/* CV Preview & Render hidden used for PDF generation */}
       {cvCandidate && (
         <div className="fixed -left-[10000px] top-0">
           <EuropassCV 

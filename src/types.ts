@@ -187,6 +187,7 @@ export interface CandidateProfile {
   payAfterWP?: string;
   payAfterVisa?: string;
   paidAmount?: string;
+  riskAmount?: number; // Ris Amount / Risk Amount
   paymentCurrency?: 'EUR' | 'NPR' | 'INR' | 'AED' | 'USD';
   includedPackageItems?: string[];
   excludedPackageItems?: string[];

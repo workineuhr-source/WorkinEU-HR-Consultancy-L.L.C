@@ -272,7 +272,7 @@ export default function AdminTeam() {
                 <div className="flex flex-col sm:flex-row items-center gap-6 w-full">
                   <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-gray-100 bg-gray-50 group shrink-0">
                     {formData.photoUrl ? (
-                      <img src={formData.photoUrl} alt="Preview" className="w-full h-full object-cover" />
+                      <img referrerPolicy="no-referrer" src={formData.photoUrl} alt="Preview" className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-300">
                         <User size={40} className="md:w-12 md:h-12" />

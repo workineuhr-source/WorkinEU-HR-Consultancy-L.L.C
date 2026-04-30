@@ -754,7 +754,7 @@ export default function AdminContent() {
                     </div>
                     {content.logoUrl && content.logoUrl !== "" && (
                       <div className="p-6 bg-gray-50 rounded-2xl flex items-center justify-center border border-dashed border-gray-200">
-                        <img src={content.logoUrl} alt="Logo Preview" className="max-h-16 object-contain" />
+                        <img referrerPolicy="no-referrer" src={content.logoUrl} alt="Logo Preview" className="max-h-16 object-contain" />
                       </div>
                     )}
                   </div>
@@ -778,7 +778,7 @@ export default function AdminContent() {
                     </div>
                     {content.faviconUrl && content.faviconUrl !== "" && (
                       <div className="p-6 bg-gray-50 rounded-2xl flex items-center justify-center border border-dashed border-gray-200">
-                        <img src={content.faviconUrl} alt="Favicon Preview" className="w-12 h-12 object-contain" />
+                        <img referrerPolicy="no-referrer" src={content.faviconUrl} alt="Favicon Preview" className="w-12 h-12 object-contain" />
                       </div>
                     )}
                   </div>
@@ -827,7 +827,7 @@ export default function AdminContent() {
                     </div>
                     {content.footerLogoUrl && content.footerLogoUrl !== "" && (
                       <div className="p-6 bg-gray-50 rounded-2xl flex items-center justify-center border border-dashed border-gray-200">
-                        <img src={content.footerLogoUrl} alt="Footer Logo Preview" className="max-h-12 object-contain" />
+                        <img referrerPolicy="no-referrer" src={content.footerLogoUrl} alt="Footer Logo Preview" className="max-h-12 object-contain" />
                       </div>
                     )}
                   </div>
@@ -1055,7 +1055,7 @@ export default function AdminContent() {
                           </div>
                           {url && (
                             <div className="aspect-[4/5] rounded-xl overflow-hidden border border-gray-100">
-                              <img src={url} alt="Slide Preview" className="w-full h-full object-cover" />
+                              <img referrerPolicy="no-referrer" src={url} alt="Slide Preview" className="w-full h-full object-cover" />
                             </div>
                           )}
                         </div>
@@ -1127,7 +1127,7 @@ export default function AdminContent() {
                     </div>
                     {(content.aboutImageUrl || content.officeImageUrl) && (
                       <div className="aspect-video bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 shadow-inner">
-                        <img src={content.aboutImageUrl || content.officeImageUrl} alt="Story Preview" className="w-full h-full object-cover" />
+                        <img referrerPolicy="no-referrer" src={content.aboutImageUrl || content.officeImageUrl} alt="Story Preview" className="w-full h-full object-cover" />
                       </div>
                     )}
                   </div>
@@ -1238,7 +1238,7 @@ export default function AdminContent() {
                   </div>
                   {content.guidingPrinciplesImageUrl && (
                     <div className="relative group aspect-square rounded-[3rem] overflow-hidden border-8 border-gray-50 shadow-2xl">
-                      <img src={content.guidingPrinciplesImageUrl} alt="Principles Preview" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+                      <img referrerPolicy="no-referrer" src={content.guidingPrinciplesImageUrl} alt="Principles Preview" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:opacity-0 transition-opacity flex items-end p-8">
                         <span className="text-white font-bold text-xl drop-shadow-lg">Visual Identity</span>
                       </div>
@@ -1312,7 +1312,7 @@ export default function AdminContent() {
                   </div>
                   {content.professionalHrSolutionsImageUrl && (
                     <div className="aspect-video bg-gray-50 rounded-2xl overflow-hidden border border-gray-100">
-                      <img src={content.professionalHrSolutionsImageUrl} alt="HR Solutions Preview" className="w-full h-full object-cover" />
+                      <img referrerPolicy="no-referrer" src={content.professionalHrSolutionsImageUrl} alt="HR Solutions Preview" className="w-full h-full object-cover" />
                     </div>
                   )}
                 </div>
@@ -1406,7 +1406,7 @@ export default function AdminContent() {
                   </div>
                   {content.coreStrengthsImageUrl && (
                     <div className="aspect-video bg-gray-50 rounded-2xl overflow-hidden border border-gray-100">
-                      <img src={content.coreStrengthsImageUrl} alt="Core Strengths Preview" className="w-full h-full object-cover" />
+                      <img referrerPolicy="no-referrer" src={content.coreStrengthsImageUrl} alt="Core Strengths Preview" className="w-full h-full object-cover" />
                     </div>
                   )}
                 </div>
@@ -1459,7 +1459,7 @@ export default function AdminContent() {
                   </div>
                   {content.whyChooseUsImageUrl && (
                     <div className="mt-4 aspect-video max-h-48 bg-gray-50 rounded-2xl overflow-hidden border border-gray-100">
-                      <img src={content.whyChooseUsImageUrl} alt="Advantage Preview" className="w-full h-full object-cover" />
+                      <img referrerPolicy="no-referrer" src={content.whyChooseUsImageUrl} alt="Advantage Preview" className="w-full h-full object-cover" />
                     </div>
                   )}
                 </div>
@@ -1547,7 +1547,7 @@ export default function AdminContent() {
                   </div>
                   {content.whyChooseUsImageUrl && (
                     <div className="aspect-video bg-gray-50 rounded-2xl overflow-hidden border border-gray-100">
-                      <img src={content.whyChooseUsImageUrl} alt="CTA Preview" className="w-full h-full object-cover" />
+                      <img referrerPolicy="no-referrer" src={content.whyChooseUsImageUrl} alt="CTA Preview" className="w-full h-full object-cover" />
                     </div>
                   )}
                 </div>
@@ -1616,7 +1616,7 @@ export default function AdminContent() {
                   </div>
                   {content.globalStandardsImageUrl && (
                     <div className="aspect-video bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 shadow-md">
-                      <img src={content.globalStandardsImageUrl} alt="Standards Preview" className="w-full h-full object-cover" />
+                      <img referrerPolicy="no-referrer" src={content.globalStandardsImageUrl} alt="Standards Preview" className="w-full h-full object-cover" />
                     </div>
                   )}
                 </div>
@@ -1743,7 +1743,7 @@ export default function AdminContent() {
                   </div>
                   {content.servicesImageUrl && (
                     <div className="aspect-video lg:aspect-square bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100">
-                      <img src={content.servicesImageUrl} alt="Services Section Preview" className="w-full h-full object-cover" />
+                      <img referrerPolicy="no-referrer" src={content.servicesImageUrl} alt="Services Section Preview" className="w-full h-full object-cover" />
                     </div>
                   )}
                 </div>
@@ -1793,7 +1793,7 @@ export default function AdminContent() {
                       </div>
                       {service.imageUrl && service.imageUrl !== "" && (
                         <div className="aspect-video rounded-lg overflow-hidden border border-gray-100">
-                          <img src={service.imageUrl} alt="Service Preview" className="w-full h-full object-cover" />
+                          <img referrerPolicy="no-referrer" src={service.imageUrl} alt="Service Preview" className="w-full h-full object-cover" />
                         </div>
                       )}
                     </div>
@@ -2337,7 +2337,7 @@ export default function AdminContent() {
                       </div>
                       {partner.logoUrl && partner.logoUrl !== "" && (
                         <div className="h-20 bg-white rounded-xl flex items-center justify-center p-4 border border-gray-100">
-                          <img src={partner.logoUrl} alt={partner.name} className="max-h-full object-contain" />
+                          <img referrerPolicy="no-referrer" src={partner.logoUrl} alt={partner.name} className="max-h-full object-contain" />
                         </div>
                       )}
                     </div>
@@ -2406,7 +2406,7 @@ export default function AdminContent() {
                     </div>
                     {content.livingSection?.imageUrl && content.livingSection.imageUrl !== "" && (
                       <div className="p-6 bg-gray-50 rounded-2xl flex items-center justify-center border border-dashed border-gray-200">
-                        <img src={content.livingSection.imageUrl} alt="Living Preview" className="max-h-48 rounded-xl object-cover" />
+                        <img referrerPolicy="no-referrer" src={content.livingSection.imageUrl} alt="Living Preview" className="max-h-48 rounded-xl object-cover" />
                       </div>
                     )}
                   </div>
@@ -2868,7 +2868,7 @@ export default function AdminContent() {
                             asst.isActive ? "bg-brand-blue" : "bg-gray-400"
                           )} style={{ backgroundColor: asst.isActive ? asst.color : undefined }}>
                             {asst.photoUrl ? (
-                              <img src={asst.photoUrl} alt={asst.name} className="w-full h-full object-cover" />
+                              <img referrerPolicy="no-referrer" src={asst.photoUrl} alt={asst.name} className="w-full h-full object-cover" />
                             ) : (
                               <Bot size={40} />
                             )}

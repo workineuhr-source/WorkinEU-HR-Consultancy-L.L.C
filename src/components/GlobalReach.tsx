@@ -42,7 +42,7 @@ export default function GlobalReach({
   };
 
   return (
-    <section className={cn("py-24 md:py-40 relative overflow-hidden transition-colors duration-500", dark ? "bg-[#020617] text-white" : "bg-white")}>
+    <section className={cn("py-12 md:py-20 relative overflow-hidden transition-colors duration-500", dark ? "bg-[#020617] text-white" : "bg-white")}>
       {/* Background Atmosphere */}
       {dark && (
         <>
@@ -52,7 +52,7 @@ export default function GlobalReach({
       )}
       
       <div className="max-w-[1920px] mx-auto px-4 md:px-8 relative z-10">
-        <div className="max-w-4xl mb-20 md:mb-32">
+        <div className="max-w-4xl mb-12 md:mb-16">
           <motion.span 
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}

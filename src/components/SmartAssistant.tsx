@@ -216,7 +216,7 @@ ${jobs.map(j => `- ${j.title} in ${j.country}. Category: ${j.category}. Salary: 
                 <div className="flex items-center gap-4 relative z-10">
                   <div className="w-14 h-14 bg-white/10 backdrop-blur-md text-white rounded-2xl flex items-center justify-center shadow-lg border border-white/10 overflow-hidden">
                     {selectedAssistant?.photoUrl ? (
-                      <img src={selectedAssistant.photoUrl} alt={selectedAssistant.name} className="w-full h-full object-cover" />
+                      <img referrerPolicy="no-referrer" src={selectedAssistant.photoUrl} alt={selectedAssistant.name} className="w-full h-full object-cover" />
                     ) : (
                       <Bot size={28} />
                     )}
@@ -262,7 +262,7 @@ ${jobs.map(j => `- ${j.title} in ${j.country}. Category: ${j.category}. Salary: 
                     >
                       <div className="w-5 h-5 rounded-lg overflow-hidden border border-slate-100 bg-slate-50 flex items-center justify-center">
                         {asst.photoUrl ? (
-                          <img src={asst.photoUrl} alt={asst.name} className="w-full h-full object-cover" />
+                          <img referrerPolicy="no-referrer" src={asst.photoUrl} alt={asst.name} className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: asst.color }}></div>
                         )}
@@ -294,7 +294,7 @@ ${jobs.map(j => `- ${j.title} in ${j.country}. Category: ${j.category}. Salary: 
                         {msg.role === 'user' ? (
                           <User size={18} />
                         ) : asst?.photoUrl ? (
-                          <img src={asst.photoUrl} alt={asst.name} className="w-full h-full object-cover" />
+                          <img referrerPolicy="no-referrer" src={asst.photoUrl} alt={asst.name} className="w-full h-full object-cover" />
                         ) : (
                           <Bot size={18} style={{ color: asst?.color }} />
                         )}
@@ -314,7 +314,7 @@ ${jobs.map(j => `- ${j.title} in ${j.country}. Category: ${j.category}. Salary: 
                   <div className="flex gap-4 max-w-[90%]">
                     <div className="w-10 h-10 bg-white border border-slate-100 text-slate-400 rounded-xl flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
                       {selectedAssistant?.photoUrl ? (
-                         <img src={selectedAssistant.photoUrl} alt={selectedAssistant.name} className="w-full h-full object-cover" />
+                         <img referrerPolicy="no-referrer" src={selectedAssistant.photoUrl} alt={selectedAssistant.name} className="w-full h-full object-cover" />
                       ) : (
                         <Bot size={18} style={{ color: selectedAssistant?.color }} />
                       )}

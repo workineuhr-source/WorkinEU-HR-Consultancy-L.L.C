@@ -153,7 +153,7 @@ export default function LoginPage() {
             whileHover={{ scale: 1.05, rotate: 5 }}
             className="w-32 h-32 bg-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 shadow-[0_30px_60px_-15px_rgba(15,23,42,0.2)] overflow-hidden p-4 border border-slate-100"
           >
-            <img src={logoUrl || "/logo.png"} alt="WorkinEU HR" className="w-full h-full object-contain" />
+            <img referrerPolicy="no-referrer" src={logoUrl || "/logo.png"} alt="WorkinEU HR" className="w-full h-full object-contain" />
           </motion.div>
           <h1 className="text-5xl font-bold text-slate-900 mb-4 tracking-tighter">
             {isSignUp ? "Create Account" : "Welcome Back"}

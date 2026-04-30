@@ -91,11 +91,29 @@ export default function AdminFinancialAccounts() {
     return { tot, ris, gross, net, rem, sym };
   };
 
-  const totals = candidates.reduce((acc, c) => {
-    // Only EUR for gross total in this basic view, or we can just skip combined totals if currencies mix.
-    // For simplicity, we just aggregate if needed, but since currencies mix, better just sum raw numbers or leave it out.
+  type CurrencyTotals = {
+    [key: string]: {
+      tot: number;
+      gross: number;
+      ris: number;
+      net: number;
+      rem: number;
+    }
+  };
+
+  const totalsByCurrency: CurrencyTotals = candidates.reduce((acc, c) => {
+    const cur = c.paymentCurrency || 'EUR';
+    if (!acc[cur]) {
+      acc[cur] = { tot: 0, gross: 0, ris: 0, net: 0, rem: 0 };
+    }
+    const m = getMath(c);
+    acc[cur].tot += m.tot;
+    acc[cur].gross += m.gross;
+    acc[cur].ris += m.ris;
+    acc[cur].net += m.net;
+    acc[cur].rem += m.rem;
     return acc;
-  }, { total: 0, collected: 0, remaining: 0, risk: 0 });
+  }, {} as CurrencyTotals);
 
   return (
     <div className="space-y-8">
@@ -103,6 +121,35 @@ export default function AdminFinancialAccounts() {
         <h1 className="text-3xl font-bold text-brand-blue">Finance & Accounts</h1>
         <p className="text-gray-500">Track candidate packages, collection history, risk amounts, and remaining balances.</p>
       </div>
+
+      {/* Overall Summary (Per Currency) */}
+      {!loading && Object.entries(totalsByCurrency).map(([currency, totals]) => (
+        <div key={currency} className="mb-8">
+          <h2 className="text-lg font-black text-slate-800 mb-4">{currency} Summary</h2>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+             <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm border-t-4 border-t-brand-blue">
+               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Pkg</p>
+               <p className="text-2xl font-bold text-brand-blue">{CURRENCY_SYMBOLS[currency] || currency} {totals.tot.toLocaleString()}</p>
+             </div>
+             <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm border-t-4 border-t-green-400">
+               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Gross Collected</p>
+               <p className="text-2xl font-bold text-green-600">{CURRENCY_SYMBOLS[currency] || currency} {totals.gross.toLocaleString()}</p>
+             </div>
+             <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm border-t-4 border-t-orange-400">
+               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Risk (Ris) Amount</p>
+               <p className="text-2xl font-bold text-orange-500">{CURRENCY_SYMBOLS[currency] || currency} {totals.ris.toLocaleString()}</p>
+             </div>
+             <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm border-t-4 border-t-brand-teal">
+               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Net Collected</p>
+               <p className="text-2xl font-bold text-brand-teal">{CURRENCY_SYMBOLS[currency] || currency} {totals.net.toLocaleString()}</p>
+             </div>
+             <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm border-t-4 border-t-rose-400">
+               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Remaining</p>
+               <p className="text-2xl font-bold text-rose-500">{CURRENCY_SYMBOLS[currency] || currency} {totals.rem.toLocaleString()}</p>
+             </div>
+          </div>
+        </div>
+      ))}
 
       {/* Search */}
       <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between gap-4">

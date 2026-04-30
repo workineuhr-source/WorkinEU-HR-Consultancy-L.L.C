@@ -1,12 +1,42 @@
-import { useState, useEffect } from 'react';
-import { collection, getDocs, query, orderBy, deleteDoc, doc, addDoc, updateDoc, serverTimestamp, getDoc } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db } from '../../firebase';
-import { Job, SiteContent } from '../../types';
-import { Plus, Search, Edit2, Trash2, MapPin, Briefcase, Calendar, X, Sparkles, Loader2, Upload, Image as ImageIcon, CreditCard } from 'lucide-react';
-import { toast } from 'sonner';
-import { motion, AnimatePresence } from 'motion/react';
-import { COUNTRIES, JOB_POSITIONS, JOB_CATEGORIES } from '../../constants';
+import { useState, useEffect } from "react";
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  deleteDoc,
+  doc,
+  addDoc,
+  updateDoc,
+  serverTimestamp,
+  getDoc,
+} from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db } from "../../firebase";
+import { Job, SiteContent } from "../../types";
+import {
+  Plus,
+  Search,
+  Edit2,
+  Trash2,
+  MapPin,
+  Briefcase,
+  Calendar,
+  X,
+  Sparkles,
+  Loader2,
+  Upload,
+  Image as ImageIcon,
+  CreditCard,
+} from "lucide-react";
+import { toast } from "sonner";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  COUNTRIES,
+  JOB_POSITIONS,
+  JOB_CATEGORIES,
+  CATEGORY_TO_POSITIONS,
+} from "../../constants";
 import { GoogleGenAI } from "@google/genai";
 
 const PREDEFINED_DOCUMENTS = [
@@ -15,7 +45,7 @@ const PREDEFINED_DOCUMENTS = [
   "Europass CV",
   "Experience Certificate",
   "Driving License Copy (Both Sides)",
-  "Police Clearance Certificate (after selection)"
+  "Police Clearance Certificate (after selection)",
 ];
 
 export default function AdminJobs() {
@@ -27,7 +57,7 @@ export default function AdminJobs() {
   const [lists, setLists] = useState({
     countries: COUNTRIES,
     positions: JOB_POSITIONS,
-    categories: JOB_CATEGORIES
+    categories: JOB_CATEGORIES,
   });
 
   useEffect(() => {
@@ -37,9 +67,11 @@ export default function AdminJobs() {
 
   const fetchJobs = async () => {
     try {
-      const q = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'));
+      const q = query(collection(db, "jobs"), orderBy("createdAt", "desc"));
       const snapshot = await getDocs(q);
-      setJobs(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Job)));
+      setJobs(
+        snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Job),
+      );
     } catch (error) {
       console.error("Error fetching jobs:", error);
     } finally {
@@ -49,14 +81,18 @@ export default function AdminJobs() {
 
   const fetchLists = async () => {
     try {
-      const docRef = doc(db, 'settings', 'siteContent');
+      const docRef = doc(db, "settings", "siteContent");
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data() as SiteContent;
         setLists({
           countries: data.countries?.length ? data.countries : COUNTRIES,
-          positions: data.jobPositions?.length ? data.jobPositions : JOB_POSITIONS,
-          categories: data.jobCategories?.length ? data.jobCategories : JOB_CATEGORIES
+          positions: data.jobPositions?.length
+            ? data.jobPositions
+            : JOB_POSITIONS,
+          categories: data.jobCategories?.length
+            ? data.jobCategories
+            : JOB_CATEGORIES,
         });
       }
     } catch (error) {
@@ -66,7 +102,7 @@ export default function AdminJobs() {
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteDoc(doc(db, 'jobs', id));
+      await deleteDoc(doc(db, "jobs", id));
       toast.success("Job deleted successfully");
       fetchJobs();
     } catch (error) {
@@ -88,10 +124,14 @@ export default function AdminJobs() {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 md:gap-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-brand-blue">Job Management</h1>
-          <p className="text-gray-500 text-xs md:text-base">Add, edit or remove job listings from the portal.</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-brand-blue">
+            Job Management
+          </h1>
+          <p className="text-gray-500 text-xs md:text-base">
+            Add, edit or remove job listings from the portal.
+          </p>
         </div>
-        <button 
+        <button
           onClick={openAddModal}
           className="w-full sm:w-auto bg-brand-blue text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-brand-gold transition-all shadow-lg"
         >
@@ -101,17 +141,25 @@ export default function AdminJobs() {
 
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {[1, 2, 3].map(i => <div key={i} className="h-64 bg-white rounded-2xl animate-pulse"></div>)}
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="h-64 bg-white rounded-2xl animate-pulse"
+            ></div>
+          ))}
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {jobs.map((job) => (
-            <div key={job.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 group overflow-hidden">
+            <div
+              key={job.id}
+              className="bg-white rounded-2xl shadow-sm border border-gray-100 group overflow-hidden"
+            >
               {job.imageUrl && job.imageUrl !== "" && (
                 <div className="h-48 w-full overflow-hidden">
-                  <img 
-                    src={job.imageUrl} 
-                    alt={job.title} 
+                  <img
+                    src={job.imageUrl}
+                    alt={job.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     referrerPolicy="no-referrer"
                     loading="lazy"
@@ -120,15 +168,17 @@ export default function AdminJobs() {
               )}
               <div className="p-6 md:p-8">
                 <div className="flex justify-between items-start mb-4 md:mb-6">
-                  <h3 className="text-lg md:text-xl font-bold text-brand-blue line-clamp-1">{job.title}</h3>
+                  <h3 className="text-lg md:text-xl font-bold text-brand-blue line-clamp-1">
+                    {job.title}
+                  </h3>
                   <div className="flex gap-1 md:gap-2 transition-opacity">
-                    <button 
+                    <button
                       onClick={() => openEditModal(job)}
                       className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
                     >
                       <Edit2 size={16} className="md:w-[18px] md:h-[18px]" />
                     </button>
-                    <button 
+                    <button
                       onClick={() => setDeleteConfirmId(job.id)}
                       className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                     >
@@ -136,43 +186,62 @@ export default function AdminJobs() {
                     </button>
                   </div>
                 </div>
-              
-              <div className="space-y-2 md:space-y-3 mb-6 md:mb-8">
-                <div className="flex items-center gap-3 text-gray-500">
-                  <MapPin size={14} className="text-brand-gold md:w-4 md:h-4" />
-                  <span className="text-xs md:text-sm font-medium">{job.country}</span>
-                </div>
-                <div className="flex items-center gap-3 text-gray-500">
-                  <Briefcase size={14} className="text-brand-gold md:w-4 md:h-4" />
-                  <span className="text-xs md:text-sm font-medium">{job.category}</span>
-                </div>
-                <div className="flex items-center gap-3 text-gray-500">
-                  <Calendar size={14} className="text-brand-gold md:w-4 md:h-4" />
-                  <span className="text-xs md:text-sm font-medium">Deadline: {job.deadline}</span>
-                </div>
-              </div>
 
-              <div className="flex justify-between items-center pt-4 md:pt-6 border-t border-gray-50">
-                <span className="text-base md:text-lg font-bold text-brand-blue">{job.currency || '€'} {job.minSalary} - {job.maxSalary}</span>
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{job.type}</span>
+                <div className="space-y-2 md:space-y-3 mb-6 md:mb-8">
+                  <div className="flex items-center gap-3 text-gray-500">
+                    <MapPin
+                      size={14}
+                      className="text-brand-gold md:w-4 md:h-4"
+                    />
+                    <span className="text-xs md:text-sm font-medium">
+                      {job.country}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 text-gray-500">
+                    <Briefcase
+                      size={14}
+                      className="text-brand-gold md:w-4 md:h-4"
+                    />
+                    <span className="text-xs md:text-sm font-medium">
+                      {job.category}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 text-gray-500">
+                    <Calendar
+                      size={14}
+                      className="text-brand-gold md:w-4 md:h-4"
+                    />
+                    <span className="text-xs md:text-sm font-medium">
+                      Deadline: {job.deadline}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center pt-4 md:pt-6 border-t border-gray-50">
+                  <span className="text-base md:text-lg font-bold text-brand-blue">
+                    {job.currency || "€"} {job.minSalary} - {job.maxSalary}
+                  </span>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    {job.type}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-    )}
+          ))}
+        </div>
+      )}
 
       {/* Job Modal */}
       <AnimatePresence>
         {isModalOpen && (
-          <JobModal 
-            job={editingJob} 
+          <JobModal
+            job={editingJob}
             lists={lists}
-            onClose={() => setIsModalOpen(false)} 
+            onClose={() => setIsModalOpen(false)}
             onSuccess={() => {
               setIsModalOpen(false);
               fetchJobs();
-            }} 
+            }}
           />
         )}
       </AnimatePresence>
@@ -181,14 +250,14 @@ export default function AdminJobs() {
       <AnimatePresence>
         {deleteConfirmId && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-brand-blue/60 backdrop-blur-sm"
               onClick={() => setDeleteConfirmId(null)}
             ></motion.div>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -197,18 +266,21 @@ export default function AdminJobs() {
               <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Trash2 size={40} />
               </div>
-              <h3 className="text-2xl font-bold text-brand-blue mb-4">Delete Job?</h3>
+              <h3 className="text-2xl font-bold text-brand-blue mb-4">
+                Delete Job?
+              </h3>
               <p className="text-gray-500 mb-8 leading-relaxed">
-                Are you sure you want to delete this job listing? This action cannot be undone.
+                Are you sure you want to delete this job listing? This action
+                cannot be undone.
               </p>
               <div className="flex gap-4">
-                <button 
+                <button
                   onClick={() => setDeleteConfirmId(null)}
                   className="flex-grow px-6 py-3 rounded-xl font-bold text-gray-500 bg-gray-100 hover:bg-gray-200 transition-all"
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   onClick={() => {
                     handleDelete(deleteConfirmId);
                     setDeleteConfirmId(null);
@@ -238,32 +310,61 @@ interface JobModalProps {
 }
 
 function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
-  const [activePricingTab, setActivePricingTab] = useState<'Nepal' | 'Gulf' | 'Europe'>('Nepal');
+  const [activePricingTab, setActivePricingTab] = useState<
+    "Nepal" | "Gulf" | "Europe"
+  >("Nepal");
   const [formData, setFormData] = useState<Partial<Job>>(
     job || {
-      title: '',
-      country: '',
-      category: '',
-      minSalary: '',
-      maxSalary: '',
-      currency: '€',
-      experience: 'Entry Level',
-      type: 'Full-time',
-      description: '',
-      responsibilities: [''],
-      requirements: [''],
-      requiredDocuments: ['Passport Copy (Front & Back)', 'Europass CV'],
-      deadline: '',
-      totalAmount: '',
-      initialPay: '',
-      payAfterWP: '',
-      payAfterVisa: '',
-      visaFeeMin: '',
-      visaFeeMax: '',
-      pricingNepal: { currency: 'NPR', totalAmount: '', initialPay: '', payAfterWP: '', payAfterVisa: '', visaFeeMin: '', visaFeeMax: '', riskAmount: '' },
-      pricingGulf: { currency: 'AED', totalAmount: '', initialPay: '', payAfterWP: '', payAfterVisa: '', visaFeeMin: '', visaFeeMax: '', riskAmount: '' },
-      pricingEurope: { currency: '€', totalAmount: '', initialPay: '', payAfterWP: '', payAfterVisa: '', visaFeeMin: '', visaFeeMax: '', riskAmount: '500' },
-    }
+      title: "",
+      country: "",
+      category: "",
+      minSalary: "",
+      maxSalary: "",
+      currency: "€",
+      experience: "Entry Level",
+      type: "Full-time",
+      description: "",
+      responsibilities: [""],
+      requirements: [""],
+      requiredDocuments: ["Passport Copy (Front & Back)", "Europass CV"],
+      deadline: "",
+      totalAmount: "",
+      initialPay: "",
+      payAfterWP: "",
+      payAfterVisa: "",
+      visaFeeMin: "",
+      visaFeeMax: "",
+      pricingNepal: {
+        currency: "NPR",
+        totalAmount: "",
+        initialPay: "",
+        payAfterWP: "",
+        payAfterVisa: "",
+        visaFeeMin: "",
+        visaFeeMax: "",
+        riskAmount: "",
+      },
+      pricingGulf: {
+        currency: "AED",
+        totalAmount: "",
+        initialPay: "",
+        payAfterWP: "",
+        payAfterVisa: "",
+        visaFeeMin: "",
+        visaFeeMax: "",
+        riskAmount: "",
+      },
+      pricingEurope: {
+        currency: "€",
+        totalAmount: "",
+        initialPay: "",
+        payAfterWP: "",
+        payAfterVisa: "",
+        visaFeeMin: "",
+        visaFeeMax: "",
+        riskAmount: "500",
+      },
+    },
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -314,8 +415,8 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
         "responsibilities" (array of strings), 
         "requirements" (array of strings).`,
         config: {
-          responseMimeType: "application/json"
-        }
+          responseMimeType: "application/json",
+        },
       });
 
       const data = JSON.parse(response.text);
@@ -323,7 +424,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
         ...formData,
         description: data.description,
         responsibilities: data.responsibilities,
-        requirements: data.requirements
+        requirements: data.requirements,
       });
       toast.success("AI Content Generated!");
     } catch (error) {
@@ -339,15 +440,15 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
     setIsSubmitting(true);
     try {
       if (job) {
-        await updateDoc(doc(db, 'jobs', job.id), {
+        await updateDoc(doc(db, "jobs", job.id), {
           ...formData,
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         });
         toast.success("Job updated successfully");
       } else {
-        await addDoc(collection(db, 'jobs'), {
+        await addDoc(collection(db, "jobs"), {
           ...formData,
-          createdAt: Date.now()
+          createdAt: Date.now(),
         });
         toast.success("Job posted successfully");
       }
@@ -360,18 +461,32 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
     }
   };
 
-  const handleArrayChange = (field: 'responsibilities' | 'requirements' | 'requiredDocuments', index: number, value: string) => {
+  const handleArrayChange = (
+    field: "responsibilities" | "requirements" | "requiredDocuments",
+    index: number,
+    value: string,
+  ) => {
     const newArray = [...(formData[field] as string[])];
     newArray[index] = value;
     setFormData({ ...formData, [field]: newArray });
   };
 
-  const addArrayItem = (field: 'responsibilities' | 'requirements' | 'requiredDocuments') => {
-    setFormData({ ...formData, [field]: [...(formData[field] as string[]), ''] });
+  const addArrayItem = (
+    field: "responsibilities" | "requirements" | "requiredDocuments",
+  ) => {
+    setFormData({
+      ...formData,
+      [field]: [...(formData[field] as string[]), ""],
+    });
   };
 
-  const removeArrayItem = (field: 'responsibilities' | 'requirements' | 'requiredDocuments', index: number) => {
-    const newArray = (formData[field] as string[]).filter((_, i) => i !== index);
+  const removeArrayItem = (
+    field: "responsibilities" | "requirements" | "requiredDocuments",
+    index: number,
+  ) => {
+    const newArray = (formData[field] as string[]).filter(
+      (_, i) => i !== index,
+    );
     setFormData({ ...formData, [field]: newArray });
   };
 
@@ -380,36 +495,41 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
     if (currentDocs.includes(doc)) {
       setFormData({
         ...formData,
-        requiredDocuments: currentDocs.filter(d => d !== doc)
+        requiredDocuments: currentDocs.filter((d) => d !== doc),
       });
     } else {
       // Filter out empty strings if any, then add
-      const filtered = currentDocs.filter(d => d.trim() !== '');
+      const filtered = currentDocs.filter((d) => d.trim() !== "");
       setFormData({
         ...formData,
-        requiredDocuments: [...filtered, doc]
+        requiredDocuments: [...filtered, doc],
       });
     }
   };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="absolute inset-0 bg-brand-blue/60 backdrop-blur-sm"
         onClick={onClose}
       ></motion.div>
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative z-10 p-6 md:p-12"
       >
         <div className="flex justify-between items-center mb-8 md:mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold text-brand-blue">{job ? 'Edit Job' : 'Post New Job'}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-brand-blue transition-colors">
+          <h2 className="text-2xl md:text-3xl font-bold text-brand-blue">
+            {job ? "Edit Job" : "Post New Job"}
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-brand-blue transition-colors"
+          >
             <X size={24} />
           </button>
         </div>
@@ -417,15 +537,22 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Job Image */}
           <div className="space-y-4">
-            <label className="block text-sm font-bold text-gray-700">Job Image (Optional)</label>
+            <label className="block text-sm font-bold text-gray-700">
+              Job Image (Optional)
+            </label>
             <div className="flex flex-col sm:flex-row gap-6 items-start">
               <div className="w-full sm:w-48 h-32 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden relative group">
                 {formData.imageUrl && formData.imageUrl !== "" ? (
                   <>
-                    <img src={formData.imageUrl} alt="Job Preview" className="w-full h-full object-cover" />
-                    <button 
+                    <img
+                      referrerPolicy="no-referrer"
+                      src={formData.imageUrl}
+                      alt="Job Preview"
+                      className="w-full h-full object-cover"
+                    />
+                    <button
                       type="button"
-                      onClick={() => setFormData({ ...formData, imageUrl: '' })}
+                      onClick={() => setFormData({ ...formData, imageUrl: "" })}
                       className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white"
                     >
                       <Trash2 size={24} />
@@ -434,91 +561,136 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                 ) : (
                   <div className="text-gray-400 flex flex-col items-center gap-2">
                     <ImageIcon size={32} />
-                    <span className="text-[10px] uppercase font-bold tracking-widest">No Image</span>
+                    <span className="text-[10px] uppercase font-bold tracking-widest">
+                      No Image
+                    </span>
                   </div>
                 )}
               </div>
               <div className="flex-grow space-y-4 w-full">
                 <div className="flex gap-2">
-                  <input 
+                  <input
                     className="flex-grow px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm"
-                    value={formData.imageUrl || ''}
-                    onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                    value={formData.imageUrl || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, imageUrl: e.target.value })
+                    }
                     placeholder="Paste image URL or upload"
                   />
                   <label className="bg-brand-blue text-white p-3 rounded-xl cursor-pointer hover:bg-brand-gold transition-all flex items-center justify-center min-w-[50px]">
-                    {uploading ? <Loader2 className="animate-spin" size={20} /> : <Upload size={20} />}
-                    <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} disabled={uploading} />
+                    {uploading ? (
+                      <Loader2 className="animate-spin" size={20} />
+                    ) : (
+                      <Upload size={20} />
+                    )}
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      disabled={uploading}
+                    />
                   </label>
                 </div>
-                <p className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Recommended: 1200x800px, Max 5MB</p>
+                <p className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">
+                  Recommended: 1200x800px, Max 5MB
+                </p>
               </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="block text-xs md:text-sm font-bold text-gray-700">Job Title</label>
-                <button 
-                  type="button"
-                  onClick={generateWithAI}
-                  disabled={isGenerating}
-                  className="text-brand-gold font-bold text-[10px] md:text-xs flex items-center gap-1 hover:text-brand-blue transition-colors disabled:opacity-50"
-                >
-                  {isGenerating ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} />}
-                  Generate with AI
-                </button>
-              </div>
-              <input 
-                required
-                list="job-positions"
-                className="w-full px-4 py-2 md:py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all text-sm md:text-base"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="e.g. Warehouse Worker"
-              />
-              <datalist id="job-positions">
-                {lists.positions.map(pos => <option key={pos} value={pos} />)}
-              </datalist>
-            </div>
-            <div>
-              <label className="block text-xs md:text-sm font-bold text-gray-700 mb-2">Country</label>
-              <input 
-                required
-                list="countries"
-                className="w-full px-4 py-2 md:py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all text-sm md:text-base"
-                value={formData.country}
-                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                placeholder="e.g. Poland"
-              />
-              <datalist id="countries">
-                {lists.countries.map(country => <option key={country} value={country} />)}
-              </datalist>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
             <div>
-              <label className="block text-xs md:text-sm font-bold text-gray-700 mb-2">Category</label>
-              <input 
+              <label className="block text-xs md:text-sm font-bold text-gray-700 mb-2">
+                Category
+              </label>
+              <input
                 required
                 list="job-categories"
                 className="w-full px-4 py-2 md:py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all text-sm md:text-base"
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, category: e.target.value })
+                }
                 placeholder="e.g. Logistics"
               />
               <datalist id="job-categories">
-                {lists.categories.map(cat => <option key={cat} value={cat} />)}
+                {lists.categories.map((cat) => (
+                  <option key={cat} value={cat} />
+                ))}
               </datalist>
             </div>
             <div>
-              <label className="block text-xs md:text-sm font-bold text-gray-700 mb-2">Currency</label>
-              <select 
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-xs md:text-sm font-bold text-gray-700">
+                  Job Title
+                </label>
+                <button
+                  type="button"
+                  onClick={generateWithAI}
+                  disabled={isGenerating}
+                  className="text-brand-gold font-bold text-[10px] md:text-xs flex items-center gap-1 hover:text-brand-blue transition-colors disabled:opacity-50"
+                >
+                  {isGenerating ? (
+                    <Loader2 size={10} className="animate-spin" />
+                  ) : (
+                    <Sparkles size={10} />
+                  )}
+                  Generate with AI
+                </button>
+              </div>
+              <input
+                required
+                list="job-positions"
                 className="w-full px-4 py-2 md:py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all text-sm md:text-base"
-                value={formData.currency || '€'}
-                onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                value={formData.title}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
+                placeholder="e.g. Warehouse Worker"
+              />
+              <datalist id="job-positions">
+                {(formData.category && CATEGORY_TO_POSITIONS[formData.category]
+                  ? CATEGORY_TO_POSITIONS[formData.category]
+                  : lists.positions
+                ).map((pos) => (
+                  <option key={pos} value={pos} />
+                ))}
+              </datalist>
+            </div>
+            <div>
+              <label className="block text-xs md:text-sm font-bold text-gray-700 mb-2">
+                Country
+              </label>
+              <input
+                required
+                list="countries"
+                className="w-full px-4 py-2 md:py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all text-sm md:text-base"
+                value={formData.country}
+                onChange={(e) =>
+                  setFormData({ ...formData, country: e.target.value })
+                }
+                placeholder="e.g. Poland"
+              />
+              <datalist id="countries">
+                {lists.countries.map((country) => (
+                  <option key={country} value={country} />
+                ))}
+              </datalist>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 md:gap-8">
+            <div>
+              <label className="block text-xs md:text-sm font-bold text-gray-700 mb-2">
+                Currency
+              </label>
+              <select
+                className="w-full px-4 py-2 md:py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all text-sm md:text-base"
+                value={formData.currency || "€"}
+                onChange={(e) =>
+                  setFormData({ ...formData, currency: e.target.value })
+                }
               >
                 <option value="€">Euro (€)</option>
                 <option value="$">US Dollar ($)</option>
@@ -531,45 +703,61 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs md:text-sm font-bold text-gray-700 mb-2">Min Salary</label>
-                <input 
+                <label className="block text-xs md:text-sm font-bold text-gray-700 mb-2">
+                  Min Salary
+                </label>
+                <input
                   required
                   className="w-full px-4 py-2 md:py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all text-sm md:text-base"
                   value={formData.minSalary}
-                  onChange={(e) => setFormData({ ...formData, minSalary: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, minSalary: e.target.value })
+                  }
                   placeholder="e.g. 1200"
                 />
               </div>
               <div>
-                <label className="block text-xs md:text-sm font-bold text-gray-700 mb-2">Max Salary</label>
-                <input 
+                <label className="block text-xs md:text-sm font-bold text-gray-700 mb-2">
+                  Max Salary
+                </label>
+                <input
                   required
                   className="w-full px-4 py-2 md:py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all text-sm md:text-base"
                   value={formData.maxSalary}
-                  onChange={(e) => setFormData({ ...formData, maxSalary: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, maxSalary: e.target.value })
+                  }
                   placeholder="e.g. 1500"
                 />
               </div>
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <label className="block text-xs md:text-sm font-bold text-gray-700 mb-2">Deadline</label>
-              <input 
+              <label className="block text-xs md:text-sm font-bold text-gray-700 mb-2">
+                Deadline
+              </label>
+              <input
                 required
                 type="date"
                 className="w-full px-4 py-2 md:py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all text-sm md:text-base"
                 value={formData.deadline}
-                onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, deadline: e.target.value })
+                }
               />
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Experience</label>
-              <select 
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                Experience
+              </label>
+              <select
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all"
                 value={formData.experience}
-                onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, experience: e.target.value })
+                }
               >
                 <option value="Entry Level">Entry Level</option>
                 <option value="1-3 Years">1-3 Years</option>
@@ -578,11 +766,15 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Job Type</label>
-              <select 
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                Job Type
+              </label>
+              <select
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all"
                 value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, type: e.target.value })
+                }
               >
                 <option value="Full-time">Full-time</option>
                 <option value="Part-time">Part-time</option>
@@ -595,19 +787,20 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
           <div className="bg-gray-50 p-6 rounded-3xl space-y-6 border border-gray-100">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <h3 className="text-brand-blue font-bold flex items-center gap-2">
-                <CreditCard size={18} className="text-brand-gold" /> Fees & Package Details
+                <CreditCard size={18} className="text-brand-gold" /> Fees &
+                Package Details
               </h3>
-              
+
               <div className="flex bg-white p-1 rounded-xl border border-gray-200 shadow-sm self-stretch sm:self-auto">
-                {(['Nepal', 'Gulf', 'Europe'] as const).map((region) => (
+                {(["Nepal", "Gulf", "Europe"] as const).map((region) => (
                   <button
                     key={region}
                     type="button"
                     onClick={() => setActivePricingTab(region)}
                     className={`flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
-                      activePricingTab === region 
-                        ? 'bg-brand-blue text-white shadow-md' 
-                        : 'text-gray-400 hover:text-gray-600'
+                      activePricingTab === region
+                        ? "bg-brand-blue text-white shadow-md"
+                        : "text-gray-400 hover:text-gray-600"
                     }`}
                   >
                     {region}
@@ -618,13 +811,23 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
 
             {/* Regional Pricing Fields */}
             {(() => {
-              const regionKey = `pricing${activePricingTab}` as 'pricingNepal' | 'pricingGulf' | 'pricingEurope';
-              const pricing = formData[regionKey] || { currency: activePricingTab === 'Nepal' ? 'NPR' : activePricingTab === 'Gulf' ? 'AED' : '€' };
-              
+              const regionKey = `pricing${activePricingTab}` as
+                | "pricingNepal"
+                | "pricingGulf"
+                | "pricingEurope";
+              const pricing = formData[regionKey] || {
+                currency:
+                  activePricingTab === "Nepal"
+                    ? "NPR"
+                    : activePricingTab === "Gulf"
+                      ? "AED"
+                      : "€",
+              };
+
               const updatePricing = (updates: Partial<typeof pricing>) => {
                 setFormData({
                   ...formData,
-                  [regionKey]: { ...pricing, ...updates }
+                  [regionKey]: { ...pricing, ...updates },
                 });
               };
 
@@ -632,45 +835,63 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Currency</label>
-                      <input 
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                        Currency
+                      </label>
+                      <input
                         className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white text-sm"
-                        value={pricing.currency || ''}
-                        onChange={(e) => updatePricing({ currency: e.target.value })}
+                        value={pricing.currency || ""}
+                        onChange={(e) =>
+                          updatePricing({ currency: e.target.value })
+                        }
                         placeholder="e.g. NPR"
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Amount</label>
-                      <input 
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                        Total Amount
+                      </label>
+                      <input
                         className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white text-sm font-bold text-brand-blue"
-                        value={pricing.totalAmount || ''}
-                        onChange={(e) => updatePricing({ totalAmount: e.target.value })}
+                        value={pricing.totalAmount || ""}
+                        onChange={(e) =>
+                          updatePricing({ totalAmount: e.target.value })
+                        }
                         placeholder="e.g. 1000"
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Initial Pay</label>
-                      <input 
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                        Initial Pay
+                      </label>
+                      <input
                         className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white text-sm"
-                        value={pricing.initialPay || ''}
-                        onChange={(e) => updatePricing({ initialPay: e.target.value })}
+                        value={pricing.initialPay || ""}
+                        onChange={(e) =>
+                          updatePricing({ initialPay: e.target.value })
+                        }
                         placeholder="e.g. 200"
                       />
                     </div>
                     <div className="md:col-span-1">
-                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">After WP / After Visa</label>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                        After WP / After Visa
+                      </label>
                       <div className="flex gap-2">
-                        <input 
+                        <input
                           className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white text-sm"
-                          value={pricing.payAfterWP || ''}
-                          onChange={(e) => updatePricing({ payAfterWP: e.target.value })}
+                          value={pricing.payAfterWP || ""}
+                          onChange={(e) =>
+                            updatePricing({ payAfterWP: e.target.value })
+                          }
                           placeholder="WP"
                         />
-                        <input 
+                        <input
                           className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white text-sm"
-                          value={pricing.payAfterVisa || ''}
-                          onChange={(e) => updatePricing({ payAfterVisa: e.target.value })}
+                          value={pricing.payAfterVisa || ""}
+                          onChange={(e) =>
+                            updatePricing({ payAfterVisa: e.target.value })
+                          }
                           placeholder="Visa"
                         />
                       </div>
@@ -679,24 +900,33 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
 
                   <div className="p-4 bg-yellow-50/50 rounded-2xl border border-yellow-100/50">
                     <label className="block text-[10px] font-bold text-yellow-600 uppercase tracking-widest mb-3 flex items-center gap-2">
-                      <Sparkles size={12} /> Visa / VFS / Embassy Fees ({activePricingTab})
+                      <Sparkles size={12} /> Visa / VFS / Embassy Fees (
+                      {activePricingTab})
                     </label>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">Min</label>
-                        <input 
+                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">
+                          Min
+                        </label>
+                        <input
                           className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white text-sm"
-                          value={pricing.visaFeeMin || ''}
-                          onChange={(e) => updatePricing({ visaFeeMin: e.target.value })}
+                          value={pricing.visaFeeMin || ""}
+                          onChange={(e) =>
+                            updatePricing({ visaFeeMin: e.target.value })
+                          }
                           placeholder="Min"
                         />
                       </div>
                       <div>
-                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">Max</label>
-                        <input 
+                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">
+                          Max
+                        </label>
+                        <input
                           className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white text-sm"
-                          value={pricing.visaFeeMax || ''}
-                          onChange={(e) => updatePricing({ visaFeeMax: e.target.value })}
+                          value={pricing.visaFeeMax || ""}
+                          onChange={(e) =>
+                            updatePricing({ visaFeeMax: e.target.value })
+                          }
                           placeholder="Max"
                         />
                       </div>
@@ -705,17 +935,20 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
 
                   <div className="p-4 bg-orange-50/50 rounded-2xl border border-orange-100/50">
                     <label className="block text-[10px] font-bold text-orange-600 uppercase tracking-widest mb-2 flex items-center gap-2">
-                       Risk Amount (In case of visa refusal)
+                      Risk Amount (In case of visa refusal)
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
-                      <input 
+                      <input
                         className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white text-sm"
-                        value={pricing.riskAmount || ''}
-                        onChange={(e) => updatePricing({ riskAmount: e.target.value })}
+                        value={pricing.riskAmount || ""}
+                        onChange={(e) =>
+                          updatePricing({ riskAmount: e.target.value })
+                        }
                         placeholder="e.g. 500"
                       />
                       <p className="text-[10px] text-gray-500 font-medium italic">
-                        This amount will be charged if the visa is refused. Reapplication is always possible.
+                        This amount will be charged if the visa is refused.
+                        Reapplication is always possible.
                       </p>
                     </div>
                   </div>
@@ -727,10 +960,20 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="p-6 bg-blue-50/50 rounded-3xl border border-blue-100">
                 <div className="flex justify-between items-center mb-4">
-                  <h4 className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Included in Package</h4>
-                  <button 
+                  <h4 className="text-[10px] font-black text-blue-600 uppercase tracking-widest">
+                    Included in Package
+                  </h4>
+                  <button
                     type="button"
-                    onClick={() => setFormData({ ...formData, includedPackageItems: [...(formData.includedPackageItems || []), ''] })}
+                    onClick={() =>
+                      setFormData({
+                        ...formData,
+                        includedPackageItems: [
+                          ...(formData.includedPackageItems || []),
+                          "",
+                        ],
+                      })
+                    }
                     className="text-blue-600 font-bold text-[10px] flex items-center gap-1 hover:underline"
                   >
                     <Plus size={14} /> Add Item
@@ -739,19 +982,32 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                 <div className="space-y-2">
                   {formData.includedPackageItems?.map((item, i) => (
                     <div key={i} className="flex gap-2 group">
-                      <input 
+                      <input
                         list="common-package-items"
                         className="flex-grow px-3 py-1.5 rounded-xl border border-blue-100 text-xs font-bold outline-none focus:border-blue-400"
                         value={item}
                         onChange={(e) => {
-                          const items = [...(formData.includedPackageItems || [])];
+                          const items = [
+                            ...(formData.includedPackageItems || []),
+                          ];
                           items[i] = e.target.value;
-                          setFormData({ ...formData, includedPackageItems: items });
+                          setFormData({
+                            ...formData,
+                            includedPackageItems: items,
+                          });
                         }}
                       />
-                      <button 
+                      <button
                         type="button"
-                        onClick={() => setFormData({ ...formData, includedPackageItems: formData.includedPackageItems?.filter((_, idx) => idx !== i) })}
+                        onClick={() =>
+                          setFormData({
+                            ...formData,
+                            includedPackageItems:
+                              formData.includedPackageItems?.filter(
+                                (_, idx) => idx !== i,
+                              ),
+                          })
+                        }
                         className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <X size={14} />
@@ -763,10 +1019,20 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
 
               <div className="p-6 bg-rose-50/50 rounded-3xl border border-rose-100">
                 <div className="flex justify-between items-center mb-4">
-                  <h4 className="text-[10px] font-black text-rose-600 uppercase tracking-widest">Candidate Pays (Excluded)</h4>
-                  <button 
+                  <h4 className="text-[10px] font-black text-rose-600 uppercase tracking-widest">
+                    Candidate Pays (Excluded)
+                  </h4>
+                  <button
                     type="button"
-                    onClick={() => setFormData({ ...formData, excludedPackageItems: [...(formData.excludedPackageItems || []), ''] })}
+                    onClick={() =>
+                      setFormData({
+                        ...formData,
+                        excludedPackageItems: [
+                          ...(formData.excludedPackageItems || []),
+                          "",
+                        ],
+                      })
+                    }
                     className="text-rose-600 font-bold text-[10px] flex items-center gap-1 hover:underline"
                   >
                     <Plus size={14} /> Add Item
@@ -775,19 +1041,32 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                 <div className="space-y-2">
                   {formData.excludedPackageItems?.map((item, i) => (
                     <div key={i} className="flex gap-2 group">
-                      <input 
+                      <input
                         list="common-package-items"
                         className="flex-grow px-3 py-1.5 rounded-xl border border-rose-100 text-xs font-bold outline-none focus:border-rose-400"
                         value={item}
                         onChange={(e) => {
-                          const items = [...(formData.excludedPackageItems || [])];
+                          const items = [
+                            ...(formData.excludedPackageItems || []),
+                          ];
                           items[i] = e.target.value;
-                          setFormData({ ...formData, excludedPackageItems: items });
+                          setFormData({
+                            ...formData,
+                            excludedPackageItems: items,
+                          });
                         }}
                       />
-                      <button 
+                      <button
                         type="button"
-                        onClick={() => setFormData({ ...formData, excludedPackageItems: formData.excludedPackageItems?.filter((_, idx) => idx !== i) })}
+                        onClick={() =>
+                          setFormData({
+                            ...formData,
+                            excludedPackageItems:
+                              formData.excludedPackageItems?.filter(
+                                (_, idx) => idx !== i,
+                              ),
+                          })
+                        }
                         className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <X size={14} />
@@ -808,24 +1087,52 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
             </datalist>
 
             <div>
-              <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Other Fees / Notes</label>
-              <input 
+              <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                Other Fees / Notes
+              </label>
+              <input
                 className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white text-sm"
-                value={formData.otherFees || ''}
-                onChange={(e) => setFormData({ ...formData, otherFees: e.target.value })}
+                value={formData.otherFees || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, otherFees: e.target.value })
+                }
                 placeholder="e.g. Medical: 50, Insurance: 30"
               />
             </div>
+
+            <label className="flex items-center gap-3 p-4 border border-gray-100 rounded-xl bg-gray-50/50 cursor-pointer hover:bg-gray-50 transition-colors">
+              <input
+                type="checkbox"
+                className="w-5 h-5 rounded border-gray-300 text-brand-gold focus:ring-brand-gold"
+                checked={!!formData.hideFeeDetails}
+                onChange={(e) =>
+                  setFormData({ ...formData, hideFeeDetails: e.target.checked })
+                }
+              />
+              <div>
+                <p className="text-sm font-bold text-slate-800">
+                  Hide Fees & Package Details from Candidates
+                </p>
+                <p className="text-xs text-slate-500">
+                  Enable this to hide the financial breakdown on the job details
+                  page.
+                </p>
+              </div>
+            </label>
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Job Description</label>
-            <textarea 
+            <label className="block text-sm font-bold text-gray-700 mb-2">
+              Job Description
+            </label>
+            <textarea
               required
               rows={6}
               className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
               placeholder="Detailed description of the job role..."
             ></textarea>
           </div>
@@ -833,20 +1140,32 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
           {/* Responsibilities */}
           <div>
             <div className="flex justify-between items-center mb-4">
-              <label className="block text-sm font-bold text-gray-700">Responsibilities</label>
-              <button type="button" onClick={() => addArrayItem('responsibilities')} className="text-brand-gold font-bold text-sm flex items-center gap-1">
+              <label className="block text-sm font-bold text-gray-700">
+                Responsibilities
+              </label>
+              <button
+                type="button"
+                onClick={() => addArrayItem("responsibilities")}
+                className="text-brand-gold font-bold text-sm flex items-center gap-1"
+              >
                 <Plus size={16} /> Add More
               </button>
             </div>
             <div className="space-y-4">
               {formData.responsibilities?.map((item, i) => (
                 <div key={i} className="flex gap-2">
-                  <input 
+                  <input
                     className="flex-grow px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold transition-all"
                     value={item}
-                    onChange={(e) => handleArrayChange('responsibilities', i, e.target.value)}
+                    onChange={(e) =>
+                      handleArrayChange("responsibilities", i, e.target.value)
+                    }
                   />
-                  <button type="button" onClick={() => removeArrayItem('responsibilities', i)} className="p-2 text-red-400 hover:bg-red-50 rounded-lg">
+                  <button
+                    type="button"
+                    onClick={() => removeArrayItem("responsibilities", i)}
+                    className="p-2 text-red-400 hover:bg-red-50 rounded-lg"
+                  >
                     <Trash2 size={18} />
                   </button>
                 </div>
@@ -857,20 +1176,32 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
           {/* Requirements */}
           <div>
             <div className="flex justify-between items-center mb-4">
-              <label className="block text-sm font-bold text-gray-700">Requirements</label>
-              <button type="button" onClick={() => addArrayItem('requirements')} className="text-brand-gold font-bold text-sm flex items-center gap-1">
+              <label className="block text-sm font-bold text-gray-700">
+                Requirements
+              </label>
+              <button
+                type="button"
+                onClick={() => addArrayItem("requirements")}
+                className="text-brand-gold font-bold text-sm flex items-center gap-1"
+              >
                 <Plus size={16} /> Add More
               </button>
             </div>
             <div className="space-y-4">
               {formData.requirements?.map((item, i) => (
                 <div key={i} className="flex gap-2">
-                  <input 
+                  <input
                     className="flex-grow px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold transition-all"
                     value={item}
-                    onChange={(e) => handleArrayChange('requirements', i, e.target.value)}
+                    onChange={(e) =>
+                      handleArrayChange("requirements", i, e.target.value)
+                    }
                   />
-                  <button type="button" onClick={() => removeArrayItem('requirements', i)} className="p-2 text-red-400 hover:bg-red-50 rounded-lg">
+                  <button
+                    type="button"
+                    onClick={() => removeArrayItem("requirements", i)}
+                    className="p-2 text-red-400 hover:bg-red-50 rounded-lg"
+                  >
                     <Trash2 size={18} />
                   </button>
                 </div>
@@ -880,27 +1211,40 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
 
           {/* Required Documents */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-4">Required Documents (Shown to Candidates)</label>
-            
+            <label className="block text-sm font-bold text-gray-700 mb-4">
+              Required Documents (Shown to Candidates)
+            </label>
+
             {/* Predefined Options */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
               {PREDEFINED_DOCUMENTS.map((doc) => (
-                <label key={doc} className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand-gold cursor-pointer transition-all">
-                  <input 
+                <label
+                  key={doc}
+                  className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-brand-gold cursor-pointer transition-all"
+                >
+                  <input
                     type="checkbox"
                     className="w-5 h-5 rounded border-gray-300 text-brand-gold focus:ring-brand-gold"
                     checked={formData.requiredDocuments?.includes(doc)}
                     onChange={() => togglePredefinedDoc(doc)}
                   />
-                  <span className="text-sm font-medium text-brand-blue">{doc}</span>
+                  <span className="text-sm font-medium text-brand-blue">
+                    {doc}
+                  </span>
                 </label>
               ))}
             </div>
 
             {/* Custom Documents */}
             <div className="flex justify-between items-center mb-4">
-              <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest">Custom Documents</label>
-              <button type="button" onClick={() => addArrayItem('requiredDocuments')} className="text-brand-gold font-bold text-sm flex items-center gap-1">
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest">
+                Custom Documents
+              </label>
+              <button
+                type="button"
+                onClick={() => addArrayItem("requiredDocuments")}
+                className="text-brand-gold font-bold text-sm flex items-center gap-1"
+              >
                 <Plus size={16} /> Add Custom
               </button>
             </div>
@@ -909,13 +1253,23 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                 if (PREDEFINED_DOCUMENTS.includes(item)) return null;
                 return (
                   <div key={i} className="flex gap-2">
-                    <input 
+                    <input
                       className="flex-grow px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold transition-all"
                       value={item}
-                      onChange={(e) => handleArrayChange('requiredDocuments', i, e.target.value)}
+                      onChange={(e) =>
+                        handleArrayChange(
+                          "requiredDocuments",
+                          i,
+                          e.target.value,
+                        )
+                      }
                       placeholder="e.g. Health Certificate"
                     />
-                    <button type="button" onClick={() => removeArrayItem('requiredDocuments', i)} className="p-2 text-red-400 hover:bg-red-50 rounded-lg">
+                    <button
+                      type="button"
+                      onClick={() => removeArrayItem("requiredDocuments", i)}
+                      className="p-2 text-red-400 hover:bg-red-50 rounded-lg"
+                    >
                       <Trash2 size={18} />
                     </button>
                   </div>
@@ -925,14 +1279,14 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
           </div>
 
           <div className="flex flex-col sm:flex-row justify-end gap-4 pt-8 border-t border-gray-50">
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={onClose}
               className="w-full sm:w-auto px-8 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-all"
             >
               Cancel
             </button>
-            <button 
+            <button
               type="submit"
               disabled={isSubmitting}
               className="w-full sm:w-auto bg-brand-blue text-white px-12 py-3 rounded-xl font-bold hover:bg-brand-gold transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-70"

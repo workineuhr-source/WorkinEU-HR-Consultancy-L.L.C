@@ -209,26 +209,37 @@ export default function EuropassCV({ candidate, id, theme = 'classic' }: Europas
         <div className={styles.sidebar}>
           
           {/* Status Indicators */}
-          <div className="space-y-3 mb-6 page-break-inside-avoid">
+          <div className="space-y-3 mb-8 page-break-inside-avoid">
             <h3 className={styles.sectionHeadingSidebar}>
               Verification Intel
             </h3>
             
-            <div className={styles.widgetBg}>
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1.5"><ShieldCheck size={12} className={styles.accentText} /> Profile Intel</p>
-              <p className={cn("text-[11px] font-bold leading-tight break-words", styles.accentText)}>{candidate.profileIntel || 'Fully Verified candidate'}</p>
+            <div className={cn(styles.widgetBg, "flex flex-col gap-1 rounded-xl p-3 bg-white/50 border border-slate-200 shadow-sm relative overflow-hidden")}>
+              <div className="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 pl-2">
+                <ShieldCheck size={14} className="text-green-600" /> Profile Intel
+              </p>
+              <p className="text-xs font-bold leading-relaxed break-words text-slate-800 pl-2">
+                {candidate.profileIntel || 'Fully Verified candidate'}
+              </p>
             </div>
 
-            <div className={cn(styles.widgetBg, "border-l-4 border-l-brand-gold")}>
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1.5"><Briefcase size={12} className="text-brand-gold" /> Work Permit</p>
-              <p className="text-[11px] font-bold uppercase text-brand-gold break-words">
+            <div className={cn(styles.widgetBg, "flex flex-col gap-1 rounded-xl p-3 bg-white/50 border border-slate-200 shadow-sm relative overflow-hidden")}>
+              <div className="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 pl-2">
+                <Briefcase size={14} className="text-amber-600" /> Work Permit
+              </p>
+              <p className="text-xs font-bold leading-relaxed break-words text-slate-800 pl-2">
                 {candidate.workPermitStatus || 'Review Pending'}
               </p>
             </div>
 
-            <div className={cn(styles.widgetBg, "border-l-4 border-l-blue-600")}>
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1.5"><Globe size={12} className="text-blue-600" /> Visa Status</p>
-              <p className="text-[11px] font-bold uppercase text-blue-600 break-words">
+            <div className={cn(styles.widgetBg, "flex flex-col gap-1 rounded-xl p-3 bg-white/50 border border-slate-200 shadow-sm relative overflow-hidden")}>
+              <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 pl-2">
+                <Globe size={14} className="text-blue-600" /> Visa Status
+              </p>
+              <p className="text-xs font-bold leading-relaxed break-words text-slate-800 pl-2">
                 {candidate.globalVisaStatus || 'Review Pending'}
               </p>
             </div>
@@ -279,39 +290,39 @@ export default function EuropassCV({ candidate, id, theme = 'classic' }: Europas
           )}
 
           {/* Personal Info */}
-          <div className="mb-4 page-break-inside-avoid">
+          <div className="mb-8 page-break-inside-avoid">
             <h3 className={styles.sectionHeadingSidebar}>Identity & Family</h3>
-            <div className="space-y-3">
-              <div className={styles.widgetBg}>
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Birth & Identity</p>
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <Calendar size={12} className="text-brand-gold shrink-0" />
-                    <span className="text-[11px] font-bold text-slate-800">DOB: {candidate.dateOfBirth || 'Not Specified'}</span>
+            <div className="space-y-4">
+              <div className={cn(styles.widgetBg, "flex flex-col gap-2 rounded-xl p-3 bg-white/50 border border-slate-200 shadow-sm")}>
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Birth & Identity</p>
+                <div className="space-y-2 mt-1">
+                  <div className="flex items-center gap-2 text-slate-700">
+                    <Calendar size={14} className="text-brand-blue shrink-0" />
+                    <span className="text-[12px] font-bold">DOB: {candidate.dateOfBirth || 'Not Specified'}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <User size={12} className="text-brand-gold shrink-0" />
-                    <span className="text-[11px] font-bold text-slate-800">Gender: {candidate.gender || 'Not Specified'}</span>
+                  <div className="flex items-center gap-2 text-slate-700">
+                    <User size={14} className="text-brand-blue shrink-0" />
+                    <span className="text-[12px] font-bold">Gender: {candidate.gender || 'Not Specified'}</span>
                   </div>
                   {candidate.nationality && (
-                    <div className="flex items-center gap-2 text-slate-600">
-                      <Globe size={12} className="text-brand-gold shrink-0" />
-                      <span className="text-[11px] font-bold text-slate-800 break-words">Nationality: {candidate.nationality}</span>
+                    <div className="flex items-center gap-2 text-slate-700">
+                      <Globe size={14} className="text-brand-blue shrink-0" />
+                      <span className="text-[12px] font-bold break-words">Nationality: {candidate.nationality}</span>
                     </div>
                   )}
                 </div>
               </div>
 
               {(candidate.passportNumber || candidate.passportIssueDate) && (
-                <div className={styles.widgetBg}>
-                  <p className={cn("text-[9px] font-black uppercase tracking-widest mb-1.5", styles.accentText)}>Passport Dossier</p>
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-2">
-                      <CreditCard size={12} className={styles.accentText} shrink-0 />
-                      <span className={cn("text-[11px] font-black uppercase break-all", styles.accentText)}>{candidate.passportNumber || 'N/A'}</span>
+                <div className={cn(styles.widgetBg, "flex flex-col gap-2 rounded-xl p-3 bg-white/50 border border-slate-200 shadow-sm")}>
+                  <p className={cn("text-[10px] font-black uppercase tracking-widest pl-1", styles.accentText)}>Passport Dossier</p>
+                  <div className="space-y-2 mt-1">
+                    <div className="flex items-center gap-2 text-slate-700">
+                      <CreditCard size={14} className={styles.accentText} shrink-0 />
+                      <span className={cn("text-[12px] font-black uppercase break-all", styles.accentText)}>{candidate.passportNumber || 'N/A'}</span>
                     </div>
                     {candidate.passportIssueCountry && (
-                      <div className="text-[10px] font-bold text-slate-600 flex items-center gap-1.5">
+                      <div className="text-[11px] font-bold text-slate-600 flex items-center gap-2">
                         <Globe size={11} className="text-slate-400 shrink-0" /> <span className="break-words">Issued in: {candidate.passportIssueCountry}</span>
                       </div>
                     )}
@@ -319,19 +330,25 @@ export default function EuropassCV({ candidate, id, theme = 'classic' }: Europas
                 </div>
               )}
 
-              {(candidate.fatherName || candidate.motherName) && (
-                <div className={styles.widgetBg}>
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Family Details</p>
-                  <div className="space-y-1.5 text-slate-600">
+              {(candidate.fatherName || candidate.motherName || candidate.familyDetails?.maritalStatus) && (
+                <div className={cn(styles.widgetBg, "flex flex-col gap-2 rounded-xl p-3 bg-white/50 border border-slate-200 shadow-sm")}>
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Family Details</p>
+                  <div className="space-y-2 mt-1 text-slate-600">
+                    {candidate.familyDetails?.maritalStatus && (
+                      <div className="flex items-center gap-2 text-[12px] font-bold text-slate-800">
+                         <Heart size={14} className="text-brand-blue shrink-0" />
+                         <span>Marital: {candidate.familyDetails.maritalStatus}</span>
+                      </div>
+                    )}
                     {candidate.fatherName && (
-                      <div className="text-[11px] font-bold text-slate-800">
-                        <span className="text-[9px] uppercase tracking-widest text-slate-400 block mb-0.5">Father</span>
+                      <div className="text-[12px] font-bold text-slate-800 border-l-2 border-brand-blue/30 pl-2">
+                        <span className="text-[9px] uppercase tracking-widest text-slate-400 block mb-0.5">Father's Name</span>
                         {candidate.fatherName}
                       </div>
                     )}
                     {candidate.motherName && (
-                      <div className="text-[11px] font-bold text-slate-800 mt-1">
-                        <span className="text-[9px] uppercase tracking-widest text-slate-400 block mb-0.5">Mother</span>
+                      <div className="text-[12px] font-bold text-slate-800 border-l-2 border-brand-blue/30 pl-2 mt-2">
+                        <span className="text-[9px] uppercase tracking-widest text-slate-400 block mb-0.5">Mother's Name</span>
                         {candidate.motherName}
                       </div>
                     )}
@@ -351,7 +368,7 @@ export default function EuropassCV({ candidate, id, theme = 'classic' }: Europas
               <h3 className={styles.sectionHeadingMain}>
                 Professional Profile
               </h3>
-              <p className="text-[13px] leading-relaxed text-justify font-medium">
+              <p className="text-[14px] leading-relaxed text-slate-800 text-justify font-medium">
                 {candidate.aboutMe}
               </p>
             </div>
@@ -363,18 +380,18 @@ export default function EuropassCV({ candidate, id, theme = 'classic' }: Europas
               <h3 className={styles.sectionHeadingMain}>
                 Professional Experience
               </h3>
-              <div className="space-y-5">
+              <div className="space-y-6">
                 {candidate.workHistory.map((work, i) => (
-                  <div key={i} className="page-break-inside-avoid flex gap-4 pr-2">
-                    <div className="w-1/4 shrink-0 text-[11px] pt-1 text-slate-500 font-bold uppercase tracking-wider leading-snug">
+                  <div key={i} className="page-break-inside-avoid flex gap-6 pr-2">
+                    <div className="w-1/4 shrink-0 text-[11px] pt-1 text-slate-600 font-bold uppercase tracking-widest leading-relaxed">
                       {work.startDate} – <br/>{work.endDate || 'Present'}
                     </div>
                     <div className="w-3/4">
                       <div className={styles.jobTitle}>{work.position}</div>
                       <div className={styles.companyTitle}>
-                        <Briefcase size={12} className="mt-0.5" /> {work.company}
+                        <Briefcase size={14} className="mt-0.5" /> {work.company}
                       </div>
-                      <div className="text-[13px] leading-relaxed text-justify font-medium space-y-1">
+                      <div className="text-[13px] leading-relaxed text-slate-800 text-justify font-medium space-y-1.5 mt-1">
                          {work.description.split('\n').map((line, j) => {
                            const l = line.trim();
                            if (!l) return null;
@@ -397,19 +414,19 @@ export default function EuropassCV({ candidate, id, theme = 'classic' }: Europas
               <h3 className={styles.sectionHeadingMain}>
                 Education & Training
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {candidate.educationHistory.map((edu, i) => (
-                  <div key={i} className="flex gap-4 page-break-inside-avoid pr-2">
-                    <div className="w-1/4 shrink-0 text-[11px] pt-1 text-slate-500 font-bold uppercase tracking-wider leading-snug">
+                  <div key={i} className="flex gap-6 page-break-inside-avoid pr-2">
+                    <div className="w-1/4 shrink-0 text-[11px] pt-1 text-slate-600 font-bold uppercase tracking-widest leading-relaxed">
                       {edu.startDate} – <br/>{edu.endDate || 'Present'}
                     </div>
                     <div className="w-3/4">
                       <div className={styles.jobTitle}>{edu.degree}</div>
                       <div className={styles.companyTitle}>
-                        <Globe size={11} className="mt-0.5" /> {edu.institution}
+                        <Globe size={13} className="mt-0.5" /> {edu.institution}
                       </div>
                       {edu.description && (
-                        <div className="text-[12px] leading-relaxed text-justify font-medium whitespace-pre-line">
+                        <div className="text-[13px] leading-relaxed text-slate-800 text-justify font-medium whitespace-pre-line mt-1.5">
                           {edu.description}
                         </div>
                       )}

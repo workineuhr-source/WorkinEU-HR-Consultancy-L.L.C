@@ -239,7 +239,7 @@ export default function AdminSuccessStories() {
                       <div className="flex gap-4">
                         <div className="w-20 h-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
                           {newStory.candidatePhotoUrl && newStory.candidatePhotoUrl !== "" ? (
-                            <img src={newStory.candidatePhotoUrl} className="w-full h-full object-cover" />
+                            <img referrerPolicy="no-referrer" src={newStory.candidatePhotoUrl} className="w-full h-full object-cover" />
                           ) : (
                             <ImageIcon className="text-gray-300" size={24} />
                           )}
@@ -266,7 +266,7 @@ export default function AdminSuccessStories() {
                       <div className="flex gap-4">
                         <div className="w-20 h-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
                           {newStory.visaImageUrl && newStory.visaImageUrl !== "" ? (
-                            <img src={newStory.visaImageUrl} className="w-full h-full object-cover" />
+                            <img referrerPolicy="no-referrer" src={newStory.visaImageUrl} className="w-full h-full object-cover" />
                           ) : (
                             <FileText className="text-gray-300" size={24} />
                           )}
@@ -329,11 +329,11 @@ export default function AdminSuccessStories() {
             className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden group"
           >
             <div className="relative h-48 bg-gray-100">
-              {story.visaImageUrl && story.visaImageUrl !== "" && <img src={story.visaImageUrl} className="w-full h-full object-cover" />}
+              {story.visaImageUrl && story.visaImageUrl !== "" && <img referrerPolicy="no-referrer" src={story.visaImageUrl} className="w-full h-full object-cover" />}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <div className="absolute bottom-4 left-4 flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl border-2 border-white overflow-hidden shadow-lg">
-                  {story.candidatePhotoUrl && story.candidatePhotoUrl !== "" && <img src={story.candidatePhotoUrl} className="w-full h-full object-cover" />}
+                  {story.candidatePhotoUrl && story.candidatePhotoUrl !== "" && <img referrerPolicy="no-referrer" src={story.candidatePhotoUrl} className="w-full h-full object-cover" />}
                 </div>
                 <div className="text-white">
                   <h3 className="font-bold leading-tight">{story.candidateName}</h3>

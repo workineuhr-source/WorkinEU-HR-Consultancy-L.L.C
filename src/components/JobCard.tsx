@@ -73,28 +73,14 @@ export default function JobCard({ job, onQuickApply }: JobCardProps) {
 
   return (
     <motion.div 
-      whileHover={{ y: -12 }}
+      whileHover={{ y: -8 }}
       className={cn(
-        "group relative bg-white dark:bg-[#0f172a]/40 rounded-[2.5rem] md:rounded-[3rem] overflow-hidden border transition-all duration-700 flex flex-col h-full",
+        "group relative bg-white dark:bg-[#0f172a]/40 rounded-[2rem] overflow-hidden border transition-all duration-700 flex flex-col h-full",
         isApproaching 
-          ? "border-brand-rose/20 dark:border-brand-rose/30 hover:border-brand-rose/50 shadow-[0_20px_50px_-12px_rgba(251,113,133,0.1)]" 
-          : "border-slate-100 dark:border-white/5 hover:border-brand-teal/20 hover:shadow-[0_60px_100px_-20px_rgba(15,23,42,0.12)]"
+          ? "border-brand-rose/20 dark:border-brand-rose/30 hover:border-brand-rose/50 shadow-[0_15px_35px_-10px_rgba(251,113,133,0.1)]" 
+          : "border-slate-100 dark:border-white/5 hover:border-brand-teal/20 hover:shadow-[0_40px_80px_-20px_rgba(15,23,42,0.12)]"
       )}
     >
-      {/* Absolute Overlays (Type Badge & Share) */}
-      <div className="absolute top-6 right-6 z-20 flex flex-col gap-3 items-end">
-        <span className="bg-white/90 backdrop-blur-md text-[#020617] px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl transition-all group-hover:bg-brand-teal group-hover:text-white text-center">
-          {job.type}
-        </span>
-        <button 
-          onClick={handleShare}
-          className="w-10 h-10 bg-slate-900/10 hover:bg-slate-900 dark:bg-white/10 dark:hover:bg-white backdrop-blur-md text-slate-900 dark:text-white hover:text-white dark:hover:text-slate-900 rounded-full flex items-center justify-center transition-all shadow-xl border border-slate-900/10 dark:border-white/20"
-          title="Share Job"
-        >
-          <Share2 size={16} />
-        </button>
-      </div>
-
       <AnimatePresence>
         {showShareMenu && (
           <motion.div 
@@ -141,122 +127,151 @@ export default function JobCard({ job, onQuickApply }: JobCardProps) {
       </AnimatePresence>
 
       {job.imageUrl && (
-        <div className="h-56 md:h-64 w-full overflow-hidden relative">
+        <div className="h-40 md:h-48 w-full overflow-hidden relative shrink-0">
           <img 
             src={job.imageUrl} 
             alt={job.title} 
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
             referrerPolicy="no-referrer"
             loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/90 via-[#020617]/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-700"></div>
           
-          <div className="absolute top-6 left-6 flex flex-col gap-3 text-white z-10">
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full shadow-2xl">
-              <MapPin size={14} className="text-brand-teal" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em]">{job.country}</span>
+          <div className="absolute bottom-4 left-4 flex flex-col gap-2 text-white z-10">
+            <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full shadow-lg">
+              <MapPin size={12} className="text-brand-teal" />
+              <span className="text-[9px] font-black uppercase tracking-[0.2em]">{job.country}</span>
             </div>
             
             {isApproaching && (
               <motion.div 
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                className="flex items-center gap-2 bg-brand-rose px-4 py-2 rounded-full shadow-xl"
+                className="flex items-center gap-1.5 bg-brand-rose px-3 py-1.5 rounded-full shadow-md"
               >
-                <AlertCircle size={14} />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Priority</span>
+                <AlertCircle size={12} />
+                <span className="text-[9px] font-black uppercase tracking-[0.2em]">Priority</span>
               </motion.div>
             )}
           </div>
         </div>
       )}
-      
-      <div className="p-6 md:p-10 flex flex-col flex-grow relative">
-        <div className="mb-6 md:mb-8">
-          <div className="flex items-center gap-3 text-slate-500 dark:text-slate-300 mb-6">
+
+      <div className="p-5 md:p-6 flex flex-col flex-grow relative">
+        <div className="flex justify-between items-start gap-4 mb-4">
+          <div className="flex flex-wrap items-center gap-2 text-slate-500 dark:text-slate-300">
             <div className={cn(
-              "w-8 h-8 rounded-xl flex items-center justify-center border transition-all duration-500",
+              "w-7 h-7 rounded-lg flex items-center justify-center border transition-all duration-500",
               isApproaching 
                 ? "bg-brand-rose/10 border-brand-rose/20 text-brand-rose" 
                 : "bg-slate-50 dark:bg-white/5 border-slate-100 dark:border-white/10 group-hover:bg-brand-teal group-hover:text-white group-hover:border-brand-teal"
             )}>
-              <Briefcase size={14} />
+              <Briefcase size={12} />
             </div>
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] truncate">{job.category}</span>
+            <span className="text-[9px] font-black uppercase tracking-[0.3em] truncate">{job.category}</span>
           </div>
           
+          <div className="flex items-center gap-2">
+            <span className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-200 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] transition-all group-hover:bg-brand-teal group-hover:text-white">
+              {job.type}
+            </span>
+            <button 
+              onClick={handleShare}
+              className="w-8 h-8 bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-full flex items-center justify-center transition-all border border-slate-100 dark:border-white/10"
+              title="Share Job"
+            >
+              <Share2 size={12} />
+            </button>
+          </div>
+        </div>
+        
+        <div className="mb-4">
           <h3 className={cn(
-            "text-2xl md:text-3xl font-black transition-all leading-[1.1] tracking-tight font-sans mb-6 line-clamp-2",
+            "text-xl md:text-2xl font-black transition-all leading-[1.15] tracking-tight font-sans mb-4 line-clamp-2",
             isApproaching ? "text-slate-900 dark:text-white group-hover:text-brand-rose" : "text-slate-900 dark:text-white group-hover:text-brand-teal"
           )}>
             {job.title}
           </h3>
           
-          <div className="flex flex-wrap gap-2 mb-6">
-            <div className="flex items-center gap-3 text-slate-700 dark:text-slate-200 text-[11px] font-bold uppercase tracking-[0.2em] bg-slate-50 dark:bg-white/5 px-4 py-2 rounded-xl border border-slate-100 dark:border-white/5">
-              <Calendar size={14} className="text-brand-teal shrink-0" />
-              <span className="truncate">{job.experience} Experience</span>
+          <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200 text-[10px] font-bold uppercase tracking-[0.2em] bg-slate-50 dark:bg-white/5 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-white/5">
+              <Calendar size={12} className="text-brand-teal shrink-0" />
+              <span className="truncate">{job.experience} Exp</span>
             </div>
             
             {/* Package Highlights */}
             {job.includedPackageItems && job.includedPackageItems.some(i => i.toLowerCase().includes('ticket')) && (
-              <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-blue-100 dark:border-blue-500/20">
-                <Plane size={14} /> Ticket Included
+              <div className="flex items-center gap-1.5 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border border-blue-100 dark:border-blue-500/20">
+                <Plane size={12} /> Flight
               </div>
             )}
             {job.includedPackageItems && job.includedPackageItems.some(i => i.toLowerCase().includes('visa')) && (
-              <div className="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-emerald-100 dark:border-emerald-500/20">
-                <CheckCircle2 size={14} /> Visa Included
+              <div className="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border border-emerald-100 dark:border-emerald-500/20">
+                <CheckCircle2 size={12} /> Visa
               </div>
             )}
           </div>
 
-          <div className="flex flex-col gap-5">
-
+          <div className="flex flex-col gap-3">
             {isApproaching && (
-              <div className="flex items-center gap-3 text-brand-rose text-[11px] font-black uppercase tracking-[0.3em] bg-brand-rose/10 px-5 py-3 rounded-2xl w-fit border border-brand-rose/20">
-                <Sparkles size={14} className="animate-pulse" />
+              <div className="flex items-center gap-2 text-brand-rose text-[10px] font-black uppercase tracking-[0.3em] bg-brand-rose/10 px-4 py-2 rounded-xl w-fit border border-brand-rose/20">
+                <Sparkles size={12} className="animate-pulse" />
                 <span>Expiring Soon</span>
+              </div>
+            )}
+            
+            {diffTime < 0 && (
+              <div className="flex items-center gap-2 text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] bg-slate-100 dark:bg-white/5 px-4 py-2 rounded-xl w-fit border border-slate-200 dark:border-white/10">
+                <span>Job Closed</span>
               </div>
             )}
           </div>
         </div>
         
-        <div className="mt-auto pt-8 md:pt-10 border-t border-slate-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-4 transition-colors">
+        <div className="mt-auto pt-4 md:pt-6 border-t border-slate-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-3 transition-colors pb-4">
           <div className="space-y-1 min-w-0 flex-grow">
-            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-300">
-              <DollarSign size={12} className="text-brand-teal shrink-0" />
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] truncate">Salary</p>
+            <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-300">
+              <DollarSign size={10} className="text-brand-teal shrink-0" />
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] truncate">Salary</p>
             </div>
-            <p className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tighter truncate">
-              <span className="text-brand-teal text-lg md:text-xl mr-1">{job.currency || '€'}</span>
+            <p className="text-lg md:text-xl font-black text-slate-900 dark:text-white tracking-tighter truncate">
+              <span className="text-brand-teal text-base md:text-lg mr-1">{job.currency || '€'}</span>
               {job.minSalary} - {job.maxSalary}
             </p>
           </div>
           
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <button 
-              onClick={(e) => {
-                e.preventDefault();
-                onQuickApply?.();
-              }}
-              className="flex-1 sm:flex-none px-6 py-4 md:px-8 md:py-6 rounded-2xl md:rounded-[1.5rem] bg-brand-gold text-slate-900 font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] transition-all duration-500 shadow-xl hover:bg-slate-900 hover:text-white hover:-translate-y-1 flex items-center justify-center gap-3 group/quick"
-            >
-              <Sparkles size={18} className="group-hover/quick:rotate-12 transition-transform" />
-              <span>Quick Apply</span>
-            </button>
+          <div className="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+            {diffTime >= 0 ? (
+              <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  onQuickApply?.();
+                }}
+                className="flex-1 sm:flex-none px-4 py-3 md:px-5 md:py-3.5 rounded-xl bg-brand-gold text-slate-900 font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] transition-all duration-300 shadow-md hover:bg-slate-900 hover:text-white hover:-translate-y-0.5 flex items-center justify-center gap-2 group/quick"
+              >
+                <Sparkles size={14} className="group-hover/quick:rotate-12 transition-transform" />
+                <span>Apply</span>
+              </button>
+            ) : (
+              <button 
+                disabled
+                className="flex-1 sm:flex-none px-4 py-3 md:px-5 md:py-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                Closed
+              </button>
+            )}
 
             <Link 
               to={`/jobs/${job.id}`} 
               className={cn(
-                "flex-1 sm:flex-none px-6 py-4 md:px-8 md:py-6 rounded-2xl md:rounded-[1.5rem] font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] transition-all duration-500 shadow-xl flex items-center justify-center gap-3 group/btn",
+                "flex-1 sm:flex-none px-4 py-3 md:px-5 md:py-3.5 rounded-xl font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] transition-all duration-300 shadow-md flex items-center justify-center gap-2 group/btn",
                 isApproaching 
-                  ? "bg-brand-rose text-white hover:shadow-brand-rose/30" 
-                  : "bg-slate-900 dark:bg-premium-gradient-animated text-white hover:shadow-brand-teal/30 hover:-translate-y-1"
+                  ? "bg-brand-rose text-white hover:shadow-brand-rose/20" 
+                  : "bg-slate-900 dark:bg-premium-gradient-animated text-white hover:shadow-brand-teal/20 hover:-translate-y-0.5"
               )}
             >
               Details
-              <ChevronRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
+              <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>
@@ -264,7 +279,7 @@ export default function JobCard({ job, onQuickApply }: JobCardProps) {
 
       {/* Subtle hover overlay */}
       <div className={cn(
-        "absolute inset-0 border-2 border-transparent rounded-[3rem] pointer-events-none transition-all duration-700",
+        "absolute inset-0 border-2 border-transparent rounded-[2rem] pointer-events-none transition-all duration-700",
         isApproaching ? "group-hover:border-brand-rose/30" : "group-hover:border-brand-teal/20"
       )}></div>
     </motion.div>

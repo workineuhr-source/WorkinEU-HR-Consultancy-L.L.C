@@ -488,7 +488,7 @@ export default function AdminCandidateDetail() {
               <div className="relative group w-24 h-24 mb-6">
                 <div className="w-24 h-24 bg-brand-blue text-white rounded-3xl flex items-center justify-center text-4xl font-black shadow-2xl overflow-hidden">
                   {editingProfile.photoUrl ? (
-                    <img src={editingProfile.photoUrl} alt="Candidate" className="w-full h-full object-cover" />
+                    <img referrerPolicy="no-referrer" src={editingProfile.photoUrl} alt="Candidate" className="w-full h-full object-cover" />
                   ) : (
                     (editingProfile.fullName || 'C').charAt(0)
                   )}
@@ -1336,7 +1336,7 @@ export default function AdminCandidateDetail() {
                    </div>
                    <div className="space-y-4">
                       {editingProfile.paymentHistory?.map((p, i) => (
-                        <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 grid grid-cols-1 md:grid-cols-4 gap-4 relative group">
+                        <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 grid grid-cols-1 md:grid-cols-5 gap-4 relative group">
                            <button 
                               onClick={() => {
                                 const newH = [...(editingProfile.paymentHistory || [])];
@@ -1380,6 +1380,14 @@ export default function AdminCandidateDetail() {
                                 <option>Credit Card</option>
                                 <option>Other</option>
                               </select>
+                           </div>
+                           <div>
+                              <label className="block text-[8px] font-black text-gray-400 mb-1 uppercase">Transaction ID</label>
+                              <input className="w-full text-xs font-bold outline-none uppercase" value={p.transactionId || ''} onChange={e => {
+                                const newH = [...(editingProfile.paymentHistory || [])];
+                                newH[i] = { ...p, transactionId: e.target.value };
+                                setEditingProfile({ ...editingProfile, paymentHistory: newH });
+                              }} placeholder="Ref..." />
                            </div>
                            <div>
                               <label className="block text-[8px] font-black text-gray-400 mb-1 uppercase">Notes</label>

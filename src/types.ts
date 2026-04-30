@@ -32,6 +32,7 @@ export interface Job {
   pricingNepal?: PackagePricing;
   pricingGulf?: PackagePricing;
   pricingEurope?: PackagePricing;
+  hideFeeDetails?: boolean;
 }
 
 export interface PackagePricing {
@@ -197,6 +198,7 @@ export interface CandidateProfile {
     method: string;
     receiptUrl?: string;
     note?: string;
+    transactionId?: string;
   }[];
   createdAt: number;
   updatedAt: number;

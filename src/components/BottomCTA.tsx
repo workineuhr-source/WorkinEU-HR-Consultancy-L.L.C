@@ -50,36 +50,38 @@ export default function BottomCTA() {
   if (!content?.ctaTitle && !content?.ctaDescription) return null;
 
   return (
-    <section className="py-24 relative overflow-hidden bg-slate-50">
+    <section className="py-12 relative overflow-hidden bg-white mt-12 border-t border-slate-100">
       <div className="absolute inset-0 z-0">
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-teal/5 rounded-full blur-[100px] -mr-48 -mt-48"></div>
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-gold/5 rounded-full blur-[100px] -ml-40 -mb-40"></div>
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-brand-teal/5 rounded-full blur-[80px] -mr-32 -mt-32"></div>
+        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-brand-gold/5 rounded-full blur-[80px] -ml-24 -mb-24"></div>
       </div>
 
-      <div className="max-w-[1920px] mx-auto px-4 md:px-8 relative z-10">
-        <div className="max-w-4xl">
+      <div className="relative z-10 w-full px-0">
+        <div className="w-full bg-slate-50 dark:bg-slate-800/50 p-6 md:p-10 border border-slate-100 dark:border-white/5 shadow-sm">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="space-y-8"
+            className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12"
           >
-            <span className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-brand-teal/10 border border-brand-teal/20 text-brand-teal text-[10px] font-black uppercase tracking-[0.4em] mb-4">
-              <Sparkles size={14} /> Global Opportunities
-            </span>
-            
-            <h2 className={`text-4xl md:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight ${getFontClass(content.styles?.bottomCta?.font)} ${getTextColor(content.styles?.bottomCta?.titleColor)}`}>
-              {content.ctaTitle || "Ready to Start Your Global Career?"}
-            </h2>
-            
-            <p className={`text-lg md:text-xl leading-relaxed max-w-2xl font-medium ${getFontClass(content.styles?.bottomCta?.font)} ${getTextColor(content.styles?.bottomCta?.descriptionColor, 'text-slate-500')}`}>
-              {content.ctaDescription || "Join hundreds of successful candidates who have transformed their lives through WorkinEU's expert recruitment and placement services."}
-            </p>
+            <div className="flex-1 space-y-4 text-center md:text-left">
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-teal/10 border border-brand-teal/20 text-brand-teal text-[10px] font-black uppercase tracking-[0.4em]">
+                <Sparkles size={12} /> Global Opportunities
+              </span>
+              
+              <h2 className={`text-2xl md:text-3xl lg:text-4xl font-black leading-[1.1] tracking-tight ${getFontClass(content.styles?.bottomCta?.font)} ${getTextColor(content.styles?.bottomCta?.titleColor)}`}>
+                {content.ctaTitle || "Ready to Start Your Global Career?"}
+              </h2>
+              
+              <p className={`text-sm md:text-base leading-relaxed max-w-xl mx-auto md:mx-0 font-medium ${getFontClass(content.styles?.bottomCta?.font)} ${getTextColor(content.styles?.bottomCta?.descriptionColor, 'text-slate-500')}`}>
+                {content.ctaDescription || "Join hundreds of successful candidates who have transformed their lives through WorkinEU's expert recruitment."}
+              </p>
+            </div>
 
-            <div className="pt-6">
+            <div className="shrink-0 flex items-center justify-center">
               <Link 
                 to="/jobs" 
-                className={`inline-flex items-center gap-5 px-12 py-6 font-black rounded-2xl transition-all shadow-2xl shadow-slate-200 group text-xs uppercase tracking-widest ${getBgColor(content.styles?.bottomCta?.buttonBgColor)} ${getTextColor(content.styles?.bottomCta?.buttonTextColor, 'text-white')} ${getFontClass(content.styles?.bottomCta?.font)}`}
+                className={`inline-flex items-center gap-4 px-8 py-5 font-black rounded-xl transition-all shadow-xl shadow-slate-200 dark:shadow-none group text-[10px] md:text-xs uppercase tracking-widest whitespace-nowrap ${getBgColor(content.styles?.bottomCta?.buttonBgColor)} ${getTextColor(content.styles?.bottomCta?.buttonTextColor, 'text-white')} ${getFontClass(content.styles?.bottomCta?.font)}`}
               >
                 {content.ctaButtonText || "Explore All Jobs"} <ArrowRight className="group-hover:translate-x-2 transition-transform" />
               </Link>

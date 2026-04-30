@@ -242,7 +242,7 @@ export default function AdminClients() {
                       <div className="flex gap-4">
                         <div className="w-24 h-24 bg-gray-50 rounded-2xl border border-dashed border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
                           {newClient.logoUrl && newClient.logoUrl !== "" ? (
-                            <img src={newClient.logoUrl} className="w-full h-full object-contain p-2" />
+                            <img referrerPolicy="no-referrer" src={newClient.logoUrl} className="w-full h-full object-contain p-2" />
                           ) : (
                             <Building2 className="text-gray-300" size={32} />
                           )}
@@ -363,7 +363,7 @@ export default function AdminClients() {
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-center p-2">
                   {client.logoUrl && client.logoUrl !== "" ? (
-                    <img src={client.logoUrl} className="w-full h-full object-contain" />
+                    <img referrerPolicy="no-referrer" src={client.logoUrl} className="w-full h-full object-contain" />
                   ) : (
                     <Building2 className="text-gray-300" size={32} />
                   )}

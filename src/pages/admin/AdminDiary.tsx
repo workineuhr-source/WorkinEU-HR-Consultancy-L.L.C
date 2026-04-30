@@ -413,7 +413,7 @@ function DiaryModal({ post, onClose, onSuccess }: DiaryModalProps) {
                 </div>
                 {formData.imageUrl && formData.imageUrl !== "" && (
                   <div className="mt-4 aspect-video rounded-xl overflow-hidden border border-gray-100">
-                    <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                    <img referrerPolicy="no-referrer" src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
                   </div>
                 )}
                 <p className="text-[10px] text-gray-400 mt-2 italic">Upload an image or provide a URL. Leave blank for a placeholder.</p>

@@ -4,30 +4,41 @@ import { db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
 
 // Initialize Gemini on the frontend
-const ai = new GoogleGenAI({ 
-  apiKey: process.env.GEMINI_API_KEY || "" 
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY || "",
 });
 
-export async function getJobRecommendations(profile: CandidateProfile, allJobs: Job[]): Promise<string[]> {
+export async function getJobRecommendations(
+  profile: CandidateProfile,
+  allJobs: Job[],
+): Promise<string[]> {
   if (!allJobs.length) return [];
 
   try {
     // 1. Fetch System Settings to see if we should use local Gemini or backend (for OpenAI)
     const settingsDoc = await getDoc(doc(db, "settings", "system"));
-    const settingsData = settingsDoc.exists() ? settingsDoc.data() as SystemSettings : null;
-    
+    const settingsData = settingsDoc.exists()
+      ? (settingsDoc.data() as SystemSettings)
+      : null;
+
     let activeConfig = null;
-    if (settingsData && settingsData.apiConfigs && settingsData.apiConfigs.length > 0) {
-      activeConfig = settingsData.apiConfigs.find((c: any) => c.isEnabled && c.id === settingsData.activeConfigId) 
-                     || settingsData.apiConfigs.find((c: any) => c.isEnabled);
+    if (
+      settingsData &&
+      settingsData.apiConfigs &&
+      settingsData.apiConfigs.length > 0
+    ) {
+      activeConfig =
+        settingsData.apiConfigs.find(
+          (c: any) => c.isEnabled && c.id === settingsData.activeConfigId,
+        ) || settingsData.apiConfigs.find((c: any) => c.isEnabled);
     }
 
-    const provider = activeConfig?.provider || 'gemini';
-    const modelName = activeConfig?.modelName || 'gemini-3-flash-preview';
+    const provider = activeConfig?.provider || "gemini";
+    const modelName = activeConfig?.modelName || "gemini-3-flash-preview";
 
     // If provider is NOT gemini (e.g. OpenAI), we still use the backend proxy
     // to protect non-Gemini keys.
-    if (provider !== 'gemini') {
+    if (provider !== "gemini") {
       const response = await fetch("/api/ai/recommend", {
         method: "POST",
         headers: {
@@ -47,9 +58,9 @@ export async function getJobRecommendations(profile: CandidateProfile, allJobs: 
     // 2. Perform Gemini recommendation on the frontend (Platform mandated)
     const profileContext = `
       Candidate Name: ${profile.fullName}
-      Experience: ${profile.experience || 'Not specified'}
-      Education: ${profile.education || 'Not specified'}
-      Skills: ${profile.skills?.join(', ') || 'Not specified'}
+      Experience: ${profile.experience || "Not specified"}
+      Education: ${profile.education || "Not specified"}
+      Skills: ${profile.skills?.join(", ") || "Not specified"}
     `;
 
     const jobsContext = allJobs.slice(0, 20).map((job: any) => ({
@@ -57,7 +68,7 @@ export async function getJobRecommendations(profile: CandidateProfile, allJobs: 
       title: job.title,
       category: job.category,
       country: job.country,
-      description: job.description.substring(0, 200) + '...'
+      description: job.description.substring(0, 200) + "...",
     }));
 
     const prompt = `
@@ -73,7 +84,9 @@ export async function getJobRecommendations(profile: CandidateProfile, allJobs: 
 
     // Use the model name from config or default
     const response = await ai.models.generateContent({
-      model: modelName.includes('gemini-1.5') ? 'gemini-3-flash-preview' : modelName, // Ensure we use supported models
+      model: modelName.includes("gemini-1.5")
+        ? "gemini-3-flash-preview"
+        : modelName, // Ensure we use supported models
       contents: prompt,
     });
 
@@ -81,9 +94,8 @@ export async function getJobRecommendations(profile: CandidateProfile, allJobs: 
     // Extract array from text if it's not pure JSON
     const match = text.match(/\[.*\]/s);
     const recommendedIds = match ? JSON.parse(match[0]) : [];
-    
-    return recommendedIds || [];
 
+    return recommendedIds || [];
   } catch (error) {
     console.error("Error getting job recommendations:", error);
     return [];

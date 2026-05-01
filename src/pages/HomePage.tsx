@@ -100,7 +100,7 @@ const Section = ({
       id={id}
       className={cn(
         "py-12 md:py-16 relative overflow-hidden transition-colors duration-500",
-        isDark ? "bg-[#020617] text-white" : "bg-white",
+        isDark ? "bg-[#121212] text-white" : "bg-white dark:bg-[#121212]",
         className,
       )}
     >
@@ -133,7 +133,7 @@ const Section = ({
                   transition={{ delay: 0.1 }}
                   className={cn(
                     "text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 md:mb-8",
-                    isDark ? "text-white" : "text-slate-900",
+                    isDark ? "text-white" : "text-slate-900 dark:text-white",
                   )}
                 >
                   {title}
@@ -147,7 +147,9 @@ const Section = ({
                   transition={{ delay: 0.2 }}
                   className={cn(
                     "text-lg md:text-xl font-medium leading-relaxed max-w-2xl",
-                    isDark ? "text-slate-200" : "text-slate-900",
+                    isDark
+                      ? "text-slate-200"
+                      : "text-slate-900 dark:text-white",
                   )}
                 >
                   {subtitle}
@@ -666,9 +668,12 @@ export default function HomePage() {
     if (color === "teal") return "text-brand-teal";
     if (color === "rose") return "text-brand-rose";
     if (color === "gold") return "text-brand-gold";
-    if (color === "blue") return "text-brand-blue";
+    if (color === "blue") return "text-brand-blue dark:text-white";
     if (color === "white") return "text-white";
-    return color.startsWith("text-") ? color : `text-[${color}]`;
+    if (color === "slate") return "text-slate-900 dark:text-white";
+    return color.startsWith("text-")
+      ? color
+      : `text-[${color}] dark:text-white`;
   };
 
   const getBgColor = (color?: string, fallback: string = "bg-brand-teal") => {
@@ -683,7 +688,7 @@ export default function HomePage() {
 
   if (isPageLoading) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center bg-white dark:bg-[#020617]">
+      <div className="min-h-[80vh] flex items-center justify-center bg-white dark:bg-[#121212]">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -699,10 +704,10 @@ export default function HomePage() {
   }
 
   return (
-    <div className="overflow-hidden bg-white">
+    <div className="overflow-hidden bg-white dark:bg-[#121212]">
       <SEO title="Jobs in Europe for Nepalese | HR Recruitment Agency" />
       {/* Hero Section */}
-      <section className="relative min-h-[60vh] lg:min-h-[70vh] flex items-center pt-24 pb-12 overflow-hidden bg-white dark:bg-[#020617]">
+      <section className="relative min-h-[60vh] lg:min-h-[70vh] flex items-center pt-24 pb-12 overflow-hidden bg-white dark:bg-[#121212]">
         <div className="absolute inset-0 z-0">
           <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-brand-teal/5 rounded-full blur-[120px] -mr-96 -mt-96"></div>
           <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-brand-rose/5 rounded-full blur-[120px] -ml-72 -mb-72"></div>
@@ -839,7 +844,7 @@ export default function HomePage() {
                 transition={{ duration: 1, delay: 0.2 }}
                 className="relative z-10"
               >
-                <div className="relative aspect-square lg:aspect-[4/5] max-w-[500px] lg:max-w-[650px] mx-auto rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white dark:border-[#020617] bg-slate-100 dark:bg-white/5">
+                <div className="relative aspect-square lg:aspect-[4/5] max-w-[500px] lg:max-w-[650px] mx-auto rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white dark:border-[#121212] bg-slate-100 dark:bg-white/5">
                   <AnimatePresence mode="wait">
                     <motion.img
                       key={currentHeroIndex}
@@ -854,7 +859,7 @@ export default function HomePage() {
                       loading="lazy"
                     />
                   </AnimatePresence>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/40 to-transparent pointer-events-none"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/40 to-transparent pointer-events-none"></div>
 
                   {/* Slider Indicators */}
                   {heroImages.length > 1 && (
@@ -961,7 +966,7 @@ export default function HomePage() {
         >
           <Link
             to="/jobs"
-            className="inline-flex items-center gap-6 px-14 py-6 bg-[#020617] dark:bg-brand-teal text-white dark:text-[#020617] font-black uppercase tracking-[0.2em] text-xs rounded-2xl hover:scale-105 active:scale-95 transition-all duration-500 group shadow-2xl shadow-brand-teal/20"
+            className="inline-flex items-center gap-6 px-14 py-6 bg-[#121212] dark:bg-brand-teal text-white dark:text-[#121212] font-black uppercase tracking-[0.2em] text-xs rounded-2xl hover:scale-105 active:scale-95 transition-all duration-500 group shadow-2xl shadow-brand-teal/20"
           >
             Explore 500+ Openings{" "}
             <ArrowRight
@@ -1003,7 +1008,7 @@ export default function HomePage() {
                 className="p-12 bg-white dark:bg-white/5 rounded-[3rem] border border-slate-100 dark:border-white/10 group overflow-hidden transition-all duration-500 hover:shadow-2xl shadow-premium"
               >
                 <div className="absolute top-0 right-0 w-40 h-40 bg-brand-teal/5 rounded-bl-[6rem] -mr-16 -mt-16 group-hover:bg-brand-teal/10 transition-all"></div>
-                <div className="w-20 h-20 bg-[#020617] dark:bg-brand-teal text-white dark:text-[#020617] rounded-3xl flex items-center justify-center mb-10 group-hover:scale-110 transition-all duration-500 shadow-xl shadow-brand-teal/10">
+                <div className="w-20 h-20 bg-[#121212] dark:bg-brand-teal text-white dark:text-[#121212] rounded-3xl flex items-center justify-center mb-10 group-hover:scale-110 transition-all duration-500 shadow-xl shadow-brand-teal/10">
                   {i === 0 ? (
                     <Globe2 size={36} />
                   ) : i === 1 ? (
@@ -1132,7 +1137,7 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden group hover:shadow-2xl transition-all duration-500"
+                className="bg-white dark:bg-white/5 rounded-[2.5rem] border border-slate-100 dark:border-white/10 overflow-hidden group hover:shadow-2xl dark:hover:shadow-none transition-all duration-500"
               >
                 <div className="relative h-64 overflow-hidden">
                   {story.visaImageUrl && (
@@ -1171,7 +1176,7 @@ export default function HomePage() {
                     </span>
                   </div>
                   {story.story && (
-                    <p className="text-slate-600 text-sm italic leading-relaxed">
+                    <p className="text-slate-600 dark:text-slate-300 text-sm italic leading-relaxed">
                       "{story.story}"
                     </p>
                   )}
@@ -1197,7 +1202,7 @@ export default function HomePage() {
                 className="p-12 bg-white dark:bg-white/5 rounded-[3rem] border border-slate-100 dark:border-white/10 shadow-xl shadow-slate-200/50 relative overflow-hidden group"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-brand-teal/5 rounded-bl-[4rem] -mr-12 -mt-12 group-hover:bg-brand-teal/10 transition-all"></div>
-                <div className="w-16 h-16 bg-slate-900 dark:bg-brand-teal text-white dark:text-[#020617] rounded-2xl flex items-center justify-center mb-8 shadow-lg transition-all duration-500">
+                <div className="w-16 h-16 bg-slate-900 dark:bg-brand-teal text-white dark:text-[#121212] rounded-2xl flex items-center justify-center mb-8 shadow-lg transition-all duration-500">
                   <Target size={32} />
                 </div>
                 <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-6">
@@ -1263,7 +1268,7 @@ export default function HomePage() {
           </div>
 
           <div className="lg:col-span-4">
-            <div className="p-12 bg-[#020617] text-white rounded-[3rem] shadow-2xl relative overflow-hidden group h-full border border-white/5">
+            <div className="p-12 bg-[#121212] text-white rounded-[3rem] shadow-2xl relative overflow-hidden group h-full border border-white/5">
               <div className="absolute -top-10 -right-10 w-48 h-48 bg-brand-teal/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
               <div className="relative z-10">
                 <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-brand-teal/10 border border-brand-teal/20 text-brand-teal text-[10px] font-black uppercase tracking-[0.3em] mb-12 shadow-inner">
@@ -1512,12 +1517,12 @@ export default function HomePage() {
 
           {/* High-Impact Global Standards Banner */}
           {content.showPartners !== false && (
-            <section className="py-12 md:py-16 relative group overflow-hidden bg-slate-50 mb-12">
+            <section className="py-12 md:py-16 relative group overflow-hidden bg-slate-50 dark:bg-white/5 mb-12">
               {/* Decorative background glow */}
               <div className="absolute -inset-10 bg-brand-teal/5 rounded-[6rem] blur-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none"></div>
 
               <div className="max-w-[1920px] mx-auto px-4 md:px-8">
-                <div className="bg-white border border-slate-200/60 rounded-[4rem] md:rounded-[6rem] overflow-hidden relative shadow-[0_40px_100px_-20px_rgba(0,0,0,0.05)]">
+                <div className="bg-white dark:bg-[#1A1A1A] border border-slate-200/60 dark:border-white/10 rounded-[4rem] md:rounded-[6rem] overflow-hidden relative shadow-[0_40px_100px_-20px_rgba(0,0,0,0.05)] dark:shadow-none">
                   {/* Animated highlights */}
                   <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-teal/10 rounded-full blur-[100px] translate-x-1/2 -translate-y-1/2 animate-pulse"></div>
                   <div
@@ -1534,7 +1539,7 @@ export default function HomePage() {
                         transition={{ delay: 0.2 }}
                         className="space-y-8"
                       >
-                        <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-slate-100 border border-slate-200 text-slate-600 text-[10px] font-black uppercase tracking-[0.4em] shadow-sm">
+                        <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-[10px] font-black uppercase tracking-[0.4em] shadow-sm">
                           <Award
                             size={14}
                             className="animate-bounce text-brand-gold"
@@ -1542,12 +1547,12 @@ export default function HomePage() {
                           {content.globalStandardsTagline || "Global Standards"}
                         </div>
 
-                        <h3 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 tracking-tighter leading-[1.1] group-hover:translate-x-2 transition-transform duration-700">
+                        <h3 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-[1.1] group-hover:translate-x-2 transition-transform duration-700">
                           {content.globalStandardsTitle ||
                             "Your Success, Our Commitment"}
                         </h3>
 
-                        <div className="text-slate-600 text-base md:text-lg font-medium leading-relaxed max-w-2xl">
+                        <div className="text-slate-600 dark:text-slate-300 text-base md:text-lg font-medium leading-relaxed max-w-2xl">
                           {content.globalStandardsDescription ? (
                             <p className="whitespace-pre-wrap">
                               {content.globalStandardsDescription}
@@ -1570,7 +1575,7 @@ export default function HomePage() {
                             {[1, 2, 3].map((i) => (
                               <div
                                 key={i}
-                                className="w-12 h-12 rounded-full border-4 border-white bg-slate-100 overflow-hidden ring-2 ring-brand-teal/20"
+                                className="w-12 h-12 rounded-full border-4 border-white dark:border-[#1A1A1A] bg-slate-100 dark:bg-white/5 overflow-hidden ring-2 ring-brand-teal/20"
                               >
                                 <img
                                   referrerPolicy="no-referrer"
@@ -1581,9 +1586,9 @@ export default function HomePage() {
                               </div>
                             ))}
                           </div>
-                          <div className="h-10 w-px bg-slate-200 mx-2"></div>
+                          <div className="h-10 w-px bg-slate-200 dark:bg-white/10 mx-2"></div>
                           <div>
-                            <p className="text-slate-900 font-black text-lg tracking-tight">
+                            <p className="text-slate-900 dark:text-white font-black text-lg tracking-tight">
                               Trust of Excellence
                             </p>
                             <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest leading-none">
@@ -1597,7 +1602,7 @@ export default function HomePage() {
                     {/* Side Image & Logo Cloud Section */}
                     <div className="xl:col-span-6 grid grid-cols-1 md:grid-cols-2">
                       {/* Side Photo */}
-                      <div className="relative h-[400px] md:h-full overflow-hidden border-x border-slate-100 bg-slate-100">
+                      <div className="relative h-[400px] md:h-full overflow-hidden border-x border-slate-100 dark:border-white/10 bg-slate-100 dark:bg-white/10">
                         <img
                           src={
                             content.globalStandardsImageUrl ||
@@ -1617,7 +1622,7 @@ export default function HomePage() {
                       </div>
 
                       {/* Logo Cloud Section */}
-                      <div className="bg-slate-50/50 p-12 md:p-16 border-l border-slate-100 flex flex-col justify-center relative overflow-hidden">
+                      <div className="bg-slate-50/50 dark:bg-black/20 p-12 md:p-16 border-l border-slate-100 dark:border-white/10 flex flex-col justify-center relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 rounded-bl-[4rem] pointer-events-none"></div>
                         <div className="grid grid-cols-2 gap-x-8 gap-y-12 relative z-10">
                           {clients.length > 0
@@ -1667,7 +1672,7 @@ export default function HomePage() {
                               )}
                         </div>
 
-                        <div className="mt-12 pt-10 border-t border-slate-200 text-center relative z-10">
+                        <div className="mt-12 pt-10 border-t border-slate-200 dark:border-white/10 text-center relative z-10">
                           <p className="text-slate-400 text-[8px] font-black uppercase tracking-[0.4em]">
                             Certified Recruiting Partner
                           </p>
@@ -1724,17 +1729,17 @@ export default function HomePage() {
                   <motion.div
                     key={i}
                     whileHover={{ x: 20 }}
-                    className="flex gap-10 p-10 bg-white rounded-[3rem] border border-slate-100 hover:border-brand-gold transition-all duration-500 group relative overflow-hidden hover:shadow-[0_30px_60px_-15px_rgba(15,23,42,0.1)]"
+                    className="flex gap-10 p-10 bg-white dark:bg-[#121212] rounded-[3rem] border border-slate-100 hover:border-brand-gold transition-all duration-500 group relative overflow-hidden hover:shadow-[0_30px_60px_-15px_rgba(15,23,42,0.1)]"
                   >
                     <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 rounded-bl-[4rem] -mr-12 -mt-12 group-hover:bg-brand-gold/10 transition-all"></div>
-                    <div className="w-20 h-20 bg-slate-900/5 text-slate-900 rounded-2xl flex items-center justify-center shrink-0 shadow-inner group-hover:bg-slate-900 group-hover:text-white transition-all duration-500">
+                    <div className="w-20 h-20 bg-slate-900/5 text-slate-900 dark:text-white rounded-2xl flex items-center justify-center shrink-0 shadow-inner group-hover:bg-slate-900 group-hover:text-white transition-all duration-500">
                       {icons[i % icons.length]}
                     </div>
                     <div>
-                      <h4 className="font-bold text-slate-900 text-2xl mb-3 group-hover:text-brand-gold transition-colors">
+                      <h4 className="font-bold text-slate-900 dark:text-white text-2xl mb-3 group-hover:text-brand-gold transition-colors">
                         {f.title}
                       </h4>
-                      <p className="text-slate-600 text-base leading-relaxed max-w-xl font-light">
+                      <p className="text-slate-600 dark:text-slate-300 text-base leading-relaxed max-w-xl font-light">
                         {f.description || f.desc}
                       </p>
                     </div>
@@ -1757,7 +1762,7 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent"></div>
 
                 <div className="absolute bottom-12 left-12 right-12">
-                  <div className="inline-flex items-center gap-2 bg-brand-gold text-slate-900 px-6 py-3 rounded-full font-bold text-[10px] uppercase tracking-[0.3em] mb-6 shadow-2xl">
+                  <div className="inline-flex items-center gap-2 bg-brand-gold text-slate-900 dark:text-white px-6 py-3 rounded-full font-bold text-[10px] uppercase tracking-[0.3em] mb-6 shadow-2xl">
                     <Sparkles size={14} /> Community Life
                   </div>
                   <h3 className="text-white font-bold text-4xl tracking-tight leading-none mb-6">
@@ -1778,7 +1783,7 @@ export default function HomePage() {
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
-                className="absolute -bottom-12 -left-12 bg-white p-8 rounded-[2.5rem] shadow-2xl border border-slate-100 z-20 hidden xl:flex items-center gap-6"
+                className="absolute -bottom-12 -left-12 bg-white dark:bg-[#121212] p-8 rounded-[2.5rem] shadow-2xl border border-slate-100 z-20 hidden xl:flex items-center gap-6"
               >
                 <div className="w-16 h-16 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center">
                   <CheckCircle size={32} />
@@ -1787,7 +1792,7 @@ export default function HomePage() {
                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.3em]">
                     Integration
                   </p>
-                  <p className="text-2xl font-bold text-slate-900">
+                  <p className="text-2xl font-bold text-slate-900 dark:text-white">
                     100% Guaranteed
                   </p>
                 </div>
@@ -1811,9 +1816,9 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-white p-8 rounded-[2.5rem] border border-slate-100 flex flex-col items-center text-center group hover:shadow-xl transition-all duration-500"
+                className="bg-white dark:bg-white/5 p-8 rounded-[2.5rem] border border-slate-100 dark:border-white/10 flex flex-col items-center text-center group hover:shadow-xl dark:hover:shadow-none transition-all duration-500"
               >
-                <div className="w-24 h-24 bg-slate-50 rounded-2xl flex items-center justify-center p-4 mb-6 group-hover:scale-110 transition-transform">
+                <div className="w-24 h-24 bg-slate-50 dark:bg-white/5 rounded-2xl flex items-center justify-center p-4 mb-6 group-hover:scale-110 transition-transform">
                   {client.logoUrl ? (
                     <img
                       src={client.logoUrl}
@@ -1825,7 +1830,7 @@ export default function HomePage() {
                     <Building2 size={40} className="text-slate-200" />
                   )}
                 </div>
-                <h4 className="font-bold text-slate-900 text-lg mb-2">
+                <h4 className="font-bold text-slate-900 dark:text-white text-lg mb-2">
                   {client.companyName}
                 </h4>
                 <div className="flex items-center gap-1.5 text-brand-gold mb-4">
@@ -1837,7 +1842,7 @@ export default function HomePage() {
                 {client.review && (
                   <div className="relative pt-6 border-t border-slate-50 w-full">
                     <Quote className="absolute top-2 left-0 text-brand-gold/10 w-8 h-8" />
-                    <p className="text-slate-600 text-xs italic line-clamp-3">
+                    <p className="text-slate-600 dark:text-slate-300 text-xs italic line-clamp-3">
                       "{client.review}"
                     </p>
                   </div>
@@ -1861,7 +1866,7 @@ export default function HomePage() {
               ? [1, 2, 3].map((i) => (
                   <div
                     key={i}
-                    className="h-96 bg-white rounded-[3rem] animate-pulse border border-slate-100"
+                    className="h-96 bg-white dark:bg-[#121212] rounded-[3rem] animate-pulse border border-slate-100"
                   ></div>
                 ))
               : (diaryPosts.length > 0 ? diaryPosts : fallbackDiary).map(
@@ -1871,7 +1876,7 @@ export default function HomePage() {
           <div className="mt-16 text-center">
             <Link
               to="/diary"
-              className="inline-flex items-center gap-3 text-slate-900 font-bold hover:text-brand-gold transition-colors group"
+              className="inline-flex items-center gap-3 text-slate-900 dark:text-white font-bold hover:text-brand-gold transition-colors group"
             >
               View All Stories{" "}
               <ArrowRight
@@ -1892,14 +1897,14 @@ export default function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           <div>
             <div className="flex items-center justify-between mb-12">
-              <h3 className="text-3xl font-bold text-slate-900 tracking-tight">
+              <h3 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
                 Candidate Stories
               </h3>
               <div className="flex gap-3">
-                <div className="w-10 h-10 rounded-2xl border border-slate-100 flex items-center justify-center text-slate-900 hover:bg-slate-900 hover:text-white transition-all cursor-pointer">
+                <div className="w-10 h-10 rounded-2xl border border-slate-100 flex items-center justify-center text-slate-900 dark:text-white hover:bg-slate-900 hover:text-white transition-all cursor-pointer">
                   <ArrowRight size={18} className="rotate-180" />
                 </div>
-                <div className="w-10 h-10 rounded-2xl border border-slate-100 flex items-center justify-center text-slate-900 hover:bg-slate-900 hover:text-white transition-all cursor-pointer">
+                <div className="w-10 h-10 rounded-2xl border border-slate-100 flex items-center justify-center text-slate-900 dark:text-white hover:bg-slate-900 hover:text-white transition-all cursor-pointer">
                   <ArrowRight size={18} />
                 </div>
               </div>
@@ -1909,7 +1914,7 @@ export default function HomePage() {
                 <motion.div
                   key={i}
                   whileHover={{ x: 10 }}
-                  className="p-10 bg-white rounded-[2.5rem] border border-slate-100 relative group transition-all duration-500 hover:shadow-[0_30px_60px_-15px_rgba(15,23,42,0.1)]"
+                  className="p-10 bg-white dark:bg-[#121212] rounded-[2.5rem] border border-slate-100 relative group transition-all duration-500 hover:shadow-[0_30px_60px_-15px_rgba(15,23,42,0.1)]"
                 >
                   <Quote className="absolute top-8 right-8 text-brand-gold/10 w-16 h-16 group-hover:text-brand-gold/20 transition-colors" />
                   <div className="flex gap-1.5 text-brand-gold mb-6">
@@ -1917,7 +1922,7 @@ export default function HomePage() {
                       <Star key={i} size={16} fill="currentColor" />
                     ))}
                   </div>
-                  <p className="text-slate-700 text-lg leading-relaxed mb-8 italic font-light">
+                  <p className="text-slate-700 dark:text-slate-300 text-lg leading-relaxed mb-8 italic font-light">
                     "
                     {review.comment ||
                       "WorkinEU made my dream of working in Poland a reality. The support was exceptional."}
@@ -1928,7 +1933,7 @@ export default function HomePage() {
                       {(review.userName || "A").charAt(0)}
                     </div>
                     <div>
-                      <h4 className="font-bold text-slate-900 text-base">
+                      <h4 className="font-bold text-slate-900 dark:text-white text-base">
                         {review.userName || "Arjun Sharma"}
                       </h4>
                       <p className="text-brand-gold text-[10px] font-bold uppercase tracking-[0.3em]">
@@ -1941,7 +1946,7 @@ export default function HomePage() {
             </div>
           </div>
           <div>
-            <h3 className="text-3xl font-bold text-slate-900 tracking-tight mb-12">
+            <h3 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-12">
               Common Questions
             </h3>
             {content.showFaqs !== false && (
@@ -1949,20 +1954,20 @@ export default function HomePage() {
                 {content.faqs?.map((faq, i) => (
                   <div
                     key={i}
-                    className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden group hover:border-brand-gold transition-all duration-500"
+                    className="bg-white dark:bg-white/5 rounded-[2rem] border border-slate-100 dark:border-white/10 overflow-hidden group hover:border-brand-gold transition-all duration-500"
                   >
                     <button
                       onClick={() => setActiveFaq(activeFaq === i ? null : i)}
-                      className="w-full px-8 py-6 flex items-center justify-between text-left hover:bg-slate-50 transition-colors"
+                      className="w-full px-8 py-6 flex items-center justify-between text-left hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
                     >
-                      <span className="font-bold text-slate-900 text-base md:text-lg">
+                      <span className="font-bold text-slate-900 dark:text-white text-base md:text-lg">
                         {faq.question}
                       </span>
                       <div
                         className={cn(
-                          "w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center text-brand-gold transition-all",
+                          "w-10 h-10 rounded-2xl bg-slate-50 dark:bg-white/5 flex items-center justify-center text-brand-gold transition-all",
                           activeFaq === i &&
-                            "bg-brand-gold text-slate-900 rotate-180",
+                            "bg-brand-gold text-slate-900 dark:text-white rotate-180",
                         )}
                       >
                         <ChevronDown size={20} />
@@ -1974,7 +1979,7 @@ export default function HomePage() {
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
-                          className="px-8 pb-8 text-slate-700 text-sm leading-relaxed border-t border-slate-50 pt-6 font-light"
+                          className="px-8 pb-8 text-slate-700 dark:text-slate-300 text-sm leading-relaxed border-t border-slate-50 pt-6 font-light"
                         >
                           {faq.answer}
                         </motion.div>
@@ -1994,10 +1999,10 @@ export default function HomePage() {
       {/* Contact & Newsletter */}
       <Section
         id="contact"
-        className="py-12 md:py-16 relative bg-white overflow-visible"
+        className="py-12 md:py-16 relative bg-white dark:bg-[#121212] overflow-visible scroll-mt-24 lg:scroll-mt-32"
       >
         <div className="absolute inset-0 z-0">
-          <div className="absolute top-0 left-0 w-full h-full bg-slate-50 opacity-50"></div>
+          <div className="absolute top-0 left-0 w-full h-full bg-slate-50 dark:bg-white/5 opacity-50"></div>
           <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-brand-teal/5 rounded-full blur-[120px] -mr-96 -mt-96"></div>
         </div>
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 lg:gap-12 items-center relative z-10 w-full">
@@ -2047,7 +2052,7 @@ export default function HomePage() {
                     to="/office"
                     className="flex items-center gap-4 group w-full"
                   >
-                    <div className="w-12 h-12 shrink-0 bg-brand-gold rounded-xl flex items-center justify-center text-slate-900 group-hover:bg-white group-hover:text-brand-gold transition-all duration-500 shadow-xl border border-brand-gold/20">
+                    <div className="w-12 h-12 shrink-0 bg-brand-gold rounded-xl flex items-center justify-center text-slate-900 dark:text-white group-hover:bg-white group-hover:text-brand-gold transition-all duration-500 shadow-xl border border-brand-gold/20">
                       <MapPin size={24} />
                     </div>
                     <div>
@@ -2068,7 +2073,7 @@ export default function HomePage() {
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="glass-dark p-10 md:p-16 rounded-[4rem] border border-white/10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)]"
+            className="bg-gradient-to-b from-white to-slate-50 dark:from-[#1A1A1A] dark:to-[#121212] p-10 md:p-16 rounded-[4rem] border-x border-t border-slate-200 dark:border-white/10 border-b-[8px] border-b-slate-200 dark:border-b-black shadow-xl shadow-slate-200/50 dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden"
           >
             <form onSubmit={handleContactSubmit} className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -2079,7 +2084,7 @@ export default function HomePage() {
                   <input
                     type="text"
                     placeholder="John Doe"
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-white outline-none focus:border-brand-gold transition-all placeholder:text-slate-500"
+                    className="w-full bg-slate-100 dark:bg-white/5 border-2 border-transparent dark:border-white/5 rounded-2xl px-8 py-5 text-slate-900 dark:text-white outline-none focus:border-brand-gold focus:bg-white dark:focus:bg-white/10 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-inner"
                     value={contactForm.fullName}
                     onChange={(e) =>
                       setContactForm({
@@ -2096,7 +2101,7 @@ export default function HomePage() {
                   <input
                     type="email"
                     placeholder="john@example.com"
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-white outline-none focus:border-brand-gold transition-all placeholder:text-slate-500"
+                    className="w-full bg-slate-100 dark:bg-white/5 border-2 border-transparent dark:border-white/5 rounded-2xl px-8 py-5 text-slate-900 dark:text-white outline-none focus:border-brand-gold focus:bg-white dark:focus:bg-white/10 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-inner"
                     value={contactForm.email}
                     onChange={(e) =>
                       setContactForm({ ...contactForm, email: e.target.value })
@@ -2111,7 +2116,7 @@ export default function HomePage() {
                 <input
                   type="tel"
                   placeholder="+971 50 1942811"
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-white outline-none focus:border-brand-gold transition-all placeholder:text-slate-500"
+                  className="w-full bg-slate-100 dark:bg-white/5 border-2 border-transparent dark:border-white/5 rounded-2xl px-8 py-5 text-slate-900 dark:text-white outline-none focus:border-brand-gold focus:bg-white dark:focus:bg-white/10 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-inner"
                   value={contactForm.phone}
                   onChange={(e) =>
                     setContactForm({ ...contactForm, phone: e.target.value })
@@ -2125,7 +2130,7 @@ export default function HomePage() {
                 <textarea
                   placeholder="Tell us about your requirements..."
                   rows={4}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-white outline-none focus:border-brand-gold transition-all resize-none placeholder:text-slate-500"
+                  className="w-full bg-slate-100 dark:bg-white/5 border-2 border-transparent dark:border-white/5 rounded-2xl px-8 py-5 text-slate-900 dark:text-white outline-none focus:border-brand-gold focus:bg-white dark:focus:bg-white/10 transition-all resize-none placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-inner"
                   value={contactForm.message}
                   onChange={(e) =>
                     setContactForm({ ...contactForm, message: e.target.value })
@@ -2135,7 +2140,7 @@ export default function HomePage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-brand-gold text-slate-900 py-6 rounded-2xl font-bold hover:bg-white transition-all flex items-center justify-center gap-4 disabled:opacity-50 shadow-2xl group/btn"
+                className="w-full bg-brand-gold text-slate-900 dark:text-white py-6 rounded-2xl font-bold hover:bg-white transition-all flex items-center justify-center gap-4 disabled:opacity-50 shadow-2xl group/btn"
               >
                 {isSubmitting ? (
                   <Loader2 className="animate-spin" />
@@ -2162,7 +2167,7 @@ export default function HomePage() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5 }}
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="fixed bottom-32 md:bottom-12 right-6 md:right-12 z-50 w-14 md:h-16 h-14 md:w-16 bg-brand-gold text-slate-900 rounded-2xl shadow-2xl flex items-center justify-center hover:bg-slate-900 hover:text-white transition-all group"
+            className="fixed bottom-32 md:bottom-12 right-6 md:right-12 z-50 w-14 md:h-16 h-14 md:w-16 bg-brand-gold text-slate-900 dark:text-white rounded-2xl shadow-2xl flex items-center justify-center hover:bg-slate-900 hover:text-white transition-all group"
           >
             <ArrowUp
               size={28}
@@ -2197,7 +2202,7 @@ export default function HomePage() {
                   setSelectedJobToApply(null);
                   setIsQuickApply(false);
                 }}
-                className="absolute top-8 right-8 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors p-3 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/10"
+                className="absolute top-8 right-8 text-slate-400 hover:text-slate-900 dark:text-white dark:hover:text-white transition-colors p-3 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/10"
               >
                 <X size={24} />
               </button>

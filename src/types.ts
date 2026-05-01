@@ -13,6 +13,9 @@ export interface Job {
   requirements: string[];
   requiredDocuments: string[];
   deadline: string;
+  vacancies?: number;
+  vacanciesMale?: number;
+  vacanciesFemale?: number;
   imageUrl?: string;
   createdAt: number;
   // Fee related fields
@@ -68,7 +71,7 @@ export interface Application {
     type: string;
   }[];
   skills?: { name: string; level: string }[];
-  status: 'pending' | 'approved' | 'rejected';
+  status: "pending" | "approved" | "rejected";
   assignedBatch?: string;
   assignedCompany?: string;
   statusHistory?: {
@@ -97,7 +100,7 @@ export interface Review {
   userRole?: string;
   rating: number;
   comment: string;
-  status: 'pending' | 'approved';
+  status: "pending" | "approved";
   createdAt: number;
 }
 
@@ -158,12 +161,12 @@ export interface CandidateProfile {
     endDate: string;
     description: string;
   }[];
-  visaStatus?: 'pending' | 'approved' | 'rejected';
-  workPermitStatus?: 'pending' | 'approved' | 'rejected' | 'Review Pending';
-  globalVisaStatus?: 'pending' | 'approved' | 'rejected' | 'Review Pending';
+  visaStatus?: "pending" | "approved" | "rejected";
+  workPermitStatus?: "pending" | "approved" | "rejected" | "Review Pending";
+  globalVisaStatus?: "pending" | "approved" | "rejected" | "Review Pending";
   aboutMe?: string;
   profileIntel?: string;
-  documentProcessingStatus?: 'pending' | 'in-progress' | 'completed';
+  documentProcessingStatus?: "pending" | "in-progress" | "completed";
   joiningDate?: string;
   expectedArrivalDate?: string;
   interviewLink?: string;
@@ -182,14 +185,14 @@ export interface CandidateProfile {
   assignedBatch?: string;
   assignedCompany?: string;
   cvTemplate?: string;
-  paymentStatus?: 'pending' | 'partially-paid' | 'fully-paid';
+  paymentStatus?: "pending" | "partially-paid" | "fully-paid";
   totalAmount?: string;
   initialPay?: string;
   payAfterWP?: string;
   payAfterVisa?: string;
   paidAmount?: string;
   riskAmount?: number; // Ris Amount / Risk Amount
-  paymentCurrency?: 'EUR' | 'NPR' | 'INR' | 'AED' | 'USD';
+  paymentCurrency?: "EUR" | "NPR" | "INR" | "AED" | "USD";
   includedPackageItems?: string[];
   excludedPackageItems?: string[];
   paymentHistory?: {
@@ -205,7 +208,7 @@ export interface CandidateProfile {
   searchHistory?: string[];
   refundRequest?: RefundRequest;
   photoUrl?: string;
-  cvPhotoStyle?: 'round' | 'square';
+  cvPhotoStyle?: "round" | "square";
   jobAlerts?: JobAlert[];
 }
 
@@ -225,7 +228,13 @@ export interface RefundRequest {
   candidateUid: string;
   candidateName: string;
   reason: string;
-  status: 'pending' | 'proposed' | 'agreed' | 'processing' | 'completed' | 'rejected';
+  status:
+    | "pending"
+    | "proposed"
+    | "agreed"
+    | "processing"
+    | "completed"
+    | "rejected";
   totalReceivedAmount: number;
   riskAmount: number;
   refundableAmount: number;
@@ -233,7 +242,7 @@ export interface RefundRequest {
   installments: {
     amount: number;
     dueDate: number;
-    status: 'pending' | 'paid';
+    status: "pending" | "paid";
     paidAt?: number;
     note?: string;
   }[];
@@ -249,7 +258,7 @@ export interface SystemSettings {
 
 export interface APIConfig {
   id: string;
-  provider: 'gemini' | 'openai' | 'custom';
+  provider: "gemini" | "openai" | "custom";
   apiKey: string;
   endpoint?: string;
   modelName?: string;
@@ -295,7 +304,12 @@ export interface SiteContent {
   vision?: string;
   values?: { title: string; description: string }[];
   coreStrengths?: string[];
-  branchOffices?: { location: string; address: string; phone: string; email: string }[];
+  branchOffices?: {
+    location: string;
+    address: string;
+    phone: string;
+    email: string;
+  }[];
   companyProfileUrl?: string;
   logoUrl?: string;
   footerLogoUrl?: string;
@@ -409,10 +423,10 @@ export interface SiteContent {
     heroDescription?: { color?: string; font?: string };
     heroPrimaryCta?: { bgColor?: string; textColor?: string; font?: string };
     heroSecondaryCta?: { bgColor?: string; textColor?: string; font?: string };
-    bottomCta?: { 
-      titleColor?: string; 
-      descriptionColor?: string; 
-      buttonBgColor?: string; 
+    bottomCta?: {
+      titleColor?: string;
+      descriptionColor?: string;
+      buttonBgColor?: string;
       buttonTextColor?: string;
       font?: string;
     };

@@ -1,19 +1,44 @@
-import { useState, useEffect } from 'react';
-import { collection, getDocs, query, orderBy, updateDoc, doc, deleteDoc, getDoc } from 'firebase/firestore';
-import { db, auth } from '../../firebase';
-import { Application, CandidateProfile } from '../../types';
-import { Search, Filter, Eye, Download, Trash2, X, CheckCircle2, AlertCircle, Clock, FileText, ArrowRight, Loader2, Globe, Calendar, Building2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { motion, AnimatePresence } from 'motion/react';
-import { cn } from '../../lib/utils';
+import { useState, useEffect } from "react";
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  updateDoc,
+  doc,
+  deleteDoc,
+  getDoc,
+} from "firebase/firestore";
+import { db, auth } from "../../firebase";
+import { Application, CandidateProfile } from "../../types";
+import {
+  Search,
+  Filter,
+  Eye,
+  Download,
+  Trash2,
+  X,
+  CheckCircle2,
+  AlertCircle,
+  Clock,
+  FileText,
+  ArrowRight,
+  Loader2,
+  Globe,
+  Calendar,
+  Building2,
+} from "lucide-react";
+import { toast } from "sonner";
+import { motion, AnimatePresence } from "motion/react";
+import { cn } from "../../lib/utils";
 
 enum OperationType {
-  CREATE = 'create',
-  UPDATE = 'update',
-  DELETE = 'delete',
-  LIST = 'list',
-  GET = 'get',
-  WRITE = 'write',
+  CREATE = "create",
+  UPDATE = "update",
+  DELETE = "delete",
+  LIST = "list",
+  GET = "get",
+  WRITE = "write",
 }
 
 interface FirestoreErrorInfo {
@@ -32,10 +57,14 @@ interface FirestoreErrorInfo {
       email: string | null;
       photoUrl: string | null;
     }[];
-  }
+  };
 }
 
-function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+function handleFirestoreError(
+  error: unknown,
+  operationType: OperationType,
+  path: string | null,
+) {
   const errInfo: FirestoreErrorInfo = {
     error: error instanceof Error ? error.message : String(error),
     authInfo: {
@@ -44,17 +73,18 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
       emailVerified: auth.currentUser?.emailVerified,
       isAnonymous: auth.currentUser?.isAnonymous,
       tenantId: auth.currentUser?.tenantId,
-      providerInfo: auth.currentUser?.providerData.map(provider => ({
-        providerId: provider.providerId,
-        displayName: provider.displayName,
-        email: provider.email,
-        photoUrl: provider.photoURL
-      })) || []
+      providerInfo:
+        auth.currentUser?.providerData.map((provider) => ({
+          providerId: provider.providerId,
+          displayName: provider.displayName,
+          email: provider.email,
+          photoUrl: provider.photoURL,
+        })) || [],
     },
     operationType,
-    path
-  }
-  console.error('Firestore Error: ', JSON.stringify(errInfo));
+    path,
+  };
+  console.error("Firestore Error: ", JSON.stringify(errInfo));
   throw new Error(JSON.stringify(errInfo));
 }
 
@@ -62,16 +92,17 @@ export default function AdminApplications() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [filteredApps, setFilteredApps] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
-  const [candidateProfile, setCandidateProfile] = useState<CandidateProfile | null>(null);
+  const [candidateProfile, setCandidateProfile] =
+    useState<CandidateProfile | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(false);
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterStatus, setFilterStatus] = useState("all");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [deleteAppId, setDeleteAppId] = useState<string | null>(null);
   const [availableCountries, setAvailableCountries] = useState<string[]>([]);
   const [isShiftingCountry, setIsShiftingCountry] = useState(false);
-  const [newTargetCountry, setNewTargetCountry] = useState('');
+  const [newTargetCountry, setNewTargetCountry] = useState("");
 
   useEffect(() => {
     fetchApplications();
@@ -80,7 +111,7 @@ export default function AdminApplications() {
 
   const fetchSettings = async () => {
     try {
-      const docRef = doc(db, 'settings', 'siteContent');
+      const docRef = doc(db, "settings", "siteContent");
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
@@ -96,15 +127,24 @@ export default function AdminApplications() {
       if (selectedApp?.candidateUid) {
         setLoadingProfile(true);
         try {
-          const docSnap = await getDoc(doc(db, 'candidates', selectedApp.candidateUid));
+          const docSnap = await getDoc(
+            doc(db, "candidates", selectedApp.candidateUid),
+          );
           if (docSnap.exists()) {
-            setCandidateProfile({ uid: docSnap.id, ...docSnap.data() } as CandidateProfile);
+            setCandidateProfile({
+              uid: docSnap.id,
+              ...docSnap.data(),
+            } as CandidateProfile);
           } else {
             setCandidateProfile(null);
           }
         } catch (error) {
           console.error("Error fetching candidate profile:", error);
-          handleFirestoreError(error, OperationType.GET, `candidates/${selectedApp.candidateUid}`);
+          handleFirestoreError(
+            error,
+            OperationType.GET,
+            `candidates/${selectedApp.candidateUid}`,
+          );
         } finally {
           setLoadingProfile(false);
         }
@@ -128,17 +168,22 @@ export default function AdminApplications() {
     try {
       setLoading(true);
       setErrorMessage(null);
-      const q = query(collection(db, 'applications'), orderBy('createdAt', 'desc'));
-      
+      const q = query(
+        collection(db, "applications"),
+        orderBy("createdAt", "desc"),
+      );
+
       let snapshot;
       try {
         snapshot = await getDocs(q);
       } catch (err) {
-        handleFirestoreError(err, OperationType.GET, 'applications');
+        handleFirestoreError(err, OperationType.GET, "applications");
         return;
       }
 
-      const apps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Application));
+      const apps = snapshot.docs.map(
+        (doc) => ({ id: doc.id, ...doc.data() }) as Application,
+      );
       setApplications(apps);
       setFilteredApps(apps);
     } catch (error: any) {
@@ -152,31 +197,41 @@ export default function AdminApplications() {
   useEffect(() => {
     let result = applications;
     if (searchTerm) {
-      result = result.filter(app => 
-        app.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        app.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        app.email.toLowerCase().includes(searchTerm.toLowerCase())
+      result = result.filter(
+        (app) =>
+          app.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          app.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          app.email.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
-    if (filterStatus !== 'all') {
-      result = result.filter(app => app.status === filterStatus);
+    if (filterStatus !== "all") {
+      result = result.filter((app) => app.status === filterStatus);
     }
     setFilteredApps(result);
   }, [searchTerm, filterStatus, applications]);
 
-  const [approvalModalApp, setApprovalModalApp] = useState<Application | null>(null);
-  const [approvalData, setApprovalData] = useState({ country: '', batch: '', company: '' });
+  const [approvalModalApp, setApprovalModalApp] = useState<Application | null>(
+    null,
+  );
+  const [approvalData, setApprovalData] = useState({
+    country: "",
+    batch: "",
+    company: "",
+  });
   const [isApproving, setIsApproving] = useState(false);
 
-  const handleStatusChange = async (id: string, newStatus: 'pending' | 'approved' | 'rejected') => {
-    const appToUpdate = applications.find(a => a.id === id);
+  const handleStatusChange = async (
+    id: string,
+    newStatus: "pending" | "approved" | "rejected",
+  ) => {
+    const appToUpdate = applications.find((a) => a.id === id);
     if (!appToUpdate) return;
-    
-    if (newStatus === 'approved' && appToUpdate.status !== 'approved') {
-      setApprovalData({ 
-        country: appToUpdate.targetCountry || appToUpdate.appliedCountry || '', 
-        batch: '', 
-        company: '' 
+
+    if (newStatus === "approved" && appToUpdate.status !== "approved") {
+      setApprovalData({
+        country: appToUpdate.targetCountry || appToUpdate.appliedCountry || "",
+        batch: "",
+        company: "",
       });
       setApprovalModalApp(appToUpdate);
       return;
@@ -185,10 +240,14 @@ export default function AdminApplications() {
     await performStatusUpdate(id, newStatus);
   };
 
-  const performStatusUpdate = async (id: string, newStatus: 'pending' | 'approved' | 'rejected', additionalData?: { country: string, batch: string, company: string }) => {
-    const appToUpdate = applications.find(a => a.id === id);
+  const performStatusUpdate = async (
+    id: string,
+    newStatus: "pending" | "approved" | "rejected",
+    additionalData?: { country: string; batch: string; company: string },
+  ) => {
+    const appToUpdate = applications.find((a) => a.id === id);
     if (!appToUpdate) return;
-    
+
     const prevStatus = appToUpdate.status;
     if (prevStatus === newStatus && !additionalData) return;
 
@@ -196,14 +255,14 @@ export default function AdminApplications() {
       prevStatus,
       newStatus,
       changedAt: Date.now(),
-      changedBy: auth.currentUser?.email || 'Admin'
+      changedBy: auth.currentUser?.email || "Admin",
     };
 
     try {
       try {
-        const updatePayload: any = { 
+        const updatePayload: any = {
           status: newStatus,
-          statusHistory: [...(appToUpdate.statusHistory || []), historyEntry]
+          statusHistory: [...(appToUpdate.statusHistory || []), historyEntry],
         };
 
         if (additionalData) {
@@ -212,15 +271,19 @@ export default function AdminApplications() {
           updatePayload.assignedCompany = additionalData.company;
         }
 
-        await updateDoc(doc(db, 'applications', id), updatePayload);
+        await updateDoc(doc(db, "applications", id), updatePayload);
 
         // Also update Candidate Profile if applicable and if approving
-        if (newStatus === 'approved' && appToUpdate.candidateUid && additionalData) {
-          await updateDoc(doc(db, 'candidates', appToUpdate.candidateUid), {
+        if (
+          newStatus === "approved" &&
+          appToUpdate.candidateUid &&
+          additionalData
+        ) {
+          await updateDoc(doc(db, "candidates", appToUpdate.candidateUid), {
             assignedCountry: additionalData.country,
             assignedBatch: additionalData.batch,
             assignedCompany: additionalData.company,
-            updatedAt: Date.now()
+            updatedAt: Date.now(),
           });
         }
       } catch (err) {
@@ -229,11 +292,17 @@ export default function AdminApplications() {
       toast.success(`Application marked as ${newStatus}`);
       fetchApplications();
       if (selectedApp?.id === id) {
-        setSelectedApp({ 
-          ...selectedApp, 
+        setSelectedApp({
+          ...selectedApp,
           status: newStatus,
           statusHistory: [...(selectedApp.statusHistory || []), historyEntry],
-          ...(additionalData ? { targetCountry: additionalData.country, assignedBatch: additionalData.batch, assignedCompany: additionalData.company } : {})
+          ...(additionalData
+            ? {
+                targetCountry: additionalData.country,
+                assignedBatch: additionalData.batch,
+                assignedCompany: additionalData.company,
+              }
+            : {}),
         } as Application);
       }
     } catch (error) {
@@ -245,7 +314,7 @@ export default function AdminApplications() {
     e.preventDefault();
     if (!approvalModalApp) return;
     setIsApproving(true);
-    await performStatusUpdate(approvalModalApp.id, 'approved', approvalData);
+    await performStatusUpdate(approvalModalApp.id, "approved", approvalData);
     setIsApproving(false);
     setApprovalModalApp(null);
   };
@@ -254,13 +323,13 @@ export default function AdminApplications() {
     if (!selectedApp || !newTargetCountry) return;
     setIsShiftingCountry(true);
     try {
-      await updateDoc(doc(db, 'applications', selectedApp.id), { 
-        targetCountry: newTargetCountry 
+      await updateDoc(doc(db, "applications", selectedApp.id), {
+        targetCountry: newTargetCountry,
       });
       toast.success(`Candidate shifted to ${newTargetCountry}`);
       fetchApplications();
       setSelectedApp({ ...selectedApp, targetCountry: newTargetCountry });
-      setNewTargetCountry('');
+      setNewTargetCountry("");
     } catch (error) {
       toast.error("Failed to shift country");
       console.error(error);
@@ -272,7 +341,7 @@ export default function AdminApplications() {
   const handleDelete = async (id: string) => {
     try {
       try {
-        await deleteDoc(doc(db, 'applications', id));
+        await deleteDoc(doc(db, "applications", id));
       } catch (err) {
         handleFirestoreError(err, OperationType.DELETE, `applications/${id}`);
       }
@@ -289,8 +358,12 @@ export default function AdminApplications() {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-brand-blue">Candidate Applications</h1>
-          <p className="text-sm md:text-base text-gray-500">Review and manage job applications from candidates.</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-brand-blue">
+            Candidate Applications
+          </h1>
+          <p className="text-sm md:text-base text-gray-500 dark:text-gray-300">
+            Review and manage job applications from candidates.
+          </p>
         </div>
       </div>
 
@@ -304,17 +377,20 @@ export default function AdminApplications() {
       {/* Filters */}
       <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4">
         <div className="relative flex-grow">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-          <input 
-            type="text" 
+          <Search
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+            size={20}
+          />
+          <input
+            type="text"
             placeholder="Search by name, email, or job..."
             className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-100 focus:border-brand-gold outline-none transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <select 
-          className="px-6 py-3 bg-gray-50 text-brand-blue font-bold rounded-xl outline-none border border-gray-100"
+        <select
+          className="px-6 py-3 bg-gray-50 dark:bg-white/5 text-brand-blue font-bold rounded-xl outline-none border border-gray-100"
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
         >
@@ -339,64 +415,81 @@ export default function AdminApplications() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {loading ? (
-                [1, 2, 3].map(i => (
-                  <tr key={i} className="animate-pulse">
-                    <td colSpan={5} className="px-8 py-6 h-20 bg-gray-50/50"></td>
-                  </tr>
-                ))
-              ) : filteredApps.map((app) => (
-                <tr key={app.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-8 py-6">
-                    <div className="flex items-center gap-2">
-                      <p className="font-bold text-brand-blue">{app.fullName}</p>
-                      {app.candidateUid && (
-                        <span className="bg-brand-gold/10 text-brand-gold text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                          Portal User
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-400">{app.email}</p>
-                  </td>
-                  <td className="px-8 py-6">
-                    <p className="text-sm font-bold text-brand-blue">{app.jobTitle}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">
-                        Orig: {app.originalCountry || app.appliedCountry || 'N/A'}
-                      </span>
-                      {app.targetCountry && app.targetCountry !== (app.originalCountry || app.appliedCountry) && (
-                        <>
-                          <span className="text-gray-300">|</span>
-                          <span className="text-[10px] font-bold text-brand-blue uppercase tracking-widest leading-none">
-                            Target: {app.targetCountry}
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <span className={cn(
-                      "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider",
-                      app.status === 'pending' ? "bg-orange-100 text-orange-600" :
-                      app.status === 'approved' ? "bg-green-100 text-green-600" :
-                      "bg-red-100 text-red-600"
-                    )}>
-                      {app.status}
-                    </span>
-                  </td>
-                  <td className="px-8 py-6 text-sm text-gray-400">
-                    {new Date(app.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-8 py-6 text-right">
-                    <button 
-                      onClick={() => setSelectedApp(app)}
-                      className="p-2 text-brand-blue hover:bg-brand-blue/5 rounded-lg transition-colors"
+              {loading
+                ? [1, 2, 3].map((i) => (
+                    <tr key={i} className="animate-pulse">
+                      <td
+                        colSpan={5}
+                        className="px-8 py-6 h-20 bg-gray-50/50"
+                      ></td>
+                    </tr>
+                  ))
+                : filteredApps.map((app) => (
+                    <tr
+                      key={app.id}
+                      className="hover:bg-gray-50 transition-colors"
                     >
-                      <Eye size={20} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-2">
+                          <p className="font-bold text-brand-blue">
+                            {app.fullName}
+                          </p>
+                          {app.candidateUid && (
+                            <span className="bg-brand-gold/10 text-brand-gold text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                              Portal User
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-400">{app.email}</p>
+                      </td>
+                      <td className="px-8 py-6">
+                        <p className="text-sm font-bold text-brand-blue">
+                          {app.jobTitle}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">
+                            Orig:{" "}
+                            {app.originalCountry || app.appliedCountry || "N/A"}
+                          </span>
+                          {app.targetCountry &&
+                            app.targetCountry !==
+                              (app.originalCountry || app.appliedCountry) && (
+                              <>
+                                <span className="text-gray-300">|</span>
+                                <span className="text-[10px] font-bold text-brand-blue uppercase tracking-widest leading-none">
+                                  Target: {app.targetCountry}
+                                </span>
+                              </>
+                            )}
+                        </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <span
+                          className={cn(
+                            "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider",
+                            app.status === "pending"
+                              ? "bg-orange-100 text-orange-600"
+                              : app.status === "approved"
+                                ? "bg-green-100 text-green-600"
+                                : "bg-red-100 text-red-600",
+                          )}
+                        >
+                          {app.status}
+                        </span>
+                      </td>
+                      <td className="px-8 py-6 text-sm text-gray-400">
+                        {new Date(app.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-8 py-6 text-right">
+                        <button
+                          onClick={() => setSelectedApp(app)}
+                          className="p-2 text-brand-blue hover:bg-brand-blue/5 rounded-lg transition-colors"
+                        >
+                          <Eye size={20} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
             </tbody>
           </table>
         </div>
@@ -406,14 +499,14 @@ export default function AdminApplications() {
       <AnimatePresence>
         {selectedApp && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-brand-blue/60 backdrop-blur-sm"
               onClick={() => setSelectedApp(null)}
             ></motion.div>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -421,60 +514,129 @@ export default function AdminApplications() {
             >
               <div className="flex justify-between items-start mb-8 md:mb-10">
                 <div>
-                  <h2 className="text-2xl md:text-3xl font-bold text-brand-blue mb-2">{selectedApp.fullName}</h2>
-                  <div className="flex flex-col gap-2 text-sm md:text-base text-gray-500">
-                    <p>Applied for: <span className="text-brand-gold font-bold">{selectedApp.jobTitle}</span></p>
+                  <h2 className="text-2xl md:text-3xl font-bold text-brand-blue mb-2">
+                    {selectedApp.fullName}
+                  </h2>
+                  <div className="flex flex-col gap-2 text-sm md:text-base text-gray-500 dark:text-gray-300">
+                    <p>
+                      Applied for:{" "}
+                      <span className="text-brand-gold font-bold">
+                        {selectedApp.jobTitle}
+                      </span>
+                    </p>
                     <div className="flex flex-wrap items-center gap-2">
-                      <p>Original: <span className="font-bold">{selectedApp.originalCountry || selectedApp.appliedCountry || 'N/A'}</span></p>
+                      <p>
+                        Original:{" "}
+                        <span className="font-bold">
+                          {selectedApp.originalCountry ||
+                            selectedApp.appliedCountry ||
+                            "N/A"}
+                        </span>
+                      </p>
                       <span className="text-gray-400">|</span>
-                      <p>Target: <span className="text-brand-blue font-bold">{selectedApp.targetCountry || selectedApp.appliedCountry || 'N/A'}</span></p>
-                      {(selectedApp.assignedBatch || selectedApp.assignedCompany) && (
-                         <>
-                           <span className="text-gray-400">|</span>
-                           {selectedApp.assignedBatch && <span className="bg-brand-gold/10 text-brand-gold px-2 py-0.5 rounded-md font-bold text-xs uppercase"><Calendar size={12} className="inline mr-1 -mt-0.5" />{selectedApp.assignedBatch}</span>}
-                           {selectedApp.assignedCompany && <span className="bg-brand-blue/10 text-brand-blue px-2 py-0.5 rounded-md font-bold text-xs"><Building2 size={12} className="inline mr-1 -mt-0.5" />{selectedApp.assignedCompany}</span>}
-                         </>
+                      <p>
+                        Target:{" "}
+                        <span className="text-brand-blue font-bold">
+                          {selectedApp.targetCountry ||
+                            selectedApp.appliedCountry ||
+                            "N/A"}
+                        </span>
+                      </p>
+                      {(selectedApp.assignedBatch ||
+                        selectedApp.assignedCompany) && (
+                        <>
+                          <span className="text-gray-400">|</span>
+                          {selectedApp.assignedBatch && (
+                            <span className="bg-brand-gold/10 text-brand-gold px-2 py-0.5 rounded-md font-bold text-xs uppercase">
+                              <Calendar
+                                size={12}
+                                className="inline mr-1 -mt-0.5"
+                              />
+                              {selectedApp.assignedBatch}
+                            </span>
+                          )}
+                          {selectedApp.assignedCompany && (
+                            <span className="bg-brand-blue/10 text-brand-blue px-2 py-0.5 rounded-md font-bold text-xs">
+                              <Building2
+                                size={12}
+                                className="inline mr-1 -mt-0.5"
+                              />
+                              {selectedApp.assignedCompany}
+                            </span>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
                 </div>
-                <button onClick={() => setSelectedApp(null)} className="text-gray-400 hover:text-brand-blue transition-colors p-2">
+                <button
+                  onClick={() => setSelectedApp(null)}
+                  className="text-gray-400 hover:text-brand-blue transition-colors p-2"
+                >
                   <X size={24} />
                 </button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-8 md:mb-12">
                 <div className="space-y-6">
-                  <h3 className="text-lg font-bold text-brand-blue border-b border-gray-100 pb-2">Contact Details</h3>
+                  <h3 className="text-lg font-bold text-brand-blue border-b border-gray-100 pb-2">
+                    Contact Details
+                  </h3>
                   <div className="space-y-4">
                     <div>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase">Email</p>
-                      <p className="text-sm md:text-base font-medium break-all">{selectedApp.email}</p>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase">
+                        Email
+                      </p>
+                      <p className="text-sm md:text-base font-medium break-all">
+                        {selectedApp.email}
+                      </p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase">Phone</p>
-                      <p className="text-sm md:text-base font-medium">{selectedApp.phone}</p>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase">
+                        Phone
+                      </p>
+                      <p className="text-sm md:text-base font-medium">
+                        {selectedApp.phone}
+                      </p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase">Passport Number</p>
-                      <p className="text-sm md:text-base font-medium">{selectedApp.passportNumber}</p>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase">
+                        Passport Number
+                      </p>
+                      <p className="text-sm md:text-base font-medium">
+                        {selectedApp.passportNumber}
+                      </p>
                     </div>
                   </div>
                 </div>
                 <div className="space-y-6">
-                  <h3 className="text-lg font-bold text-brand-blue border-b border-gray-100 pb-2">Professional Info</h3>
+                  <h3 className="text-lg font-bold text-brand-blue border-b border-gray-100 pb-2">
+                    Professional Info
+                  </h3>
                   <div className="space-y-4">
                     <div>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase">Nationality</p>
-                      <p className="text-sm md:text-base font-medium">{selectedApp.nationality}</p>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase">
+                        Nationality
+                      </p>
+                      <p className="text-sm md:text-base font-medium">
+                        {selectedApp.nationality}
+                      </p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase">Experience</p>
-                      <p className="text-sm md:text-base font-medium">{selectedApp.experience}</p>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase">
+                        Experience
+                      </p>
+                      <p className="text-sm md:text-base font-medium">
+                        {selectedApp.experience}
+                      </p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase">Education</p>
-                      <p className="text-sm md:text-base font-medium">{selectedApp.education}</p>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase">
+                        Education
+                      </p>
+                      <p className="text-sm md:text-base font-medium">
+                        {selectedApp.education}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -484,68 +646,105 @@ export default function AdminApplications() {
               {selectedApp.candidateUid && (
                 <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 mb-12">
                   <h4 className="font-bold text-brand-blue mb-4 flex items-center gap-2">
-                    <AlertCircle size={18} className="text-brand-gold" /> Candidate Portal Information
+                    <AlertCircle size={18} className="text-brand-gold" />{" "}
+                    Candidate Portal Information
                   </h4>
                   {loadingProfile ? (
-                    <div className="flex items-center gap-2 text-gray-500">
-                      <Clock className="animate-spin" size={16} /> Loading profile...
+                    <div className="flex items-center gap-2 text-gray-500 dark:text-gray-300">
+                      <Clock className="animate-spin" size={16} /> Loading
+                      profile...
                     </div>
                   ) : candidateProfile ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                       <div>
-                        <p className="text-slate-600 font-medium">Nationality</p>
-                        <p className="font-medium">{candidateProfile.nationality || 'Not provided'}</p>
+                        <p className="text-slate-600 dark:text-slate-300 font-medium">
+                          Nationality
+                        </p>
+                        <p className="font-medium">
+                          {candidateProfile.nationality || "Not provided"}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-slate-600 font-medium">Passport Number</p>
-                        <p className="font-medium">{candidateProfile.passportNumber || 'Not provided'}</p>
+                        <p className="text-slate-600 dark:text-slate-300 font-medium">
+                          Passport Number
+                        </p>
+                        <p className="font-medium">
+                          {candidateProfile.passportNumber || "Not provided"}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-slate-600 font-medium">Education</p>
-                        <p className="font-medium">{candidateProfile.education || 'Not provided'}</p>
+                        <p className="text-slate-600 dark:text-slate-300 font-medium">
+                          Education
+                        </p>
+                        <p className="font-medium">
+                          {candidateProfile.education || "Not provided"}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-slate-600 font-medium">Experience</p>
-                        <p className="font-medium">{candidateProfile.experience || 'Not provided'}</p>
+                        <p className="text-slate-600 dark:text-slate-300 font-medium">
+                          Experience
+                        </p>
+                        <p className="font-medium">
+                          {candidateProfile.experience || "Not provided"}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-gray-500">Visa Status</p>
-                        <p className="font-medium capitalize">{candidateProfile.visaStatus || 'Pending'}</p>
+                        <p className="text-gray-500 dark:text-gray-300">
+                          Visa Status
+                        </p>
+                        <p className="font-medium capitalize">
+                          {candidateProfile.visaStatus || "Pending"}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-gray-500">Joining Date</p>
-                        <p className="font-medium">{candidateProfile.joiningDate || 'Not set'}</p>
+                        <p className="text-gray-500 dark:text-gray-300">
+                          Joining Date
+                        </p>
+                        <p className="font-medium">
+                          {candidateProfile.joiningDate || "Not set"}
+                        </p>
                       </div>
                     </div>
                   ) : (
-                    <p className="text-gray-500 italic">Profile not found or deleted.</p>
+                    <p className="text-gray-500 dark:text-gray-300 italic">
+                      Profile not found or deleted.
+                    </p>
                   )}
                 </div>
               )}
 
               <div className="mb-8 md:mb-12">
-                <h3 className="text-lg font-bold text-brand-blue border-b border-gray-100 pb-2 mb-4">Cover Letter</h3>
-                <p className="text-sm md:text-base text-gray-600 bg-gray-50 p-4 md:p-6 rounded-2xl whitespace-pre-wrap italic">
+                <h3 className="text-lg font-bold text-brand-blue border-b border-gray-100 pb-2 mb-4">
+                  Cover Letter
+                </h3>
+                <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-white/5 p-4 md:p-6 rounded-2xl whitespace-pre-wrap italic">
                   {selectedApp.coverLetter || "No cover letter provided."}
                 </p>
               </div>
 
               <div className="mb-8 md:mb-12">
-                <h3 className="text-lg font-bold text-brand-blue border-b border-gray-100 pb-2 mb-6">Attached Documents</h3>
+                <h3 className="text-lg font-bold text-brand-blue border-b border-gray-100 pb-2 mb-6">
+                  Attached Documents
+                </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {selectedApp.documents.map((doc, i) => (
-                    <div key={i} className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-100">
+                    <div
+                      key={i}
+                      className="flex items-center justify-between bg-white dark:bg-[#121212] p-4 rounded-xl border border-gray-100"
+                    >
                       <div className="flex items-center gap-3">
                         <FileText className="text-brand-gold" size={20} />
-                        <span className="text-xs md:text-sm font-medium">{doc.name}</span>
+                        <span className="text-xs md:text-sm font-medium">
+                          {doc.name}
+                        </span>
                       </div>
-                      <a 
-                        href={doc.url} 
-                        target="_blank" 
+                      <a
+                        href={doc.url}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-brand-blue hover:text-brand-gold transition-colors p-2"
                       >
-                         <Download size={20} />
+                        <Download size={20} />
                       </a>
                     </div>
                   ))}
@@ -553,38 +752,56 @@ export default function AdminApplications() {
               </div>
 
               <div className="mb-8 md:mb-12">
-                <h3 className="text-lg font-bold text-brand-blue border-b border-gray-100 pb-2 mb-6">Status History</h3>
+                <h3 className="text-lg font-bold text-brand-blue border-b border-gray-100 pb-2 mb-6">
+                  Status History
+                </h3>
                 <div className="space-y-4">
-                  {selectedApp.statusHistory && selectedApp.statusHistory.length > 0 ? (
+                  {selectedApp.statusHistory &&
+                  selectedApp.statusHistory.length > 0 ? (
                     selectedApp.statusHistory.map((log, i) => (
-                      <div key={i} className="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 relative overflow-hidden group">
+                      <div
+                        key={i}
+                        className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 relative overflow-hidden group"
+                      >
                         <div className="w-1 h-full absolute left-0 top-0 bg-brand-gold"></div>
-                        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-brand-blue shadow-sm shrink-0">
+                        <div className="w-10 h-10 bg-white dark:bg-[#121212] rounded-xl flex items-center justify-center text-brand-blue shadow-sm shrink-0">
                           <Clock size={20} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-1">
-                            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Status Change</span>
-                            <span className="text-xs text-gray-500">{new Date(log.changedAt).toLocaleString()}</span>
+                            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                              Status Change
+                            </span>
+                            <span className="text-xs text-gray-500 dark:text-gray-300">
+                              {new Date(log.changedAt).toLocaleString()}
+                            </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 bg-gray-200 text-gray-600 rounded text-[10px] font-bold uppercase">{log.prevStatus}</span>
+                            <span className="px-2 py-0.5 bg-gray-200 text-gray-600 dark:text-gray-300 rounded text-[10px] font-bold uppercase">
+                              {log.prevStatus}
+                            </span>
                             <ArrowRight size={14} className="text-gray-300" />
-                            <span className={cn(
-                              "px-2 py-0.5 rounded text-[10px] font-bold uppercase",
-                              log.newStatus === 'approved' ? "bg-green-100 text-green-600" :
-                              log.newStatus === 'rejected' ? "bg-red-100 text-red-600" :
-                              "bg-orange-100 text-orange-600"
-                            )}>
+                            <span
+                              className={cn(
+                                "px-2 py-0.5 rounded text-[10px] font-bold uppercase",
+                                log.newStatus === "approved"
+                                  ? "bg-green-100 text-green-600"
+                                  : log.newStatus === "rejected"
+                                    ? "bg-red-100 text-red-600"
+                                    : "bg-orange-100 text-orange-600",
+                              )}
+                            >
                               {log.newStatus}
                             </span>
                           </div>
-                          <p className="text-[10px] text-gray-400 mt-2 italic">Updated by: {log.changedBy}</p>
+                          <p className="text-[10px] text-gray-400 mt-2 italic">
+                            Updated by: {log.changedBy}
+                          </p>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 text-center italic text-gray-500 text-sm">
+                    <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 text-center italic text-gray-500 dark:text-gray-300 text-sm">
                       No status changes logged yet.
                     </div>
                   )}
@@ -593,53 +810,66 @@ export default function AdminApplications() {
 
               {/* Country Shift Interface */}
               <div className="mb-8 md:mb-12 p-6 bg-blue-50/50 rounded-3xl border border-blue-100/50">
-                <h3 className="text-lg font-bold text-brand-blue mb-4">Shift Target Country</h3>
+                <h3 className="text-lg font-bold text-brand-blue mb-4">
+                  Shift Target Country
+                </h3>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <select 
+                  <select
                     value={newTargetCountry}
                     onChange={(e) => setNewTargetCountry(e.target.value)}
-                    className="flex-grow px-4 py-3 rounded-xl border border-gray-200 bg-white outline-none focus:border-brand-gold text-sm font-medium"
+                    className="flex-grow px-4 py-3 rounded-xl border border-gray-200 bg-white dark:bg-[#121212] outline-none focus:border-brand-gold text-sm font-medium"
                   >
                     <option value="">Select New Destination</option>
-                    {availableCountries.map(c => (
-                      <option key={c} value={c}>{c}</option>
+                    {availableCountries.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
                     ))}
                   </select>
-                  <button 
+                  <button
                     onClick={handleCountryShift}
                     disabled={!newTargetCountry || isShiftingCountry}
                     className="bg-brand-blue text-white px-8 py-3 rounded-xl font-bold text-sm disabled:opacity-50 transition-all hover:bg-brand-blue/90"
                   >
-                    {isShiftingCountry ? 'Shifting...' : 'Update Country'}
+                    {isShiftingCountry ? "Shifting..." : "Update Country"}
                   </button>
                 </div>
                 <p className="text-[10px] text-gray-400 mt-3 font-medium uppercase tracking-widest">
-                  This will change the candidate's active processing path while preserving the original intent.
+                  This will change the candidate's active processing path while
+                  preserving the original intent.
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row justify-between items-center gap-6 pt-8 border-t border-gray-50">
                 <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                  <button 
-                    onClick={() => handleStatusChange(selectedApp.id, 'approved')}
+                  <button
+                    onClick={() =>
+                      handleStatusChange(selectedApp.id, "approved")
+                    }
                     className={cn(
                       "w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold transition-all",
-                      selectedApp.status === 'approved' ? "bg-green-600 text-white" : "bg-green-50 text-green-600 hover:bg-green-100"
+                      selectedApp.status === "approved"
+                        ? "bg-green-600 text-white"
+                        : "bg-green-50 text-green-600 hover:bg-green-100",
                     )}
                   >
                     <CheckCircle2 size={20} /> Approve
                   </button>
-                  <button 
-                    onClick={() => handleStatusChange(selectedApp.id, 'rejected')}
+                  <button
+                    onClick={() =>
+                      handleStatusChange(selectedApp.id, "rejected")
+                    }
                     className={cn(
                       "w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold transition-all",
-                      selectedApp.status === 'rejected' ? "bg-red-600 text-white" : "bg-red-50 text-red-600 hover:bg-red-100"
+                      selectedApp.status === "rejected"
+                        ? "bg-red-600 text-white"
+                        : "bg-red-50 text-red-600 hover:bg-red-100",
                     )}
                   >
                     <AlertCircle size={20} /> Reject
                   </button>
                 </div>
-                <button 
+                <button
                   onClick={() => setDeleteAppId(selectedApp.id)}
                   className="w-full sm:w-auto flex items-center justify-center gap-2 text-gray-400 hover:text-red-500 font-bold transition-colors py-3"
                 >
@@ -652,79 +882,113 @@ export default function AdminApplications() {
         {/* Approval Assignment Modal */}
         {approvalModalApp && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-brand-blue/60 backdrop-blur-sm"
               onClick={() => !isApproving && setApprovalModalApp(null)}
             ></motion.div>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               className="bg-white rounded-3xl shadow-2xl w-full max-w-md relative z-10 p-6 md:p-8"
             >
               <div className="flex justify-between items-center mb-6">
-                 <div>
-                   <h3 className="text-xl font-bold text-brand-blue">Approve Application</h3>
-                   <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Assign Placement</p>
-                 </div>
-                 <button onClick={() => !isApproving && setApprovalModalApp(null)} className="p-2 bg-gray-50 text-gray-400 hover:text-brand-blue rounded-full transition-colors">
-                   <X size={18} />
-                 </button>
+                <div>
+                  <h3 className="text-xl font-bold text-brand-blue">
+                    Approve Application
+                  </h3>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">
+                    Assign Placement
+                  </p>
+                </div>
+                <button
+                  onClick={() => !isApproving && setApprovalModalApp(null)}
+                  className="p-2 bg-gray-50 dark:bg-white/5 text-gray-400 hover:text-brand-blue rounded-full transition-colors"
+                >
+                  <X size={18} />
+                </button>
               </div>
 
               <form onSubmit={submitApproval} className="space-y-5">
                 <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5"><Globe size={12} className="text-brand-gold"/> Target Country</label>
-                  <input 
-                    type="text" 
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5">
+                    <Globe size={12} className="text-brand-gold" /> Target
+                    Country
+                  </label>
+                  <input
+                    type="text"
                     required
                     placeholder="e.g. Romania, Poland"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-gold outline-none text-sm font-semibold text-slate-700 bg-gray-50 focus:bg-white"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-gold outline-none text-sm font-semibold text-slate-700 dark:text-slate-300 bg-gray-50 focus:bg-white dark:bg-[#121212]"
                     value={approvalData.country}
-                    onChange={(e) => setApprovalData({...approvalData, country: e.target.value})}
+                    onChange={(e) =>
+                      setApprovalData({
+                        ...approvalData,
+                        country: e.target.value,
+                      })
+                    }
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5"><Calendar size={12} className="text-brand-gold"/> Batch</label>
-                    <input 
-                      type="text" 
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5">
+                      <Calendar size={12} className="text-brand-gold" /> Batch
+                    </label>
+                    <input
+                      type="text"
                       placeholder="e.g. Batch 1"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-gold outline-none text-sm font-semibold text-slate-700 bg-gray-50 focus:bg-white"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-gold outline-none text-sm font-semibold text-slate-700 dark:text-slate-300 bg-gray-50 focus:bg-white dark:bg-[#121212]"
                       value={approvalData.batch}
-                      onChange={(e) => setApprovalData({...approvalData, batch: e.target.value})}
+                      onChange={(e) =>
+                        setApprovalData({
+                          ...approvalData,
+                          batch: e.target.value,
+                        })
+                      }
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5"><Building2 size={12} className="text-brand-gold"/> Company</label>
-                    <input 
-                      type="text" 
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5">
+                      <Building2 size={12} className="text-brand-gold" />{" "}
+                      Company
+                    </label>
+                    <input
+                      type="text"
                       placeholder="e.g. Client X"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-gold outline-none text-sm font-semibold text-slate-700 bg-gray-50 focus:bg-white"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-gold outline-none text-sm font-semibold text-slate-700 dark:text-slate-300 bg-gray-50 focus:bg-white dark:bg-[#121212]"
                       value={approvalData.company}
-                      onChange={(e) => setApprovalData({...approvalData, company: e.target.value})}
+                      onChange={(e) =>
+                        setApprovalData({
+                          ...approvalData,
+                          company: e.target.value,
+                        })
+                      }
                     />
                   </div>
                 </div>
 
                 <div className="pt-4 flex gap-4 mt-6">
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setApprovalModalApp(null)}
                     disabled={isApproving}
-                    className="flex-grow px-6 py-3.5 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-all border border-gray-200 text-xs uppercase tracking-widest"
+                    className="flex-grow px-6 py-3.5 rounded-xl font-bold text-gray-500 dark:text-gray-300 hover:bg-gray-50 transition-all border border-gray-200 text-xs uppercase tracking-widest"
                   >
                     Cancel
                   </button>
-                  <button 
+                  <button
                     type="submit"
                     disabled={isApproving}
                     className="flex-grow flex justify-center items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-white bg-green-500 hover:bg-green-600 transition-all shadow-lg shadow-green-500/20 text-xs uppercase tracking-widest"
                   >
-                    {isApproving ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
+                    {isApproving ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      <CheckCircle2 size={16} />
+                    )}
                     Approve
                   </button>
                 </div>
@@ -736,14 +1000,14 @@ export default function AdminApplications() {
         {/* Delete Confirmation Modal */}
         {deleteAppId && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-brand-blue/60 backdrop-blur-sm"
               onClick={() => setDeleteAppId(null)}
             ></motion.div>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -752,18 +1016,21 @@ export default function AdminApplications() {
               <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Trash2 size={40} />
               </div>
-              <h3 className="text-2xl font-bold text-brand-blue mb-4">Confirm Deletion</h3>
-              <p className="text-gray-500 mb-8 leading-relaxed">
-                Are you sure you want to delete this application? This action cannot be undone.
+              <h3 className="text-2xl font-bold text-brand-blue mb-4">
+                Confirm Deletion
+              </h3>
+              <p className="text-gray-500 dark:text-gray-300 mb-8 leading-relaxed">
+                Are you sure you want to delete this application? This action
+                cannot be undone.
               </p>
               <div className="flex gap-4">
-                <button 
+                <button
                   onClick={() => setDeleteAppId(null)}
-                  className="flex-grow px-6 py-3 rounded-xl font-bold text-gray-500 bg-gray-100 hover:bg-gray-200 transition-all"
+                  className="flex-grow px-6 py-3 rounded-xl font-bold text-gray-500 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 transition-all"
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   onClick={() => handleDelete(deleteAppId)}
                   className="flex-grow px-6 py-3 rounded-xl font-bold text-white bg-red-500 hover:bg-red-600 transition-all shadow-lg shadow-red-500/20"
                 >

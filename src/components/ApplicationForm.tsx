@@ -410,7 +410,7 @@ export default function ApplicationForm({
                 >
                   <div className="absolute top-0 right-0 w-64 h-64 bg-brand-gold/10 rounded-full -mr-32 -mt-32 blur-3xl transition-all group-hover:bg-brand-gold/20"></div>
                   <div className="flex items-center gap-6 relative z-10">
-                    <div className="w-20 h-20 bg-brand-gold text-slate-900 rounded-3xl flex items-center justify-center shadow-2xl group-hover:rotate-12 transition-transform duration-500">
+                    <div className="w-20 h-20 bg-brand-gold text-slate-900 dark:text-white rounded-3xl flex items-center justify-center shadow-2xl group-hover:rotate-12 transition-transform duration-500">
                       <Sparkles size={40} />
                     </div>
                     <div>

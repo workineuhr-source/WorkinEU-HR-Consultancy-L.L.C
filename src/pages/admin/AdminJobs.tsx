@@ -28,6 +28,7 @@ import {
   Upload,
   Image as ImageIcon,
   CreditCard,
+  Users,
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "motion/react";
@@ -127,7 +128,7 @@ export default function AdminJobs() {
           <h1 className="text-2xl md:text-3xl font-bold text-brand-blue">
             Job Management
           </h1>
-          <p className="text-gray-500 text-xs md:text-base">
+          <p className="text-gray-500 dark:text-gray-300 text-xs md:text-base">
             Add, edit or remove job listings from the portal.
           </p>
         </div>
@@ -144,7 +145,7 @@ export default function AdminJobs() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-64 bg-white rounded-2xl animate-pulse"
+              className="h-64 bg-white dark:bg-[#121212] rounded-2xl animate-pulse"
             ></div>
           ))}
         </div>
@@ -188,7 +189,7 @@ export default function AdminJobs() {
                 </div>
 
                 <div className="space-y-2 md:space-y-3 mb-6 md:mb-8">
-                  <div className="flex items-center gap-3 text-gray-500">
+                  <div className="flex items-center gap-3 text-gray-500 dark:text-gray-300">
                     <MapPin
                       size={14}
                       className="text-brand-gold md:w-4 md:h-4"
@@ -197,7 +198,7 @@ export default function AdminJobs() {
                       {job.country}
                     </span>
                   </div>
-                  <div className="flex items-center gap-3 text-gray-500">
+                  <div className="flex items-center gap-3 text-gray-500 dark:text-gray-300">
                     <Briefcase
                       size={14}
                       className="text-brand-gold md:w-4 md:h-4"
@@ -206,13 +207,25 @@ export default function AdminJobs() {
                       {job.category}
                     </span>
                   </div>
-                  <div className="flex items-center gap-3 text-gray-500">
+                  <div className="flex items-center gap-3 text-gray-500 dark:text-gray-300">
                     <Calendar
                       size={14}
                       className="text-brand-gold md:w-4 md:h-4"
                     />
                     <span className="text-xs md:text-sm font-medium">
                       Deadline: {job.deadline}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 text-gray-500 dark:text-gray-300">
+                    <Users
+                      size={14}
+                      className="text-brand-gold md:w-4 md:h-4"
+                    />
+                    <span className="text-xs md:text-sm font-medium">
+                      Vacancies: {job.vacancies || "-"}
+                      {job.vacanciesMale || job.vacanciesFemale
+                        ? ` (M: ${job.vacanciesMale || 0}, F: ${job.vacanciesFemale || 0})`
+                        : ""}
                     </span>
                   </div>
                 </div>
@@ -269,14 +282,14 @@ export default function AdminJobs() {
               <h3 className="text-2xl font-bold text-brand-blue mb-4">
                 Delete Job?
               </h3>
-              <p className="text-gray-500 mb-8 leading-relaxed">
+              <p className="text-gray-500 dark:text-gray-300 mb-8 leading-relaxed">
                 Are you sure you want to delete this job listing? This action
                 cannot be undone.
               </p>
               <div className="flex gap-4">
                 <button
                   onClick={() => setDeleteConfirmId(null)}
-                  className="flex-grow px-6 py-3 rounded-xl font-bold text-gray-500 bg-gray-100 hover:bg-gray-200 transition-all"
+                  className="flex-grow px-6 py-3 rounded-xl font-bold text-gray-500 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 transition-all"
                 >
                   Cancel
                 </button>
@@ -537,11 +550,11 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Job Image */}
           <div className="space-y-4">
-            <label className="block text-sm font-bold text-gray-700">
+            <label className="block text-sm font-bold text-gray-700 dark:text-gray-200">
               Job Image (Optional)
             </label>
             <div className="flex flex-col sm:flex-row gap-6 items-start">
-              <div className="w-full sm:w-48 h-32 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden relative group">
+              <div className="w-full sm:w-48 h-32 bg-gray-50 dark:bg-white/5 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden relative group">
                 {formData.imageUrl && formData.imageUrl !== "" ? (
                   <>
                     <img
@@ -570,7 +583,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
               <div className="flex-grow space-y-4 w-full">
                 <div className="flex gap-2">
                   <input
-                    className="flex-grow px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm"
+                    className="flex-grow px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 dark:bg-white/5 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm"
                     value={formData.imageUrl || ""}
                     onChange={(e) =>
                       setFormData({ ...formData, imageUrl: e.target.value })
@@ -601,7 +614,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
             <div>
-              <label className="block text-xs md:text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">
                 Category
               </label>
               <input
@@ -622,7 +635,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
             </div>
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className="block text-xs md:text-sm font-bold text-gray-700">
+                <label className="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-200">
                   Job Title
                 </label>
                 <button
@@ -659,7 +672,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
               </datalist>
             </div>
             <div>
-              <label className="block text-xs md:text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">
                 Country
               </label>
               <input
@@ -682,7 +695,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 md:gap-8">
             <div>
-              <label className="block text-xs md:text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">
                 Currency
               </label>
               <select
@@ -703,7 +716,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs md:text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">
                   Min Salary
                 </label>
                 <input
@@ -717,7 +730,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                 />
               </div>
               <div>
-                <label className="block text-xs md:text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">
                   Max Salary
                 </label>
                 <input
@@ -735,7 +748,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <label className="block text-xs md:text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">
                 Deadline
               </label>
               <input
@@ -749,7 +762,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">
                 Experience
               </label>
               <select
@@ -766,7 +779,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">
                 Job Type
               </label>
               <select
@@ -783,6 +796,63 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
             </div>
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">
+                Total Vacancies
+              </label>
+              <input
+                type="number"
+                min="0"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all text-sm md:text-base"
+                value={formData.vacancies || ""}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    vacancies: parseInt(e.target.value) || 0,
+                  })
+                }
+                placeholder="e.g. 50"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">
+                Vacancies (Male)
+              </label>
+              <input
+                type="number"
+                min="0"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all text-sm md:text-base"
+                value={formData.vacanciesMale || ""}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    vacanciesMale: parseInt(e.target.value) || 0,
+                  })
+                }
+                placeholder="e.g. 30"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">
+                Vacancies (Female)
+              </label>
+              <input
+                type="number"
+                min="0"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all text-sm md:text-base"
+                value={formData.vacanciesFemale || ""}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    vacanciesFemale: parseInt(e.target.value) || 0,
+                  })
+                }
+                placeholder="e.g. 20"
+              />
+            </div>
+          </div>
+
           {/* Fees & Package Section */}
           <div className="bg-gray-50 p-6 rounded-3xl space-y-6 border border-gray-100">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -791,7 +861,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                 Package Details
               </h3>
 
-              <div className="flex bg-white p-1 rounded-xl border border-gray-200 shadow-sm self-stretch sm:self-auto">
+              <div className="flex bg-white dark:bg-[#121212] p-1 rounded-xl border border-gray-200 shadow-sm self-stretch sm:self-auto">
                 {(["Nepal", "Gulf", "Europe"] as const).map((region) => (
                   <button
                     key={region}
@@ -800,7 +870,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                     className={`flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
                       activePricingTab === region
                         ? "bg-brand-blue text-white shadow-md"
-                        : "text-gray-400 hover:text-gray-600"
+                        : "text-gray-400 hover:text-gray-600 dark:text-gray-300"
                     }`}
                   >
                     {region}
@@ -839,7 +909,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                         Currency
                       </label>
                       <input
-                        className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white text-sm"
+                        className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white dark:bg-[#121212] text-sm"
                         value={pricing.currency || ""}
                         onChange={(e) =>
                           updatePricing({ currency: e.target.value })
@@ -852,7 +922,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                         Total Amount
                       </label>
                       <input
-                        className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white text-sm font-bold text-brand-blue"
+                        className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white dark:bg-[#121212] text-sm font-bold text-brand-blue"
                         value={pricing.totalAmount || ""}
                         onChange={(e) =>
                           updatePricing({ totalAmount: e.target.value })
@@ -865,7 +935,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                         Initial Pay
                       </label>
                       <input
-                        className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white text-sm"
+                        className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white dark:bg-[#121212] text-sm"
                         value={pricing.initialPay || ""}
                         onChange={(e) =>
                           updatePricing({ initialPay: e.target.value })
@@ -879,7 +949,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                       </label>
                       <div className="flex gap-2">
                         <input
-                          className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white text-sm"
+                          className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white dark:bg-[#121212] text-sm"
                           value={pricing.payAfterWP || ""}
                           onChange={(e) =>
                             updatePricing({ payAfterWP: e.target.value })
@@ -887,7 +957,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                           placeholder="WP"
                         />
                         <input
-                          className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white text-sm"
+                          className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white dark:bg-[#121212] text-sm"
                           value={pricing.payAfterVisa || ""}
                           onChange={(e) =>
                             updatePricing({ payAfterVisa: e.target.value })
@@ -909,7 +979,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                           Min
                         </label>
                         <input
-                          className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white text-sm"
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white dark:bg-[#121212] text-sm"
                           value={pricing.visaFeeMin || ""}
                           onChange={(e) =>
                             updatePricing({ visaFeeMin: e.target.value })
@@ -922,7 +992,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                           Max
                         </label>
                         <input
-                          className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white text-sm"
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white dark:bg-[#121212] text-sm"
                           value={pricing.visaFeeMax || ""}
                           onChange={(e) =>
                             updatePricing({ visaFeeMax: e.target.value })
@@ -939,14 +1009,14 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                       <input
-                        className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white text-sm"
+                        className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white dark:bg-[#121212] text-sm"
                         value={pricing.riskAmount || ""}
                         onChange={(e) =>
                           updatePricing({ riskAmount: e.target.value })
                         }
                         placeholder="e.g. 500"
                       />
-                      <p className="text-[10px] text-gray-500 font-medium italic">
+                      <p className="text-[10px] text-gray-500 dark:text-gray-300 font-medium italic">
                         This amount will be charged if the visa is refused.
                         Reapplication is always possible.
                       </p>
@@ -1091,7 +1161,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                 Other Fees / Notes
               </label>
               <input
-                className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white text-sm"
+                className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white dark:bg-[#121212] text-sm"
                 value={formData.otherFees || ""}
                 onChange={(e) =>
                   setFormData({ ...formData, otherFees: e.target.value })
@@ -1110,7 +1180,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                 }
               />
               <div>
-                <p className="text-sm font-bold text-slate-800">
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
                   Hide Fees & Package Details from Candidates
                 </p>
                 <p className="text-xs text-slate-500">
@@ -1122,7 +1192,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
+            <label className="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">
               Job Description
             </label>
             <textarea
@@ -1140,7 +1210,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
           {/* Responsibilities */}
           <div>
             <div className="flex justify-between items-center mb-4">
-              <label className="block text-sm font-bold text-gray-700">
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-200">
                 Responsibilities
               </label>
               <button
@@ -1176,7 +1246,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
           {/* Requirements */}
           <div>
             <div className="flex justify-between items-center mb-4">
-              <label className="block text-sm font-bold text-gray-700">
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-200">
                 Requirements
               </label>
               <button
@@ -1211,7 +1281,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
 
           {/* Required Documents */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-4">
+            <label className="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-4">
               Required Documents (Shown to Candidates)
             </label>
 
@@ -1282,7 +1352,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="w-full sm:w-auto px-8 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-all"
+              className="w-full sm:w-auto px-8 py-3 rounded-xl font-bold text-gray-500 dark:text-gray-300 hover:bg-gray-50 transition-all"
             >
               Cancel
             </button>

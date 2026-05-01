@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet-async';
+import { Helmet } from "react-helmet-async";
 
 interface SEOProps {
   title: string;
@@ -7,11 +7,11 @@ interface SEOProps {
   url?: string;
 }
 
-export default function SEO({ 
-  title, 
-  description = "Work in Europe - Premier HR Recruitment Agency for EU Jobs. Connect with top employers in Croatia, Romania, Slovenia, and more.", 
+export default function SEO({
+  title,
+  description = "Work in Europe - Premier HR Recruitment Agency for EU Jobs. Connect with top employers in Croatia, Romania, Slovenia, and more.",
   keywords = "Jobs in Europe for Nepalese, Work in Europe, EU jobs for Asians, Work in Slovenia, Work in Croatia, Work in Romania, HR recruitment agency",
-  url = window.location.href
+  url = window.location.href,
 }: SEOProps) {
   const siteTitle = `${title} | WorkinEU HR`;
 
@@ -34,7 +34,7 @@ export default function SEO({
       <meta property="twitter:url" content={url} />
       <meta property="twitter:title" content={siteTitle} />
       <meta property="twitter:description" content={description} />
-      
+
       {/* Robots & Canonical */}
       <link rel="canonical" href={url} />
     </Helmet>

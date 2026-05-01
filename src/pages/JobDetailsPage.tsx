@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
 import { Job } from "../types";
 import {
@@ -145,7 +145,7 @@ export default function JobDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-white/5">
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-brand-gold"></div>
       </div>
     );
@@ -153,13 +153,13 @@ export default function JobDetailsPage() {
 
   if (!job) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-50">
-        <h2 className="text-4xl font-bold text-slate-900 mb-6">
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-50 dark:bg-white/5">
+        <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-6">
           Job Not Found
         </h2>
         <Link
           to="/jobs"
-          className="text-brand-gold font-bold flex items-center gap-3 text-lg hover:text-slate-900 transition-colors"
+          className="text-brand-gold font-bold flex items-center gap-3 text-lg hover:text-slate-900 dark:text-white transition-colors"
         >
           <ChevronLeft size={24} /> Back to Job Portal
         </Link>
@@ -674,7 +674,7 @@ export default function JobDetailsPage() {
                             "flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all",
                             selectedRegion === region
                               ? "bg-brand-gold text-brand-blue shadow-lg"
-                              : "text-slate-500 hover:text-slate-900 dark:hover:text-white",
+                              : "text-slate-500 hover:text-slate-900 dark:text-white dark:hover:text-white",
                           )}
                         >
                           {region}
@@ -881,7 +881,7 @@ export default function JobDetailsPage() {
                 setShowApplyForm(false);
                 setIsQuickApply(false);
               }}
-              className="absolute top-8 right-8 text-slate-400 hover:text-slate-900 transition-colors p-2 bg-slate-50 rounded-xl border border-slate-100"
+              className="absolute top-8 right-8 text-slate-400 hover:text-slate-900 dark:text-white transition-colors p-2 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-100"
             >
               <X size={24} />
             </button>

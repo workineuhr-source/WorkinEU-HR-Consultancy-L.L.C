@@ -1,5 +1,5 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import React, { Component, ErrorInfo, ReactNode } from "react";
+import { AlertCircle, RefreshCw } from "lucide-react";
 
 interface Props {
   children: ReactNode;
@@ -13,7 +13,7 @@ interface State {
 class ErrorBoundary extends Component<Props, State> {
   public state: State = {
     hasError: false,
-    error: null
+    error: null,
   };
 
   public static getDerivedStateFromError(error: Error): State {
@@ -21,7 +21,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Uncaught error:', error, errorInfo);
+    console.error("Uncaught error:", error, errorInfo);
   }
 
   public render() {
@@ -42,8 +42,12 @@ class ErrorBoundary extends Component<Props, State> {
             <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <AlertCircle className="text-red-500 w-8 h-8" />
             </div>
-            <h2 className="text-2xl font-bold text-brand-blue mb-4">Something went wrong</h2>
-            <p className="text-gray-500 mb-8">{errorMessage}</p>
+            <h2 className="text-2xl font-bold text-brand-blue mb-4">
+              Something went wrong
+            </h2>
+            <p className="text-gray-500 dark:text-gray-300 mb-8">
+              {errorMessage}
+            </p>
             <button
               onClick={() => window.location.reload()}
               className="flex items-center justify-center gap-2 w-full bg-brand-blue text-white py-3 rounded-xl font-bold hover:bg-brand-gold transition-all shadow-lg"

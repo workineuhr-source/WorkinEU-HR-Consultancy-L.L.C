@@ -109,14 +109,20 @@ export default function JobsPage() {
   }, [searchParams]);
 
   const handleTrendingClick = (tag: string) => {
-    setSearchTerm(tag);
-    setFilters({ country: "", category: "", experience: "" });
-    // Small delay to allow react to render before scrolling
-    setTimeout(() => {
-      document
-        .getElementById("jobs-results")
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 100);
+    // Determine if it's a known country or category to set proper filters
+    const knownCountries = ["Germany", "Croatia", "Malta", "Romania", "Poland", "Portugal"];
+    const knownCategories = ["IT", "Hospitality", "Manufacturing", "Construction", "Healthcare"];
+    
+    if (knownCountries.includes(tag)) {
+      setFilters({ country: tag, category: "", experience: "" });
+      setSearchTerm("");
+    } else if (knownCategories.includes(tag)) {
+      setFilters({ country: "", category: tag, experience: "" });
+      setSearchTerm("");
+    } else {
+      setSearchTerm(tag);
+      setFilters({ country: "", category: "", experience: "" });
+    }
   };
 
   useEffect(() => {
@@ -184,17 +190,31 @@ export default function JobsPage() {
 
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
+      
+      // If the search term is a short acronym like "IT", we should search more strictly
+      const isShortAcronym = term.length <= 2;
+      
       result = result.filter(
-        (job) =>
-          job.title.toLowerCase().includes(term) ||
-          job.country.toLowerCase().includes(term) ||
-          job.category.toLowerCase().includes(term) ||
-          job.description.toLowerCase().includes(term) ||
-          job.requirements.some((req) => req.toLowerCase().includes(term)) ||
-          job.responsibilities.some((resp) =>
-            resp.toLowerCase().includes(term),
-          ) ||
-          job.type.toLowerCase().includes(term),
+        (job) => {
+          if (isShortAcronym) {
+            // For short acronyms, match category exactly or title with word boundary
+            const titleMatch = new RegExp(`\\b${term}\\b`, 'i').test(job.title);
+            const categoryMatch = job.category.toLowerCase() === term;
+            return titleMatch || categoryMatch;
+          }
+          
+          return (
+            job.title.toLowerCase().includes(term) ||
+            job.country.toLowerCase().includes(term) ||
+            job.category.toLowerCase().includes(term) ||
+            job.description.toLowerCase().includes(term) ||
+            job.requirements.some((req) => req.toLowerCase().includes(term)) ||
+            job.responsibilities.some((resp) =>
+              resp.toLowerCase().includes(term)
+            ) ||
+            job.type.toLowerCase().includes(term)
+          );
+        }
       );
     }
 
@@ -280,7 +300,7 @@ export default function JobsPage() {
   };
 
   return (
-    <div className="bg-white dark:bg-[#020617] min-h-screen py-32 relative overflow-hidden transition-colors duration-500">
+    <div className="bg-white dark:bg-[#121212] min-h-screen py-32 relative overflow-hidden transition-colors duration-500">
       <SEO title="Find High Paying EU Jobs | Europe Job Vacancies" />
       {/* Background elements */}
       <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-[0.03] dark:opacity-[0.05] pointer-events-none"></div>
@@ -349,7 +369,7 @@ export default function JobsPage() {
                 {searchTerm && (
                   <button
                     onClick={() => setSearchTerm("")}
-                    className="p-1.5 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                    className="p-1.5 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full text-slate-400 hover:text-slate-900 dark:text-white dark:hover:text-white transition-colors"
                   >
                     <X size={16} />
                   </button>
@@ -359,17 +379,9 @@ export default function JobsPage() {
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => {
-                      document
-                        .getElementById("jobs-results")
-                        ?.scrollIntoView({
-                          behavior: "smooth",
-                          block: "start",
-                        });
-                    }}
                     className={cn(
                       "h-full px-6 md:px-8 flex items-center justify-center gap-2 rounded-full font-bold text-[9px] md:text-[10px] uppercase tracking-widest transition-all duration-300",
-                      "bg-brand-gold text-slate-900 shadow-sm hover:shadow-md hover:bg-yellow-400",
+                      "bg-brand-gold text-slate-900 dark:text-white shadow-sm hover:shadow-md hover:bg-yellow-400",
                     )}
                   >
                     <Search size={14} className="md:w-3.5 md:h-3.5" />
@@ -509,7 +521,7 @@ export default function JobsPage() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={clearFilters}
-                    className="px-6 py-2.5 bg-slate-50 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg font-bold text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 border border-slate-200 dark:border-white/10"
+                    className="px-6 py-2.5 bg-slate-50 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:text-white dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg font-bold text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 border border-slate-200 dark:border-white/10"
                   >
                     <X size={14} /> Clear Auto-Filters
                   </motion.button>
@@ -532,7 +544,7 @@ export default function JobsPage() {
                   </div>
                   <div>
                     <div className="flex items-center gap-3 mb-4">
-                      <span className="px-4 py-1 bg-brand-gold text-slate-900 text-[10px] font-black uppercase tracking-widest rounded-full">
+                      <span className="px-4 py-1 bg-brand-gold text-slate-900 dark:text-white text-[10px] font-black uppercase tracking-widest rounded-full">
                         AI Driven
                       </span>
                       <span className="text-slate-400 dark:text-slate-500 text-[10px] font-black uppercase tracking-[0.3em]">
@@ -596,7 +608,7 @@ export default function JobsPage() {
           )}
 
         {/* Results */}
-        <div id="jobs-results" className="pt-8 scroll-mt-24">
+        <div className="pt-8">
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
@@ -707,7 +719,7 @@ export default function JobsPage() {
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={clearFilters}
-                  className="bg-brand-blue text-white px-8 py-3.5 rounded-xl font-bold text-sm shadow-lg hover:shadow-xl hover:bg-brand-gold hover:text-slate-900 transition-all duration-300 flex items-center gap-2 mx-auto"
+                  className="bg-brand-blue text-white px-8 py-3.5 rounded-xl font-bold text-sm shadow-lg hover:shadow-xl hover:bg-brand-gold hover:text-slate-900 dark:text-white transition-all duration-300 flex items-center gap-2 mx-auto"
                 >
                   <X size={16} /> Reset All Filters
                 </motion.button>
@@ -782,14 +794,14 @@ export default function JobsPage() {
                   <div className="absolute inset-0 bg-brand-gold/20 rounded-xl blur-md opacity-0 group-focus-within/input:opacity-100 transition-opacity"></div>
                   <div className="relative">
                     <Mail
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within/input:text-brand-gold transition-colors"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 dark:text-slate-300 group-focus-within/input:text-brand-gold transition-colors"
                       size={16}
                     />
                     <input
                       type="email"
                       required
                       placeholder="your@email.com"
-                      className="w-full pl-12 pr-4 py-3.5 bg-slate-800/50 border border-slate-700 rounded-xl outline-none focus:border-brand-gold focus:bg-slate-800 transition-all text-sm font-bold text-white placeholder:text-slate-600"
+                      className="w-full pl-12 pr-4 py-3.5 bg-slate-800/50 border border-slate-700 rounded-xl outline-none focus:border-brand-gold focus:bg-slate-800 transition-all text-sm font-bold text-white placeholder:text-slate-600 dark:text-slate-300"
                       value={alertEmail}
                       onChange={(e) => setAlertEmail(e.target.value)}
                     />
@@ -846,7 +858,7 @@ export default function JobsPage() {
                   setSelectedJobToApply(null);
                   setIsQuickApply(false);
                 }}
-                className="absolute top-8 right-8 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors p-3 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/10"
+                className="absolute top-8 right-8 text-slate-400 hover:text-slate-900 dark:text-white dark:hover:text-white transition-colors p-3 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/10"
               >
                 <X size={24} />
               </button>

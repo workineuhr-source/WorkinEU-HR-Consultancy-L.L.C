@@ -609,7 +609,7 @@ export default function CandidateDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#020617] pt-20 pb-20 transition-colors duration-500 relative overflow-hidden">
+    <div className="min-h-screen bg-white dark:bg-[#121212] pt-20 pb-20 transition-colors duration-500 relative overflow-hidden">
       {/* Background elements */}
       <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-[0.03] dark:opacity-[0.05] pointer-events-none"></div>
       <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-brand-teal/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2 animate-pulse"></div>
@@ -635,7 +635,7 @@ export default function CandidateDashboard() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-[#020617] dark:bg-brand-teal flex items-center justify-center text-white dark:text-[#020617] font-black text-lg">
+                <div className="w-full h-full bg-[#121212] dark:bg-brand-teal flex items-center justify-center text-white dark:text-[#121212] font-black text-lg">
                   {(profile.fullName || "C").charAt(0)}
                 </div>
               )}
@@ -684,7 +684,7 @@ export default function CandidateDashboard() {
                 className={cn(
                   "flex items-center gap-3 px-6 py-4 rounded-2xl transition-all font-black text-[10px] uppercase tracking-widest whitespace-nowrap border shadow-2xl",
                   activeTab === item.id
-                    ? "bg-brand-teal text-[#020617] border-brand-teal/20"
+                    ? "bg-brand-teal text-[#121212] border-brand-teal/20"
                     : "bg-white dark:bg-[#0f172a] text-slate-500 dark:text-slate-400 border-slate-100 dark:border-white/5",
                 )}
               >
@@ -698,8 +698,8 @@ export default function CandidateDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar - Desktop Only */}
           <div className="hidden lg:block lg:col-span-1 space-y-6">
-            <div className="bg-white dark:bg-[#020617] rounded-[3rem] shadow-xl border border-gray-100 dark:border-white/5 overflow-hidden transition-all duration-500">
-              <div className="p-10 text-center bg-[#020617] text-white relative">
+            <div className="bg-white dark:bg-[#121212] rounded-[3rem] shadow-xl border border-gray-100 dark:border-white/5 overflow-hidden transition-all duration-500">
+              <div className="p-10 text-center bg-[#121212] text-white relative">
                 <div className="absolute inset-0 bg-mesh opacity-10"></div>
                 <div className="relative z-10">
                   <div className="w-28 h-28 bg-white dark:bg-slate-800 rounded-[2rem] flex items-center justify-center mx-auto mb-6 text-4xl font-black overflow-hidden border-4 border-brand-teal/20 shadow-2xl">
@@ -788,7 +788,7 @@ export default function CandidateDashboard() {
                     className={cn(
                       "w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-black text-xs uppercase tracking-widest border",
                       activeTab === item.id
-                        ? "bg-brand-teal text-[#020617] shadow-xl shadow-brand-teal/10 border-brand-teal/20"
+                        ? "bg-brand-teal text-[#121212] shadow-xl shadow-brand-teal/10 border-brand-teal/20"
                         : "text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 border-transparent",
                     )}
                   >
@@ -809,7 +809,7 @@ export default function CandidateDashboard() {
               </nav>
             </div>
 
-            <div className="bg-[#020617] rounded-[3rem] p-10 text-white shadow-2xl relative overflow-hidden border border-white/5 group">
+            <div className="bg-[#121212] rounded-[3rem] p-10 text-white shadow-2xl relative overflow-hidden border border-white/5 group">
               <div className="absolute inset-0 bg-mesh opacity-20 group-hover:opacity-30 transition-opacity"></div>
               <div className="relative z-10">
                 <p className="text-brand-teal font-black text-[10px] uppercase tracking-[0.3em] mb-4">
@@ -826,7 +826,7 @@ export default function CandidateDashboard() {
                   href={whatsappLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full bg-white text-[#020617] px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-brand-teal hover:text-white transition-all shadow-xl"
+                  className="w-full bg-white dark:bg-[#121212] text-[#121212] px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-brand-teal hover:text-white transition-all shadow-xl"
                 >
                   <Globe size={18} /> WhatsApp Support
                 </a>
@@ -902,17 +902,17 @@ export default function CandidateDashboard() {
                     </div>
                     <Link
                       to={`/candidate/profile/${profile?.uid}`}
-                      className="relative bg-[#020617] dark:bg-brand-teal p-10 rounded-[3rem] shadow-premium flex flex-col items-center justify-center text-center transition-all hover:scale-[1.02] active:scale-95 group overflow-hidden border border-white/5"
+                      className="relative bg-[#121212] dark:bg-brand-teal p-10 rounded-[3rem] shadow-premium flex flex-col items-center justify-center text-center transition-all hover:scale-[1.02] active:scale-95 group overflow-hidden border border-white/5"
                     >
                       <div className="absolute inset-0 bg-mesh opacity-20"></div>
                       <div className="relative z-10 flex flex-col items-center">
-                        <div className="w-20 h-20 bg-white/10 text-white dark:text-[#020617] rounded-[1.5rem] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-2xl backdrop-blur-xl border border-white/20">
+                        <div className="w-20 h-20 bg-white/10 text-white dark:text-[#121212] rounded-[1.5rem] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-2xl backdrop-blur-xl border border-white/20">
                           <Download size={36} />
                         </div>
-                        <h4 className="text-white dark:text-[#020617] font-black text-[10px] uppercase tracking-[0.4em] mb-1">
+                        <h4 className="text-white dark:text-[#121212] font-black text-[10px] uppercase tracking-[0.4em] mb-1">
                           Export Identity
                         </h4>
-                        <p className="text-brand-teal dark:text-[#020617]/70 text-[10px] font-black uppercase tracking-widest">
+                        <p className="text-brand-teal dark:text-[#121212]/70 text-[10px] font-black uppercase tracking-widest">
                           View Europass CV
                         </p>
                       </div>
@@ -1347,7 +1347,7 @@ export default function CandidateDashboard() {
                               "px-4 py-2 rounded-lg text-xs font-bold transition-all",
                               newDoc.uploadMethod !== "url"
                                 ? "bg-brand-gold text-brand-blue"
-                                : "bg-gray-100 dark:bg-slate-800 text-gray-500",
+                                : "bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-gray-300",
                             )}
                           >
                             Upload File
@@ -1365,7 +1365,7 @@ export default function CandidateDashboard() {
                               "px-4 py-2 rounded-lg text-xs font-bold transition-all",
                               newDoc.uploadMethod === "url"
                                 ? "bg-brand-gold text-brand-blue"
-                                : "bg-gray-100 dark:bg-slate-800 text-gray-500",
+                                : "bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-gray-300",
                             )}
                           >
                             Google Drive Link

@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../../lib/utils";
 import { useState, useEffect } from "react";
 import {
   collection,
@@ -275,9 +276,9 @@ export default function AdminTeam() {
             <div className="aspect-square relative">
               {member.photoUrl && member.photoUrl !== "" && (
                 <img
-                  src={member.photoUrl}
+                  src={getDirectImageUrl(member.photoUrl)}
                   alt={member.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                   referrerPolicy="no-referrer"
                   loading="lazy"
                 />
@@ -351,9 +352,9 @@ export default function AdminTeam() {
                     {formData.photoUrl ? (
                       <img
                         referrerPolicy="no-referrer"
-                        src={formData.photoUrl}
+                        src={getDirectImageUrl(formData.photoUrl)}
                         alt="Preview"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-300">

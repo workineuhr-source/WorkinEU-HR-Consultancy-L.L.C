@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../../lib/utils";
 import { useState, useEffect } from "react";
 import {
   collection,
@@ -159,9 +160,9 @@ export default function AdminJobs() {
               {job.imageUrl && job.imageUrl !== "" && (
                 <div className="h-48 w-full overflow-hidden">
                   <img
-                    src={job.imageUrl}
+                    src={getDirectImageUrl(job.imageUrl)}
                     alt={job.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                     referrerPolicy="no-referrer"
                     loading="lazy"
                   />
@@ -559,9 +560,9 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                   <>
                     <img
                       referrerPolicy="no-referrer"
-                      src={formData.imageUrl}
+                      src={getDirectImageUrl(formData.imageUrl)}
                       alt="Job Preview"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                     <button
                       type="button"
@@ -698,13 +699,16 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
               <label className="block text-xs md:text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">
                 Currency
               </label>
-              <select
-                className="w-full px-4 py-2 md:py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all text-sm md:text-base"
-                value={formData.currency || "€"}
+              <input
+                list="currency-options"
+                className="w-full px-4 py-2 md:py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all text-sm md:text-base dark:bg-slate-800 dark:border-white/10 dark:text-white"
+                value={formData.currency || ""}
                 onChange={(e) =>
                   setFormData({ ...formData, currency: e.target.value })
                 }
-              >
+                placeholder="e.g. € or USD"
+              />
+              <datalist id="currency-options">
                 <option value="€">Euro (€)</option>
                 <option value="$">US Dollar ($)</option>
                 <option value="£">British Pound (£)</option>
@@ -712,7 +716,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                 <option value="NPR">Nepalese Rupee (NPR)</option>
                 <option value="PLN">Polish Zloty (PLN)</option>
                 <option value="RON">Romanian Leu (RON)</option>
-              </select>
+              </datalist>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
               <div>

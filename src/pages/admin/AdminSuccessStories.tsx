@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../../lib/utils";
 import React, { useState, useEffect } from "react";
 import {
   Plus,
@@ -319,8 +320,8 @@ export default function AdminSuccessStories() {
                           newStory.candidatePhotoUrl !== "" ? (
                             <img
                               referrerPolicy="no-referrer"
-                              src={newStory.candidatePhotoUrl}
-                              className="w-full h-full object-cover"
+                              src={getDirectImageUrl(newStory.candidatePhotoUrl)}
+                              className="w-full h-full object-contain"
                             />
                           ) : (
                             <ImageIcon className="text-gray-300" size={24} />
@@ -372,8 +373,8 @@ export default function AdminSuccessStories() {
                           newStory.visaImageUrl !== "" ? (
                             <img
                               referrerPolicy="no-referrer"
-                              src={newStory.visaImageUrl}
-                              className="w-full h-full object-cover"
+                              src={getDirectImageUrl(newStory.visaImageUrl)}
+                              className="w-full h-full object-contain"
                             />
                           ) : (
                             <FileText className="text-gray-300" size={24} />
@@ -464,8 +465,8 @@ export default function AdminSuccessStories() {
               {story.visaImageUrl && story.visaImageUrl !== "" && (
                 <img
                   referrerPolicy="no-referrer"
-                  src={story.visaImageUrl}
-                  className="w-full h-full object-cover"
+                  src={getDirectImageUrl(story.visaImageUrl)}
+                  className="w-full h-full object-contain"
                 />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -475,8 +476,8 @@ export default function AdminSuccessStories() {
                     story.candidatePhotoUrl !== "" && (
                       <img
                         referrerPolicy="no-referrer"
-                        src={story.candidatePhotoUrl}
-                        className="w-full h-full object-cover"
+                        src={getDirectImageUrl(story.candidatePhotoUrl)}
+                        className="w-full h-full object-contain"
                       />
                     )}
                 </div>

@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../lib/utils";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
@@ -109,12 +110,12 @@ export default function AboutPage() {
             >
               <div className="aspect-square lg:aspect-[4/5] rounded-[4rem] overflow-hidden shadow-[0_80px_160px_-30px_rgba(15,23,42,0.4)] border-[12px] border-white dark:border-[#0f172a] relative z-10 group bg-slate-100 dark:bg-white/5">
                 <img
-                  src={
+                  src={getDirectImageUrl(
                     content?.aboutImageUrl ||
                     "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&q=80&w=1200"
-                  }
+                  )}
                   alt="About Us"
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                  className="w-full h-full object-contain transition-transform duration-1000 group-hover:scale-105"
                   referrerPolicy="no-referrer"
                   loading="lazy"
                 />
@@ -300,12 +301,12 @@ export default function AboutPage() {
                 className="aspect-[4/5] rounded-[5rem] overflow-hidden shadow-[0_60px_120px_-20px_rgba(0,0,0,0.5)] border-[16px] border-white/5 group perspective-1000"
               >
                 <img
-                  src={
+                  src={getDirectImageUrl(
                     content?.whyChooseUsImageUrl ||
                     "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=1200"
-                  }
+                  )}
                   alt="Our Advantage"
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                  className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-1000"
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/60 via-transparent to-transparent"></div>

@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../../lib/utils";
 import { useState, useEffect } from "react";
 import {
   collection,
@@ -137,12 +138,12 @@ export default function AdminDiary() {
             >
               <div className="h-48 relative overflow-hidden">
                 <img
-                  src={
+                  src={getDirectImageUrl(
                     post.imageUrl ||
                     "https://images.unsplash.com/photo-1541746972996-4e0b0f43e01a?auto=format&fit=crop&q=80&w=800"
-                  }
+                  )}
                   alt={post.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute top-4 left-4">
@@ -507,9 +508,9 @@ function DiaryModal({ post, onClose, onSuccess }: DiaryModalProps) {
                   <div className="mt-4 aspect-video rounded-xl overflow-hidden border border-gray-100">
                     <img
                       referrerPolicy="no-referrer"
-                      src={formData.imageUrl}
+                      src={getDirectImageUrl(formData.imageUrl)}
                       alt="Preview"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   </div>
                 )}

@@ -391,27 +391,41 @@ export default function JobsPage() {
               </div>
             </div>
 
-            <div className="flex flex-wrap justify-center items-center gap-3 md:gap-4 mt-6">
-              <span className="text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest">
-                Trending
-              </span>
-              {[
-                "Nurse",
-                "Driver",
-                "Germany",
-                "Warehouse",
-                "IT",
-                "Hospitality",
-              ].map((tag) => (
+          <div className="flex flex-wrap justify-center items-center gap-3 md:gap-4 mt-8">
+            <span className="text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-inner border border-slate-200 dark:border-white/5">
+              Trending
+            </span>
+            {[
+              "Nurse",
+              "Driver",
+              "Germany",
+              "Warehouse",
+              "IT",
+              "Hospitality",
+            ].map((tag) => {
+              const isActive = searchTerm === tag || filters.country === tag || filters.category === tag;
+              return (
                 <button
                   key={tag}
-                  onClick={() => handleTrendingClick(tag)}
-                  className="text-[10px] font-bold text-slate-500 hover:text-brand-gold transition-colors hover:underline underline-offset-4"
+                  onClick={() => {
+                    if (isActive) {
+                      clearFilters();
+                    } else {
+                      handleTrendingClick(tag);
+                    }
+                  }}
+                  className={cn(
+                    "px-4 py-1.5 rounded-xl text-xs font-bold border-2 transition-all",
+                    isActive
+                      ? "bg-brand-teal text-white border-brand-teal shadow-none translate-x-[2px] translate-y-[2px]"
+                      : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-white/10 shadow-[2px_2px_0_0_#cbd5e1] dark:shadow-[2px_2px_0_0_rgba(255,255,255,0.1)] hover:border-brand-teal dark:hover:border-brand-teal hover:shadow-[3px_3px_0_0_#0d9488] dark:hover:shadow-[3px_3px_0_0_#0d9488] hover:text-brand-teal dark:hover:text-brand-teal active:shadow-[0_0_0_0_#0d9488] active:dark:shadow-[0_0_0_0_#0d9488] active:translate-x-[2px] active:translate-y-[2px]"
+                  )}
                 >
                   {tag}
                 </button>
-              ))}
-            </div>
+              );
+            })}
+          </div>
           </motion.div>
 
           <motion.div

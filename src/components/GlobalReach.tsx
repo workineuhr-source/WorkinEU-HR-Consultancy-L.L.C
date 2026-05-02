@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../lib/utils";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
@@ -135,9 +136,9 @@ export default function GlobalReach({
                   <div className="w-20 h-12 mx-auto mb-8 rounded-xl overflow-hidden shadow-2xl border border-white/10 group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-700 relative z-10">
                     {countryToCode[country] ? (
                       <img
-                        src={`https://flagcdn.com/w160/${countryToCode[country]}.png`}
+                        src={getDirectImageUrl(`https://flagcdn.com/w160/${countryToCode[country]}.png`)}
                         alt={country}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                         referrerPolicy="no-referrer"
                       />
                     ) : (

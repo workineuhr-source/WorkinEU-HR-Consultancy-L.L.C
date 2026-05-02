@@ -1,9 +1,11 @@
+import { getDirectImageUrl } from "../lib/utils";
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { DiaryPost } from "../types";
 import { motion } from "motion/react";
+import SEO from "../components/SEO";
 import {
   Calendar,
   User,
@@ -67,6 +69,7 @@ export default function DiaryDetailsPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#121212] pt-32 pb-20">
+      <SEO title={`${post.title} - WorkInEU Diary`} description={post.content.substring(0, 160)} />
       <div className="max-w-6xl mx-auto px-4 md:px-8">
         {/* Back Buttons */}
         <div className="flex items-center gap-6 mb-12">
@@ -142,12 +145,12 @@ export default function DiaryDetailsPage() {
           className="relative aspect-video rounded-[3rem] overflow-hidden mb-16 shadow-2xl"
         >
           <img
-            src={
+            src={getDirectImageUrl(
               post.imageUrl ||
               `https://images.unsplash.com/photo-1541746972996-4e0b0f43e01a?auto=format&fit=crop&q=80&w=1200`
-            }
+            )}
             alt={post.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
             referrerPolicy="no-referrer"
           />
         </motion.div>

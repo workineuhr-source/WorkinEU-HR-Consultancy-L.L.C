@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../../lib/utils";
 import React, { useState, useEffect } from "react";
 import {
   Save,
@@ -1255,7 +1256,7 @@ export default function AdminContent() {
                           <div className="p-6 bg-gray-50 dark:bg-white/5 rounded-2xl flex items-center justify-center border border-dashed border-gray-200">
                             <img
                               referrerPolicy="no-referrer"
-                              src={content.logoUrl}
+                              src={getDirectImageUrl(content.logoUrl)}
                               alt="Logo Preview"
                               className="max-h-16 object-contain"
                             />
@@ -1302,7 +1303,7 @@ export default function AdminContent() {
                           <div className="p-6 bg-gray-50 dark:bg-white/5 rounded-2xl flex items-center justify-center border border-dashed border-gray-200">
                             <img
                               referrerPolicy="no-referrer"
-                              src={content.faviconUrl}
+                              src={getDirectImageUrl(content.faviconUrl)}
                               alt="Favicon Preview"
                               className="w-12 h-12 object-contain"
                             />
@@ -1398,7 +1399,7 @@ export default function AdminContent() {
                             <div className="p-6 bg-gray-50 dark:bg-white/5 rounded-2xl flex items-center justify-center border border-dashed border-gray-200">
                               <img
                                 referrerPolicy="no-referrer"
-                                src={content.footerLogoUrl}
+                                src={getDirectImageUrl(content.footerLogoUrl)}
                                 alt="Footer Logo Preview"
                                 className="max-h-12 object-contain"
                               />
@@ -1802,9 +1803,9 @@ export default function AdminContent() {
                                 <div className="aspect-[4/5] rounded-xl overflow-hidden border border-gray-100">
                                   <img
                                     referrerPolicy="no-referrer"
-                                    src={url}
+                                    src={getDirectImageUrl(url)}
                                     alt="Slide Preview"
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-contain"
                                   />
                                 </div>
                               )}
@@ -1920,11 +1921,11 @@ export default function AdminContent() {
                           <div className="aspect-video bg-gray-50 dark:bg-white/5 rounded-2xl overflow-hidden border border-gray-100 shadow-inner">
                             <img
                               referrerPolicy="no-referrer"
-                              src={
+                              src={getDirectImageUrl(
                                 content.aboutImageUrl || content.officeImageUrl
-                              }
+                              )}
                               alt="Story Preview"
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-contain"
                             />
                           </div>
                         )}
@@ -2086,9 +2087,9 @@ export default function AdminContent() {
                         <div className="relative group aspect-square rounded-[3rem] overflow-hidden border-8 border-gray-50 shadow-2xl">
                           <img
                             referrerPolicy="no-referrer"
-                            src={content.guidingPrinciplesImageUrl}
+                            src={getDirectImageUrl(content.guidingPrinciplesImageUrl)}
                             alt="Principles Preview"
-                            className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                            className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-700"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:opacity-0 transition-opacity flex items-end p-8">
                             <span className="text-white font-bold text-xl drop-shadow-lg">
@@ -2219,9 +2220,9 @@ export default function AdminContent() {
                         <div className="aspect-video bg-gray-50 dark:bg-white/5 rounded-2xl overflow-hidden border border-gray-100">
                           <img
                             referrerPolicy="no-referrer"
-                            src={content.professionalHrSolutionsImageUrl}
+                            src={getDirectImageUrl(content.professionalHrSolutionsImageUrl)}
                             alt="HR Solutions Preview"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain"
                           />
                         </div>
                       )}
@@ -2377,9 +2378,9 @@ export default function AdminContent() {
                         <div className="aspect-video bg-gray-50 dark:bg-white/5 rounded-2xl overflow-hidden border border-gray-100">
                           <img
                             referrerPolicy="no-referrer"
-                            src={content.coreStrengthsImageUrl}
+                            src={getDirectImageUrl(content.coreStrengthsImageUrl)}
                             alt="Core Strengths Preview"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain"
                           />
                         </div>
                       )}
@@ -2486,9 +2487,9 @@ export default function AdminContent() {
                         <div className="mt-4 aspect-video max-h-48 bg-gray-50 dark:bg-white/5 rounded-2xl overflow-hidden border border-gray-100">
                           <img
                             referrerPolicy="no-referrer"
-                            src={content.whyChooseUsImageUrl}
+                            src={getDirectImageUrl(content.whyChooseUsImageUrl)}
                             alt="Advantage Preview"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain"
                           />
                         </div>
                       )}
@@ -2633,9 +2634,9 @@ export default function AdminContent() {
                         <div className="aspect-video bg-gray-50 dark:bg-white/5 rounded-2xl overflow-hidden border border-gray-100">
                           <img
                             referrerPolicy="no-referrer"
-                            src={content.whyChooseUsImageUrl}
+                            src={getDirectImageUrl(content.whyChooseUsImageUrl)}
                             alt="CTA Preview"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain"
                           />
                         </div>
                       )}
@@ -2747,9 +2748,9 @@ export default function AdminContent() {
                         <div className="aspect-video bg-gray-50 dark:bg-white/5 rounded-2xl overflow-hidden border border-gray-100 shadow-md">
                           <img
                             referrerPolicy="no-referrer"
-                            src={content.globalStandardsImageUrl}
+                            src={getDirectImageUrl(content.globalStandardsImageUrl)}
                             alt="Standards Preview"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain"
                           />
                         </div>
                       )}
@@ -2938,9 +2939,9 @@ export default function AdminContent() {
                         <div className="aspect-video lg:aspect-square bg-white dark:bg-[#121212] rounded-3xl overflow-hidden shadow-lg border border-gray-100">
                           <img
                             referrerPolicy="no-referrer"
-                            src={content.servicesImageUrl}
+                            src={getDirectImageUrl(content.servicesImageUrl)}
                             alt="Services Section Preview"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain"
                           />
                         </div>
                       )}
@@ -3023,9 +3024,9 @@ export default function AdminContent() {
                             <div className="aspect-video rounded-lg overflow-hidden border border-gray-100">
                               <img
                                 referrerPolicy="no-referrer"
-                                src={service.imageUrl}
+                                src={getDirectImageUrl(service.imageUrl)}
                                 alt="Service Preview"
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-contain"
                               />
                             </div>
                           )}
@@ -3865,7 +3866,7 @@ export default function AdminContent() {
                             <div className="h-20 bg-white dark:bg-[#121212] rounded-xl flex items-center justify-center p-4 border border-gray-100">
                               <img
                                 referrerPolicy="no-referrer"
-                                src={partner.logoUrl}
+                                src={getDirectImageUrl(partner.logoUrl)}
                                 alt={partner.name}
                                 className="max-h-full object-contain"
                               />
@@ -3991,9 +3992,9 @@ export default function AdminContent() {
                             <div className="p-6 bg-gray-50 dark:bg-white/5 rounded-2xl flex items-center justify-center border border-dashed border-gray-200">
                               <img
                                 referrerPolicy="no-referrer"
-                                src={content.livingSection.imageUrl}
+                                src={getDirectImageUrl(content.livingSection.imageUrl)}
                                 alt="Living Preview"
-                                className="max-h-48 rounded-xl object-cover"
+                                className="max-h-48 rounded-xl object-contain"
                               />
                             </div>
                           )}
@@ -4837,9 +4838,9 @@ export default function AdminContent() {
                                 {asst.photoUrl ? (
                                   <img
                                     referrerPolicy="no-referrer"
-                                    src={asst.photoUrl}
+                                    src={getDirectImageUrl(asst.photoUrl)}
                                     alt={asst.name}
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-contain"
                                   />
                                 ) : (
                                   <Bot size={40} />

@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../lib/utils";
 import { Link } from "react-router-dom";
 import { Job } from "../types";
 import {
@@ -195,9 +196,9 @@ export default function JobCard({ job, onQuickApply }: JobCardProps) {
       {job.imageUrl && (
         <div className="h-40 md:h-48 w-full overflow-hidden relative shrink-0">
           <img
-            src={job.imageUrl}
+            src={getDirectImageUrl(job.imageUrl)}
             alt={job.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-1000"
             referrerPolicy="no-referrer"
             loading="lazy"
           />

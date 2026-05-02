@@ -192,7 +192,7 @@ export interface CandidateProfile {
   payAfterVisa?: string;
   paidAmount?: string;
   riskAmount?: number; // Ris Amount / Risk Amount
-  paymentCurrency?: "EUR" | "NPR" | "INR" | "AED" | "USD";
+  paymentCurrency?: string;
   includedPackageItems?: string[];
   excludedPackageItems?: string[];
   paymentHistory?: {

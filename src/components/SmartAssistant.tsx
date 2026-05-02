@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../lib/utils";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -270,9 +271,9 @@ ${jobs.map((j) => `- ${j.title} in ${j.country}. Category: ${j.category}. Salary
                     {selectedAssistant?.photoUrl ? (
                       <img
                         referrerPolicy="no-referrer"
-                        src={selectedAssistant.photoUrl}
+                        src={getDirectImageUrl(selectedAssistant.photoUrl)}
                         alt={selectedAssistant.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     ) : (
                       <Bot size={28} />
@@ -328,9 +329,9 @@ ${jobs.map((j) => `- ${j.title} in ${j.country}. Category: ${j.category}. Salary
                         {asst.photoUrl ? (
                           <img
                             referrerPolicy="no-referrer"
-                            src={asst.photoUrl}
+                            src={getDirectImageUrl(asst.photoUrl)}
                             alt={asst.name}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain"
                           />
                         ) : (
                           <div
@@ -374,9 +375,9 @@ ${jobs.map((j) => `- ${j.title} in ${j.country}. Category: ${j.category}. Salary
                         ) : asst?.photoUrl ? (
                           <img
                             referrerPolicy="no-referrer"
-                            src={asst.photoUrl}
+                            src={getDirectImageUrl(asst.photoUrl)}
                             alt={asst.name}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain"
                           />
                         ) : (
                           <Bot size={18} style={{ color: asst?.color }} />
@@ -401,9 +402,9 @@ ${jobs.map((j) => `- ${j.title} in ${j.country}. Category: ${j.category}. Salary
                       {selectedAssistant?.photoUrl ? (
                         <img
                           referrerPolicy="no-referrer"
-                          src={selectedAssistant.photoUrl}
+                          src={getDirectImageUrl(selectedAssistant.photoUrl)}
                           alt={selectedAssistant.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                         />
                       ) : (
                         <Bot

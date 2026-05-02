@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../lib/utils";
 import { useState, useEffect } from "react";
 import {
   signInWithEmailAndPassword,
@@ -211,7 +212,7 @@ export default function LoginPage() {
           >
             <img
               referrerPolicy="no-referrer"
-              src={logoUrl || "/logo.png"}
+              src={getDirectImageUrl(logoUrl || "/logo.png")}
               alt="WorkinEU HR"
               className="w-full h-full object-contain"
             />

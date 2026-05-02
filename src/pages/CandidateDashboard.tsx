@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../lib/utils";
 import { useState, useEffect } from "react";
 import { auth, db } from "../firebase";
 import {
@@ -630,9 +631,9 @@ export default function CandidateDashboard() {
               {profile.photoUrl ? (
                 <img
                   referrerPolicy="no-referrer"
-                  src={profile.photoUrl}
+                  src={getDirectImageUrl(profile.photoUrl)}
                   alt="User"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               ) : (
                 <div className="w-full h-full bg-[#121212] dark:bg-brand-teal flex items-center justify-center text-white dark:text-[#121212] font-black text-lg">
@@ -705,9 +706,9 @@ export default function CandidateDashboard() {
                   <div className="w-28 h-28 bg-white dark:bg-slate-800 rounded-[2rem] flex items-center justify-center mx-auto mb-6 text-4xl font-black overflow-hidden border-4 border-brand-teal/20 shadow-2xl">
                     {profile.photoUrl ? (
                       <img
-                        src={profile.photoUrl}
+                        src={getDirectImageUrl(profile.photoUrl)}
                         alt={profile.fullName || "Candidate"}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                         referrerPolicy="no-referrer"
                       />
                     ) : (
@@ -2403,9 +2404,9 @@ export default function CandidateDashboard() {
                         <div className="w-32 h-32 bg-gray-100 dark:bg-slate-800 rounded-3xl flex items-center justify-center text-4xl font-bold text-gray-400 dark:text-white overflow-hidden border-2 border-gray-100 dark:border-slate-700 group-hover:border-brand-gold transition-all">
                           {profile.photoUrl ? (
                             <img
-                              src={profile.photoUrl}
+                              src={getDirectImageUrl(profile.photoUrl)}
                               alt={profile.fullName || "Candidate"}
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-contain"
                               referrerPolicy="no-referrer"
                             />
                           ) : (

@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../lib/utils";
 import { useState, useEffect } from "react";
 import {
   Routes,
@@ -212,7 +213,7 @@ export default function AdminDashboard() {
           <Link to="/" className="flex items-center gap-4 group">
             <div className="w-12 h-12 bg-white dark:bg-[#121212] rounded-xl flex items-center justify-center shadow-lg shadow-brand-teal/20 overflow-hidden group-hover:scale-110 transition-transform">
               <img
-                src={logoUrl || "/logo.png"}
+                src={getDirectImageUrl(logoUrl || "/logo.png")}
                 alt="Logo"
                 className="w-full h-full object-contain p-1"
                 referrerPolicy="no-referrer"
@@ -315,7 +316,7 @@ export default function AdminDashboard() {
             <Link to="/" className="lg:hidden flex items-center gap-2 group">
               <div className="w-10 h-10 bg-white dark:bg-[#121212] rounded-xl flex items-center justify-center shadow-lg overflow-hidden border border-gray-100">
                 <img
-                  src={logoUrl || "/logo.png"}
+                  src={getDirectImageUrl(logoUrl || "/logo.png")}
                   alt="Logo"
                   className="w-full h-full object-contain p-1"
                   referrerPolicy="no-referrer"

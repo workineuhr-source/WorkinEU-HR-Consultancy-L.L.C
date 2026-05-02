@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../lib/utils";
 import { motion } from "motion/react";
 import { Calendar, User, ArrowRight } from "lucide-react";
 import { DiaryPost } from "../types";
@@ -22,12 +23,12 @@ export default function DiaryCard({ post }: DiaryCardProps) {
       <Link to={`/diary/${post.id}`} className="flex flex-col h-full">
         <div className="relative h-80 overflow-hidden">
           <img
-            src={
+            src={getDirectImageUrl(
               post.imageUrl ||
               `https://images.unsplash.com/photo-1541746972996-4e0b0f43e01a?auto=format&fit=crop&q=80&w=800`
-            }
+            )}
             alt={post.title}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+            className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-1000"
             referrerPolicy="no-referrer"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-700"></div>

@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../lib/utils";
 import { CandidateProfile } from "../types";
 import { cn } from "../lib/utils";
 import {
@@ -205,10 +206,10 @@ export default function EuropassCV({
         {candidate.photoUrl ? (
           <div className="shrink-0 flex items-center">
             <img
-              src={candidate.photoUrl}
+              src={getDirectImageUrl(candidate.photoUrl)}
               alt={candidate.fullName}
               className={cn(
-                "w-32 h-40 object-cover object-top",
+                "w-32 h-40 object-contain object-top",
                 photoStyleClass,
                 styles.photoWrapper,
               )}

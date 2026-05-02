@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../lib/utils";
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
@@ -45,6 +46,7 @@ import { motion, AnimatePresence } from "motion/react";
 import Markdown from "react-markdown";
 import { cn } from "../lib/utils";
 import { toast } from "sonner";
+import SEO from "../components/SEO";
 
 export default function JobDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -175,6 +177,7 @@ export default function JobDetailsPage() {
 
   return (
     <div className="bg-white dark:bg-slate-900 min-h-screen py-24 md:py-32 relative overflow-hidden transition-colors duration-500">
+      <SEO title={`${job.title} in ${job.country} - WorkinEU Jobs`} description={job.description?.substring(0, 150) || ""} />
       {/* Background elements */}
       <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-10 dark:opacity-20 pointer-events-none"></div>
       <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-brand-gold/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2 animate-pulse"></div>
@@ -221,9 +224,9 @@ export default function JobDetailsPage() {
             <div className="h-[450px] md:h-[650px] w-full rounded-[4rem] md:rounded-[5.5rem] overflow-hidden relative shadow-[0_60px_100px_-20px_rgba(15,23,42,0.25)] border-4 border-white/50 dark:border-white/10 group-hover:shadow-[0_80px_120px_-20px_rgba(15,23,42,0.35)] transition-all duration-700">
               {job.imageUrl ? (
                 <img
-                  src={job.imageUrl}
+                  src={getDirectImageUrl(job.imageUrl)}
                   alt={job.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[2000ms] ease-out"
+                  className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-[2000ms] ease-out"
                   referrerPolicy="no-referrer"
                 />
               ) : (
@@ -437,9 +440,9 @@ export default function JobDetailsPage() {
                       >
                         <img
                           referrerPolicy="no-referrer"
-                          src={`https://i.pravatar.cc/100?u=candidates-${i}`}
+                          src={getDirectImageUrl(`https://i.pravatar.cc/100?u=candidates-${i}`)}
                           alt="Candidate"
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                         />
                       </div>
                     ))}

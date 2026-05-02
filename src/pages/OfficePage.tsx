@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../lib/utils";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import {
@@ -23,6 +24,7 @@ import {
   Globe,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import SEO from "../components/SEO";
 
 export default function OfficePage() {
   const [content, setContent] = useState<SiteContent | null>(null);
@@ -64,16 +66,17 @@ export default function OfficePage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#121212] pt-32 pb-20">
+      <SEO title="Our Office & Team - WorkInEU HR Portal" description="Visit our office in Dubai. Meet our expert team of recruiters and consultants." />
       {/* Hero Section with Office Photo */}
       <section className="relative h-[70vh] min-h-[600px] overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src={
+            src={getDirectImageUrl(
               content?.officeImageUrl ||
               "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1920"
-            }
+            )}
             alt="Our Office"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
             referrerPolicy="no-referrer"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-slate-900/40 via-slate-900/20 to-slate-900"></div>
@@ -221,12 +224,12 @@ export default function OfficePage() {
               >
                 <div className="relative aspect-[3/4] rounded-[3rem] overflow-hidden mb-8 shadow-xl group-hover:shadow-2xl transition-all duration-500">
                   <img
-                    src={
+                    src={getDirectImageUrl(
                       member.photoUrl ||
                       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400"
-                    }
+                    )}
                     alt={member.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-1000"
                     referrerPolicy="no-referrer"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>

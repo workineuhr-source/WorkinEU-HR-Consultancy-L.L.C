@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../lib/utils";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import SEO from "../components/SEO";
@@ -166,9 +167,9 @@ const Section = ({
                 className="relative rounded-[3rem] overflow-hidden shadow-2xl aspect-video lg:aspect-square"
               >
                 <img
-                  src={image}
+                  src={getDirectImageUrl(image)}
                   alt={title || "Section visual"}
-                  className="w-full h-full object-cover transition-transform duration-1000 hover:scale-105"
+                  className="w-full h-full object-contain transition-transform duration-1000 hover:scale-105"
                   referrerPolicy="no-referrer"
                   loading="lazy"
                 />
@@ -848,7 +849,7 @@ export default function HomePage() {
                   <AnimatePresence mode="wait">
                     <motion.img
                       key={currentHeroIndex}
-                      src={heroImages[currentHeroIndex]}
+                      src={getDirectImageUrl(heroImages[currentHeroIndex])}
                       alt="Professional recruitment"
                       initial={{ opacity: 0, scale: 1.1 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -881,26 +882,26 @@ export default function HomePage() {
                 </div>
 
                 {/* Floating Real-time Stats */}
-                <div className="absolute -bottom-6 -right-6 md:-bottom-8 md:-right-8 p-6 md:p-8 glass-card dark:glass-dark rounded-[2rem] shadow-2xl animate-float z-20">
-                  <p className="text-3xl md:text-4xl font-black text-brand-teal tracking-tighter">
+                <div className="absolute -bottom-4 -right-4 md:-bottom-6 md:-right-6 p-4 md:p-6 glass-card dark:glass-dark rounded-2xl md:rounded-[1.5rem] shadow-xl animate-float z-20 max-w-[140px] md:max-w-none">
+                  <p className="text-2xl md:text-3xl font-black text-brand-teal tracking-tighter leading-none mb-1">
                     {totalOpeningsDirect > 0
                       ? `${totalOpeningsDirect}+`
                       : content.stats?.[0]?.value || "500+"}
                   </p>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                  <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                     Live Openings
                   </p>
                 </div>
                 <div
-                  className="absolute -top-6 -left-6 md:-top-8 md:-left-8 p-6 md:p-8 glass-card dark:glass-dark rounded-[2rem] shadow-2xl animate-float z-20"
+                  className="absolute -top-4 -left-4 md:-top-6 md:-left-6 p-4 md:p-6 glass-card dark:glass-dark rounded-2xl md:rounded-[1.5rem] shadow-xl animate-float z-20 max-w-[140px] md:max-w-none"
                   style={{ animationDelay: "1s" }}
                 >
-                  <p className="text-3xl md:text-4xl font-black text-brand-rose tracking-tighter">
+                  <p className="text-2xl md:text-3xl font-black text-brand-rose tracking-tighter leading-none mb-1">
                     {totalCountriesDirect > 0
                       ? `${totalCountriesDirect} Countries`
                       : content.stats?.[1]?.value || "24+"}
                   </p>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                  <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                     Global Reach
                   </p>
                 </div>
@@ -1090,9 +1091,9 @@ export default function HomePage() {
                 >
                   <div className="h-72 overflow-hidden relative">
                     <img
-                      src={imgs[i % imgs.length]}
+                      src={getDirectImageUrl(imgs[i % imgs.length])}
                       alt={step.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 pointer-events-none"
+                      className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-1000 pointer-events-none"
                       referrerPolicy="no-referrer"
                     />
                     <div className="absolute inset-0 bg-slate-900/40 group-hover:bg-brand-teal/20 transition-colors duration-700"></div>
@@ -1142,8 +1143,8 @@ export default function HomePage() {
                 <div className="relative h-64 overflow-hidden">
                   {story.visaImageUrl && (
                     <img
-                      src={story.visaImageUrl}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                      src={getDirectImageUrl(story.visaImageUrl)}
+                      className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-1000"
                       referrerPolicy="no-referrer"
                     />
                   )}
@@ -1152,8 +1153,8 @@ export default function HomePage() {
                     <div className="w-16 h-16 rounded-2xl border-2 border-white overflow-hidden shadow-xl">
                       {story.candidatePhotoUrl && (
                         <img
-                          src={story.candidatePhotoUrl}
-                          className="w-full h-full object-cover"
+                          src={getDirectImageUrl(story.candidatePhotoUrl)}
+                          className="w-full h-full object-contain"
                           referrerPolicy="no-referrer"
                         />
                       )}
@@ -1393,12 +1394,12 @@ export default function HomePage() {
               className="relative rounded-[4rem] overflow-hidden shadow-premium aspect-[4/3] group"
             >
               <img
-                src={
+                src={getDirectImageUrl(
                   content.professionalHrSolutionsImageUrl ||
                   "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200"
-                }
+                )}
                 alt="Professional HR Solutions"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-1000"
                 referrerPolicy="no-referrer"
               />
               <div className="absolute inset-0 bg-gradient-to-tr from-brand-teal/20 to-transparent"></div>
@@ -1493,12 +1494,12 @@ export default function HomePage() {
             <div className="lg:col-span-4 lg:sticky lg:top-24">
               <div className="rounded-[4rem] overflow-hidden relative aspect-[3/4] shadow-2xl border-8 border-white dark:border-white/10 group">
                 <img
-                  src={
+                  src={getDirectImageUrl(
                     content.coreStrengthsImageUrl ||
                     "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800"
-                  }
+                  )}
                   alt="Expertise"
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                  className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-1000"
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
@@ -1579,9 +1580,9 @@ export default function HomePage() {
                               >
                                 <img
                                   referrerPolicy="no-referrer"
-                                  src={`https://i.pravatar.cc/100?u=partners-${i}`}
+                                  src={getDirectImageUrl(`https://i.pravatar.cc/100?u=partners-${i}`)}
                                   alt="Partner"
-                                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
+                                  className="w-full h-full object-contain grayscale hover:grayscale-0 transition-all duration-500"
                                 />
                               </div>
                             ))}
@@ -1604,12 +1605,12 @@ export default function HomePage() {
                       {/* Side Photo */}
                       <div className="relative h-[400px] md:h-full overflow-hidden border-x border-slate-100 dark:border-white/10 bg-slate-100 dark:bg-white/10">
                         <img
-                          src={
+                          src={getDirectImageUrl(
                             content.globalStandardsImageUrl ||
                             "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800"
-                          }
+                          )}
                           alt="WorkinEU Standards"
-                          className="w-full h-full object-cover grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-1000"
+                          className="w-full h-full object-contain grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-1000"
                           referrerPolicy="no-referrer"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/10 to-transparent"></div>
@@ -1640,7 +1641,7 @@ export default function HomePage() {
                                     className="flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-500 group/logo opacity-70 hover:opacity-100"
                                   >
                                     <img
-                                      src={p.logoUrl}
+                                      src={getDirectImageUrl(p.logoUrl)}
                                       alt={p.companyName}
                                       className="h-8 lg:h-10 w-auto object-contain drop-shadow-sm"
                                       referrerPolicy="no-referrer"
@@ -1662,7 +1663,7 @@ export default function HomePage() {
                                     className="flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-500 opacity-70 hover:opacity-100"
                                   >
                                     <img
-                                      src={p.logoUrl}
+                                      src={getDirectImageUrl(p.logoUrl)}
                                       alt={p.name}
                                       className="h-8 lg:h-10 w-auto object-contain drop-shadow-sm"
                                       referrerPolicy="no-referrer"
@@ -1754,9 +1755,9 @@ export default function HomePage() {
                 className="relative rounded-[5rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(15,23,42,0.3)] border-[16px] border-slate-50 aspect-[4/5] group perspective-1000"
               >
                 <img
-                  src="https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&q=80&w=1200"
+                  src={getDirectImageUrl("https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&q=80&w=1200")}
                   alt="Living in Europe"
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                  className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-1000"
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent"></div>
@@ -1821,7 +1822,7 @@ export default function HomePage() {
                 <div className="w-24 h-24 bg-slate-50 dark:bg-white/5 rounded-2xl flex items-center justify-center p-4 mb-6 group-hover:scale-110 transition-transform">
                   {client.logoUrl ? (
                     <img
-                      src={client.logoUrl}
+                      src={getDirectImageUrl(client.logoUrl)}
                       alt={client.companyName}
                       className="w-full h-full object-contain"
                       referrerPolicy="no-referrer"

@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../lib/utils";
 import { Link, useNavigate } from "react-router-dom";
 import { User, signOut } from "firebase/auth";
 import { auth, db } from "../firebase";
@@ -36,6 +37,7 @@ export default function Navbar({ user }: NavbarProps) {
   const [companyProfileUrl, setCompanyProfileUrl] = useState<string | null>(
     null,
   );
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
 
@@ -157,7 +159,7 @@ export default function Navbar({ user }: NavbarProps) {
             >
               <div className="w-12 h-12 bg-white dark:bg-[#121212] rounded-xl flex items-center justify-center shadow-2xl group-hover:rotate-6 transition-transform overflow-hidden">
                 <img
-                  src={logoUrl || "/logo.png"}
+                  src={getDirectImageUrl(logoUrl || "/logo.png")}
                   alt="WorkinEU HR"
                   className="w-full h-full object-contain p-1"
                   referrerPolicy="no-referrer"
@@ -252,9 +254,9 @@ export default function Navbar({ user }: NavbarProps) {
                     {!isAdmin && photoUrl && (
                       <div className="w-6 h-6 rounded-full overflow-hidden border border-slate-900/20">
                         <img
-                          src={photoUrl}
+                          src={getDirectImageUrl(photoUrl)}
                           alt="Profile"
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                           referrerPolicy="no-referrer"
                         />
                       </div>
@@ -293,7 +295,13 @@ export default function Navbar({ user }: NavbarProps) {
           </div>
 
           {/* Compact Mobile Navbar Actions */}
-          <div className="md:hidden flex items-center gap-4">
+          <div className="md:hidden flex items-center gap-3">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 pointer-events-auto"
+            >
+              {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
             {user ? (
               <Link
                 to={isAdmin ? "/admin" : "/candidate/dashboard"}
@@ -301,9 +309,9 @@ export default function Navbar({ user }: NavbarProps) {
               >
                 {photoUrl ? (
                   <img
-                    src={photoUrl}
+                    src={getDirectImageUrl(photoUrl)}
                     alt="Me"
-                    className="w-full h-full object-cover rounded-xl"
+                    className="w-full h-full object-contain rounded-xl"
                     referrerPolicy="no-referrer"
                   />
                 ) : (
@@ -313,14 +321,69 @@ export default function Navbar({ user }: NavbarProps) {
             ) : (
               <Link
                 to="/login"
-                className="bg-premium-gradient-animated text-white px-5 py-2 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-lg"
+                className="bg-premium-gradient-animated text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-lg"
               >
                 Login
               </Link>
             )}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-900 dark:text-white"
+            >
+              {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu Content */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden absolute top-full left-0 right-0 bg-white/95 dark:bg-slate-950/95 backdrop-blur-2xl border-b border-slate-200/50 dark:border-white/10 shadow-xl overflow-hidden"
+          >
+            <div className="px-6 py-6 flex flex-col gap-6">
+              {navLinks.map((link, i) =>
+                link.external ? (
+                  <a
+                    key={`mobile-${i}`}
+                    href={link.path}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-lg font-bold text-slate-900 dark:text-white uppercase tracking-widest"
+                  >
+                    {link.name}
+                  </a>
+                ) : (
+                  <Link
+                    key={`mobile-${i}`}
+                    to={link.path}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-lg font-bold text-slate-900 dark:text-white uppercase tracking-widest"
+                  >
+                    {link.name}
+                  </Link>
+                )
+              )}
+              {user && (
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="mt-4 flex items-center gap-3 text-red-500 font-bold uppercase tracking-widest text-lg"
+                >
+                  <LogOut size={20} /> Logout
+                </button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

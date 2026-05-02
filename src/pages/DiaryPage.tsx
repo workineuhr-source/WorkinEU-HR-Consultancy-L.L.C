@@ -6,6 +6,7 @@ import { DiaryPost } from "../types";
 import DiaryCard from "../components/DiaryCard";
 import { Loader2, Search, Filter } from "lucide-react";
 import BottomCTA from "../components/BottomCTA";
+import SEO from "../components/SEO";
 
 export default function DiaryPage() {
   const [posts, setPosts] = useState<DiaryPost[]>([]);
@@ -89,6 +90,7 @@ export default function DiaryPage() {
 
   return (
     <div className="min-h-screen bg-slate-50/50 pt-40 pb-32 relative overflow-hidden">
+      <SEO title="Our Diary | News & Success Stories - WorkInEU" description="Updates from WorkinEU. Read about our successful placements, visa updates, and agency news." />
       {/* Background elements */}
       <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-20 pointer-events-none"></div>
       <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-brand-gold/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2 animate-pulse"></div>

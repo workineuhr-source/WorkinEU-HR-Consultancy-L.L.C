@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../../lib/utils";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
@@ -626,9 +627,9 @@ export default function AdminCandidateDetail() {
                   {editingProfile.photoUrl ? (
                     <img
                       referrerPolicy="no-referrer"
-                      src={editingProfile.photoUrl}
+                      src={getDirectImageUrl(editingProfile.photoUrl)}
                       alt="Candidate"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   ) : (
                     (editingProfile.fullName || "C").charAt(0)
@@ -1878,22 +1879,27 @@ export default function AdminCandidateDetail() {
                 </label>
                 <div className="flex flex-col md:flex-row items-center justify-center gap-8">
                   <div className="bg-white px-8 py-4 rounded-3xl shadow-sm border border-green-100 flex items-center gap-4 max-w-full overflow-x-auto no-scrollbar">
-                    <select
-                      className="text-4xl font-black text-brand-blue outline-none bg-transparent cursor-pointer"
-                      value={editingProfile.paymentCurrency || "EUR"}
-                      onChange={(e) =>
-                        setEditingProfile({
-                          ...editingProfile,
-                          paymentCurrency: e.target.value as any,
-                        })
-                      }
-                    >
-                      <option value="EUR">€</option>
-                      <option value="NPR">Rs</option>
-                      <option value="INR">₹</option>
-                      <option value="AED">د.إ</option>
-                      <option value="USD">$</option>
-                    </select>
+                    <div className="flex flex-col items-center gap-1">
+                      <input
+                        list="payment-currency-options"
+                        className="text-2xl md:text-4xl font-black text-brand-blue outline-none bg-transparent cursor-text w-20 md:w-24 text-center border-b-2 border-transparent focus:border-brand-blue transition-colors"
+                        value={editingProfile.paymentCurrency || ""}
+                        onChange={(e) =>
+                          setEditingProfile({
+                            ...editingProfile,
+                            paymentCurrency: e.target.value,
+                          })
+                        }
+                        placeholder="EUR"
+                      />
+                      <datalist id="payment-currency-options">
+                        <option value="EUR">EUR (€)</option>
+                        <option value="NPR">NPR (Rs)</option>
+                        <option value="INR">INR (₹)</option>
+                        <option value="AED">AED (د.إ)</option>
+                        <option value="USD">USD ($)</option>
+                      </datalist>
+                    </div>
                     <input
                       type="text"
                       className="text-3xl md:text-5xl font-black text-brand-blue outline-none w-[150px] md:w-full min-w-[150px] bg-transparent flex-1"

@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../lib/utils";
 import { Link } from "react-router-dom";
 import {
   Facebook,
@@ -92,7 +93,7 @@ export default function Footer() {
               <div className="flex items-center gap-5">
                 <div className="w-16 h-16 bg-white dark:bg-[#121212] rounded-2xl flex items-center justify-center shadow-2xl group-hover:rotate-6 transition-transform overflow-hidden">
                   <img
-                    src={footerLogoUrl || logoUrl || "/logo.png"}
+                    src={getDirectImageUrl(footerLogoUrl || logoUrl || "/logo.png")}
                     alt="WorkinEU HR"
                     className="w-full h-full object-contain p-1"
                     referrerPolicy="no-referrer"

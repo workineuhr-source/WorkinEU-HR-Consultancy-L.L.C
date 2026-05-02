@@ -1,3 +1,4 @@
+import { getDirectImageUrl } from "../../lib/utils";
 import React, { useState, useEffect } from "react";
 import {
   Plus,
@@ -323,7 +324,7 @@ export default function AdminClients() {
                           {newClient.logoUrl && newClient.logoUrl !== "" ? (
                             <img
                               referrerPolicy="no-referrer"
-                              src={newClient.logoUrl}
+                              src={getDirectImageUrl(newClient.logoUrl)}
                               className="w-full h-full object-contain p-2"
                             />
                           ) : (
@@ -506,7 +507,7 @@ export default function AdminClients() {
                   {client.logoUrl && client.logoUrl !== "" ? (
                     <img
                       referrerPolicy="no-referrer"
-                      src={client.logoUrl}
+                      src={getDirectImageUrl(client.logoUrl)}
                       className="w-full h-full object-contain"
                     />
                   ) : (

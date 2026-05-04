@@ -315,7 +315,7 @@ export default function JobDetailsPage() {
                         Monthly Salary
                       </p>
                       <p className="text-3xl font-black text-brand-blue dark:text-brand-gold tracking-tighter">
-                        {job.currency || "€"} {job.maxSalary}
+                        {job.currency || "€"} {job.minSalary} - {job.maxSalary}
                       </p>
                     </div>
                     <div className="space-y-2">

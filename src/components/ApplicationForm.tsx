@@ -2,8 +2,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Job, Application, SiteContent, CandidateProfile } from "../types";
-import { collection, addDoc, doc, getDoc } from "firebase/firestore";
+import { collection, addDoc, doc, getDoc, setDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import {
@@ -36,6 +37,25 @@ const schema = z.object({
   appliedPosition: z.string().min(2, "Position is required"),
   appliedCountry: z.string().min(2, "Country is required"),
   coverLetter: z.string().optional(),
+  password: z.string().optional(),
+  confirmPassword: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (!auth.currentUser) {
+    if (!data.password || data.password.length < 6) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Password must be at least 6 characters",
+        path: ["password"],
+      });
+    }
+    if (data.password !== data.confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Passwords do not match",
+        path: ["confirmPassword"],
+      });
+    }
+  }
 });
 
 type FormData = z.infer<typeof schema>;
@@ -124,6 +144,8 @@ export default function ApplicationForm({
         "phone",
         "passportNumber",
         "nationality",
+        "password",
+        "confirmPassword"
       ];
     } else if (step === 2) {
       fieldsToValidate = [
@@ -272,6 +294,40 @@ export default function ApplicationForm({
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     try {
+      let uid = auth.currentUser?.uid;
+
+      if (!uid && data.password) {
+        try {
+          const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+          uid = userCredential.user.uid;
+          
+          const profile: Partial<CandidateProfile> = {
+            fullName: data.fullName,
+            email: data.email,
+            phone: data.phone,
+            passportNumber: data.passportNumber,
+            nationality: data.nationality,
+            experience: data.experience,
+            education: data.education,
+            appliedPosition: data.appliedPosition,
+            skills: skills,
+            documents: files,
+            createdAt: Date.now()
+          };
+          
+          await setDoc(doc(db, "candidates", uid), profile);
+        } catch (error: any) {
+          console.error("Error creating account:", error);
+          if (error.code === 'auth/email-already-in-use') {
+            toast.error("An account with this email already exists. Please log in first.");
+          } else {
+            toast.error("Failed to create account. Please try again.");
+          }
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       const application: Partial<Application> = {
         jobId: job.id,
         jobTitle: data.appliedPosition,
@@ -283,7 +339,7 @@ export default function ApplicationForm({
         skills,
         status: "pending",
         createdAt: Date.now(),
-        candidateUid: auth.currentUser?.uid,
+        candidateUid: uid,
       };
 
       await addDoc(collection(db, "applications"), application);
@@ -526,6 +582,43 @@ export default function ApplicationForm({
                   </p>
                 )}
               </div>
+
+              {!auth.currentUser && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-6">
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      {...register("password")}
+                      className="w-full px-10 py-6 rounded-[2rem] border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-brand-gold focus:ring-8 focus:ring-brand-gold/5 transition-all duration-500 text-slate-900 dark:text-white font-bold shadow-inner text-lg"
+                      placeholder="Min 6 characters"
+                    />
+                    {errors.password && (
+                      <p className="text-red-500 text-xs mt-2 font-bold ml-6 uppercase tracking-tighter">
+                        {errors.password.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-3">
+                    <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-6">
+                      Confirm Password
+                    </label>
+                    <input
+                      type="password"
+                      {...register("confirmPassword")}
+                      className="w-full px-10 py-6 rounded-[2rem] border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-brand-gold focus:ring-8 focus:ring-brand-gold/5 transition-all duration-500 text-slate-900 dark:text-white font-bold shadow-inner text-lg"
+                      placeholder="Confirm password"
+                    />
+                    {errors.confirmPassword && (
+                      <p className="text-red-500 text-xs mt-2 font-bold ml-6 uppercase tracking-tighter">
+                        {errors.confirmPassword.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
             </motion.div>
           )}
 

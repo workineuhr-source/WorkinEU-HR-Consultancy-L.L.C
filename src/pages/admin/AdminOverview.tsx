@@ -99,9 +99,6 @@ export default function AdminOverview() {
     totalMessages: 0,
     totalDiaryPosts: 0,
   });
-  const [recentApplications, setRecentApplications] = useState<Application[]>(
-    [],
-  );
   const [chartData, setChartData] = useState<any[]>([]);
   const [statusData, setStatusData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -111,6 +108,16 @@ export default function AdminOverview() {
     null,
   );
   const [recentAppsError, setRecentAppsError] = useState<string | null>(null);
+  const [allApplications, setAllApplications] = useState<Application[]>([]);
+  const [recentAppsStatusFilter, setRecentAppsStatusFilter] = useState("all");
+
+  const recentApplications = useMemo(() => {
+    let filtered = allApplications;
+    if (recentAppsStatusFilter !== "all") {
+      filtered = filtered.filter(app => app.status === recentAppsStatusFilter);
+    }
+    return filtered.slice(0, 5);
+  }, [allApplications, recentAppsStatusFilter]);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -149,13 +156,14 @@ export default function AdminOverview() {
         if (appsSnap) {
           const apps = (appsSnap as any).docs.map(
             (doc: any) => ({ id: doc.id, ...doc.data() }) as Application,
-          );
+          ).sort((a: Application, b: Application) => b.createdAt - a.createdAt);
+          setAllApplications(apps);
 
           setStats({
             totalJobs: jobsSnap.size,
             totalApplications: appsSnap.size,
             activeCandidates: candidatesSnap.size,
-            pendingApplications: apps.filter((a) => a.status === "pending")
+            pendingApplications: apps.filter((a: Application) => a.status === "pending")
               .length,
             totalMessages: messagesSnap.size,
             totalDiaryPosts: diarySnap.size,
@@ -212,21 +220,6 @@ export default function AdminOverview() {
           setStats((prev) => ({ ...prev, totalJobs: jobsSnap.size }));
         }
 
-        try {
-          const q = query(
-            collection(db, "applications"),
-            orderBy("createdAt", "desc"),
-            limit(5),
-          );
-          const recentSnap = await getDocs(q);
-          setRecentApplications(
-            recentSnap.docs.map(
-              (doc) => ({ id: doc.id, ...doc.data() }) as Application,
-            ),
-          );
-        } catch (err) {
-          setRecentAppsError("Failed to load recent applications");
-        }
       } catch (error: any) {
         console.error("Error fetching stats:", error);
         setErrorMessage(error.message || "Failed to fetch dashboard data.");
@@ -464,16 +457,28 @@ export default function AdminOverview() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Recent Applications */}
         <div className="lg:col-span-2 bg-white dark:bg-[#121212] rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-6 md:p-8 border-b border-gray-50 flex justify-between items-center">
+          <div className="p-6 md:p-8 border-b border-gray-50 flex justify-between items-center flex-wrap gap-4">
             <h3 className="text-lg md:text-xl font-bold text-brand-blue">
               Recent Applications
             </h3>
-            <Link
-              to="/admin/applications"
-              className="text-brand-gold font-bold text-xs md:text-sm flex items-center gap-1"
-            >
-              View All <ChevronRight size={16} />
-            </Link>
+            <div className="flex items-center gap-4">
+              <select
+                className="px-4 py-2 bg-gray-50 dark:bg-[#1f1f1f] text-brand-blue font-bold rounded-lg outline-none border border-gray-200 text-sm"
+                value={recentAppsStatusFilter}
+                onChange={(e) => setRecentAppsStatusFilter(e.target.value)}
+              >
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+              </select>
+              <Link
+                to="/admin/applications"
+                className="text-brand-gold font-bold text-xs md:text-sm flex items-center gap-1 whitespace-nowrap"
+              >
+                View All <ChevronRight size={16} />
+              </Link>
+            </div>
           </div>
           <div className="overflow-x-auto relative">
             {recentAppsError ? (

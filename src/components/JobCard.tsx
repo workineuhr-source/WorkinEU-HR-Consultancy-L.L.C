@@ -194,15 +194,22 @@ export default function JobCard({ job, onQuickApply }: JobCardProps) {
       </AnimatePresence>
 
       {job.imageUrl && (
-        <div className="h-40 md:h-48 w-full overflow-hidden relative shrink-0">
+        <Link to={`/jobs/${job.id}`} className="h-40 md:h-48 w-full overflow-hidden relative shrink-0 block cursor-pointer">
           <img
             src={getDirectImageUrl(job.imageUrl)}
             alt={job.title}
-            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-1000"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 bg-slate-100 dark:bg-slate-800"
             referrerPolicy="no-referrer"
             loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/90 via-[#121212]/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-700"></div>
+
+          {/* Apply Now Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 pointer-events-none">
+             <span className="bg-brand-gold text-slate-900 px-4 py-2 rounded-lg font-black uppercase tracking-wider text-xs shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+               View Details
+             </span>
+          </div>
 
           <div className="absolute bottom-4 left-4 flex flex-col gap-2 text-white z-10">
             <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full shadow-lg">
@@ -225,7 +232,7 @@ export default function JobCard({ job, onQuickApply }: JobCardProps) {
               </motion.div>
             )}
           </div>
-        </div>
+        </Link>
       )}
 
       <div className="p-5 md:p-6 flex flex-col flex-grow relative">
@@ -261,16 +268,18 @@ export default function JobCard({ job, onQuickApply }: JobCardProps) {
         </div>
 
         <div className="mb-4">
-          <h3
-            className={cn(
-              "text-xl md:text-2xl font-black transition-all leading-[1.15] tracking-tight font-sans mb-4 line-clamp-2",
-              isApproaching
-                ? "text-slate-900 dark:text-white group-hover:text-brand-rose"
-                : "text-slate-900 dark:text-white group-hover:text-brand-teal",
-            )}
-          >
-            {job.title}
-          </h3>
+          <Link to={`/jobs/${job.id}`} className="block block group/title">
+            <h3
+              className={cn(
+                "text-xl md:text-2xl font-black transition-all leading-[1.15] tracking-tight font-sans mb-4 line-clamp-2",
+                isApproaching
+                  ? "text-slate-900 dark:text-white group-hover/title:text-brand-rose"
+                  : "text-slate-900 dark:text-white group-hover/title:text-brand-teal",
+              )}
+            >
+              {job.title}
+            </h3>
+          </Link>
 
           <div className="flex flex-wrap gap-2 mb-4">
             <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200 text-[10px] font-bold uppercase tracking-[0.2em] bg-slate-50 dark:bg-white/5 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-white/5">

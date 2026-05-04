@@ -725,7 +725,8 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                 </label>
                 <input
                   required
-                  className="w-full px-4 py-2 md:py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all text-sm md:text-base"
+                  type="number"
+                  className="w-full px-4 py-2 md:py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all text-sm md:text-base dark:bg-slate-800 dark:border-white/10 dark:text-white"
                   value={formData.minSalary}
                   onChange={(e) =>
                     setFormData({ ...formData, minSalary: e.target.value })
@@ -739,7 +740,8 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                 </label>
                 <input
                   required
-                  className="w-full px-4 py-2 md:py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all text-sm md:text-base"
+                  type="number"
+                  className="w-full px-4 py-2 md:py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all text-sm md:text-base dark:bg-slate-800 dark:border-white/10 dark:text-white"
                   value={formData.maxSalary}
                   onChange={(e) =>
                     setFormData({ ...formData, maxSalary: e.target.value })

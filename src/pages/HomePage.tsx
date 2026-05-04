@@ -31,6 +31,8 @@ import {
   Calendar,
   Building2,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Send,
   FileSearch,
   UserPlus,
@@ -237,7 +239,6 @@ export default function HomePage() {
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [team, setTeam] = useState<TeamMember[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
   const [content, setContent] = useState<SiteContent>({
     heroTagline: "Connecting Talent Globally",
     heroTitle: "Human Resources Consultancies LLC",
@@ -628,23 +629,50 @@ export default function HomePage() {
     });
   }, [content.countries, jobCounts]);
 
-  const heroImages = useMemo(() => {
+  const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
+
+  const heroItems = useMemo(() => {
+    const items: { id: string; url: string; link?: string; title?: string; job?: Job }[] = [];
+    
+    // Admin configured images
     const urls = content.heroImageUrls || [];
-    return urls.filter((url) => url && url.trim() !== "").length > 0
-      ? urls.filter((url) => url && url.trim() !== "")
-      : [
+    const validUrls = urls.filter((url) => url && url.trim() !== "");
+    if (validUrls.length > 0) {
+      validUrls.forEach((url, i) => items.push({ id: `admin-${i}`, url }));
+    } else {
+      items.push({
+        id: "default-1",
+        url:
           content.heroImageUrl ||
-            "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=1200",
-        ];
-  }, [content.heroImageUrls, content.heroImageUrl]);
+          "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=1200",
+      });
+    }
+
+    // Job images
+    if (featuredJobs && featuredJobs.length > 0) {
+      featuredJobs.forEach((job) => {
+        if (job.imageUrl) {
+          items.push({
+            id: `job-${job.id}`,
+            url: job.imageUrl,
+            link: `/jobs/${job.id}`,
+            title: job.title,
+            job: job,
+          });
+        }
+      });
+    }
+
+    return items;
+  }, [content.heroImageUrls, content.heroImageUrl, featuredJobs]);
 
   useEffect(() => {
-    if (heroImages.length <= 1) return;
+    if (heroItems.length <= 1) return;
     const interval = setInterval(() => {
-      setCurrentHeroIndex((prev) => (prev + 1) % heroImages.length);
-    }, 6000); // 6 seconds per slide
+      setCurrentHeroIndex((prev) => (prev + 1) % heroItems.length);
+    }, 5000);
     return () => clearInterval(interval);
-  }, [heroImages.length]);
+  }, [heroItems.length]);
 
   const getFontClass = (font?: string) => {
     switch (font) {
@@ -708,10 +736,10 @@ export default function HomePage() {
     <div className="overflow-hidden bg-white dark:bg-[#121212]">
       <SEO title="Jobs in Europe for Nepalese | HR Recruitment Agency" />
       {/* Hero Section */}
-      <section className="relative min-h-[60vh] lg:min-h-[70vh] flex items-center pt-24 pb-12 overflow-hidden bg-white dark:bg-[#121212]">
+      <section className="relative min-h-[40vh] lg:min-h-[50vh] flex items-center pt-20 pb-8 overflow-hidden bg-white dark:bg-[#121212]">
         <div className="absolute inset-0 z-0">
-          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-brand-teal/5 rounded-full blur-[120px] -mr-96 -mt-96"></div>
-          <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-brand-rose/5 rounded-full blur-[120px] -ml-72 -mb-72"></div>
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-teal/5 rounded-full blur-[100px] -mr-96 -mt-96"></div>
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-brand-rose/5 rounded-full blur-[100px] -ml-72 -mb-72"></div>
           {/* Subtle World Map */}
           <div className="absolute inset-0 opacity-[0.05] dark:opacity-[0.1] pointer-events-none">
             <svg viewBox="0 0 1000 500" className="w-full h-full object-cover">
@@ -845,32 +873,95 @@ export default function HomePage() {
                 transition={{ duration: 1, delay: 0.2 }}
                 className="relative z-10"
               >
-                <div className="relative aspect-square lg:aspect-[4/5] max-w-[500px] lg:max-w-[650px] mx-auto rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white dark:border-[#121212] bg-slate-100 dark:bg-white/5">
-                  <AnimatePresence mode="wait">
-                    <motion.img
-                      key={currentHeroIndex}
-                      src={getDirectImageUrl(heroImages[currentHeroIndex])}
-                      alt="Professional recruitment"
-                      initial={{ opacity: 0, scale: 1.1 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 1.05 }}
-                      transition={{ duration: 1.2, ease: "easeOut" }}
-                      className="absolute inset-0 w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                      loading="lazy"
-                    />
+                <div className="relative h-[550px] sm:h-[650px] lg:h-[780px] max-w-[450px] lg:max-w-[550px] w-full mx-auto rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white dark:border-[#121212] bg-slate-50 dark:bg-white/5 group/slider">
+                  <AnimatePresence mode="popLayout" initial={false}>
+                    <motion.div
+                      key={`slide-${currentHeroIndex}`}
+                      initial={{ opacity: 0, x: 100 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -100 }}
+                      transition={{ duration: 0.6, ease: "circOut" }}
+                      className="absolute inset-0"
+                    >
+                      {heroItems[currentHeroIndex]?.link ? (
+                        <Link to={heroItems[currentHeroIndex].link!} className="absolute inset-0 block group/link">
+                          <img
+                            src={getDirectImageUrl(heroItems[currentHeroIndex].url)}
+                            alt={heroItems[currentHeroIndex].title || "Professional recruitment"}
+                            className="w-full h-full object-cover bg-slate-100 dark:bg-[#121212]"
+                            referrerPolicy="no-referrer"
+                            loading="eager"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent pointer-events-none"></div>
+                          {heroItems[currentHeroIndex]?.job && (
+                            <div className="absolute bottom-[4.5rem] left-6 right-6 text-white pointer-events-none">
+                              <h3 className="text-xl sm:text-2xl font-black mb-2 leading-tight drop-shadow-md line-clamp-2">
+                                {heroItems[currentHeroIndex].job?.title}
+                              </h3>
+                              <div className="flex flex-wrap gap-2 text-xs sm:text-sm font-medium opacity-90">
+                                 <span className="bg-white/20 backdrop-blur-sm px-2 py-1 rounded-md border border-white/10">{heroItems[currentHeroIndex].job?.country}</span>
+                                 <span className="bg-white/20 backdrop-blur-sm px-2 py-1 rounded-md border border-white/10">{heroItems[currentHeroIndex].job?.experience} Exp</span>
+                                 {heroItems[currentHeroIndex].job?.salary && (
+                                   <span className="bg-brand-teal/80 backdrop-blur-sm px-2 py-1 rounded-md text-white border border-brand-teal/20">{heroItems[currentHeroIndex].job?.salary}</span>
+                                 )}
+                              </div>
+                            </div>
+                          )}
+                          {/* Interactive overlay on hover */}
+                          <div className="absolute inset-0 bg-black/0 group-hover/link:bg-black/20 transition-colors duration-300 flex items-center justify-center pointer-events-none group-hover/link:pointer-events-auto z-10">
+                            <span className="opacity-0 group-hover/link:opacity-100 bg-brand-gold text-slate-900 px-6 py-3 rounded-xl font-bold uppercase tracking-wider transform translate-y-4 group-hover/link:translate-y-0 transition-all duration-300 shadow-xl">
+                              View {heroItems[currentHeroIndex].job?.title || heroItems[currentHeroIndex].title || "Details"}
+                            </span>
+                          </div>
+                        </Link>
+                      ) : (
+                        <div className="absolute inset-0">
+                           <img
+                             src={getDirectImageUrl(heroItems[currentHeroIndex]?.url)}
+                             alt="Professional recruitment"
+                             className="w-full h-full object-cover bg-slate-100 dark:bg-[#121212]"
+                             referrerPolicy="no-referrer"
+                             loading="eager"
+                           />
+                           <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/40 to-transparent pointer-events-none"></div>
+                        </div>
+                      )}
+                    </motion.div>
                   </AnimatePresence>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/40 to-transparent pointer-events-none"></div>
+
+                  {/* Next / Prev Arrows */}
+                  {heroItems.length > 1 && (
+                    <>
+                      <button 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentHeroIndex((prev) => (prev - 1 + heroItems.length) % heroItems.length);
+                        }}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-md flex items-center justify-center text-white opacity-0 group-hover/slider:opacity-100 transition-opacity z-20 cursor-pointer shadow-lg border border-white/20"
+                      >
+                        <ChevronLeft size={24} />
+                      </button>
+                      <button 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentHeroIndex((prev) => (prev + 1) % heroItems.length);
+                        }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-md flex items-center justify-center text-white opacity-0 group-hover/slider:opacity-100 transition-opacity z-20 cursor-pointer shadow-lg border border-white/20"
+                      >
+                        <ChevronRight size={24} />
+                      </button>
+                    </>
+                  )}
 
                   {/* Slider Indicators */}
-                  {heroImages.length > 1 && (
-                    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-3 z-30">
-                      {heroImages.map((_, i) => (
+                  {heroItems.length > 1 && (
+                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-30 flex-wrap justify-center max-w-[90%]">
+                      {heroItems.map((_, i) => (
                         <button
                           key={i}
                           onClick={() => setCurrentHeroIndex(i)}
                           className={cn(
-                            "h-1.5 transition-all duration-500 rounded-full",
+                            "h-1.5 transition-all duration-500 rounded-full shadow-sm",
                             currentHeroIndex === i
                               ? "w-8 bg-brand-teal"
                               : "w-1.5 bg-white/40 hover:bg-white/70",

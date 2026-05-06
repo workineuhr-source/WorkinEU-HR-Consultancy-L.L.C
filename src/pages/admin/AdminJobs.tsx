@@ -324,6 +324,9 @@ interface JobModalProps {
 }
 
 function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
+  const [activeDetailsTab, setActiveDetailsTab] = useState<
+    "description" | "responsibilities" | "requirements"
+  >("description");
   const [activePricingTab, setActivePricingTab] = useState<
     "Nepal" | "Gulf" | "Europe"
   >("Nepal");
@@ -1197,92 +1200,131 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
             </label>
           </div>
 
-          <div>
-            <label className="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">
-              Job Description
-            </label>
-            <textarea
-              required
-              rows={6}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all"
-              value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-              placeholder="Detailed description of the job role..."
-            ></textarea>
-          </div>
-
-          {/* Responsibilities */}
-          <div>
-            <div className="flex justify-between items-center mb-4">
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-200">
-                Responsibilities
-              </label>
-              <button
-                type="button"
-                onClick={() => addArrayItem("responsibilities")}
-                className="text-brand-gold font-bold text-sm flex items-center gap-1"
-              >
-                <Plus size={16} /> Add More
-              </button>
-            </div>
-            <div className="space-y-4">
-              {formData.responsibilities?.map((item, i) => (
-                <div key={i} className="flex gap-2">
-                  <input
-                    className="flex-grow px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold transition-all"
-                    value={item}
-                    onChange={(e) =>
-                      handleArrayChange("responsibilities", i, e.target.value)
-                    }
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeArrayItem("responsibilities", i)}
-                    className="p-2 text-red-400 hover:bg-red-50 rounded-lg"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
+          <div className="bg-slate-50 dark:bg-[#1f1f1f] rounded-2xl p-4 border border-slate-100 dark:border-white/5">
+            <div className="flex flex-wrap gap-2 mb-6">
+              {[
+                { id: "description", label: "Description" },
+                { id: "responsibilities", label: "Responsibilities" },
+                { id: "requirements", label: "Requirements" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveDetailsTab(tab.id as any)}
+                  className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+                    activeDetailsTab === tab.id
+                      ? "bg-brand-blue text-white shadow-md"
+                      : "bg-white dark:bg-[#2a2a2a] text-slate-500 hover:text-brand-blue border border-slate-200 dark:border-white/10"
+                  }`}
+                >
+                  {tab.label}
+                </button>
               ))}
             </div>
-          </div>
 
-          {/* Requirements */}
-          <div>
-            <div className="flex justify-between items-center mb-4">
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-200">
-                Requirements
-              </label>
-              <button
-                type="button"
-                onClick={() => addArrayItem("requirements")}
-                className="text-brand-gold font-bold text-sm flex items-center gap-1"
-              >
-                <Plus size={16} /> Add More
-              </button>
-            </div>
-            <div className="space-y-4">
-              {formData.requirements?.map((item, i) => (
-                <div key={i} className="flex gap-2">
-                  <input
-                    className="flex-grow px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold transition-all"
-                    value={item}
-                    onChange={(e) =>
-                      handleArrayChange("requirements", i, e.target.value)
-                    }
-                  />
+            {activeDetailsTab === "description" && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">
+                  Job Description
+                </label>
+                <textarea
+                  required
+                  rows={8}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all dark:bg-slate-800 dark:border-white/10 dark:text-white"
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                  placeholder="Detailed description of the job role..."
+                ></textarea>
+              </motion.div>
+            )}
+
+            {activeDetailsTab === "responsibilities" && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <div className="flex justify-between items-center mb-4">
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-200">
+                    Responsibilities
+                  </label>
                   <button
                     type="button"
-                    onClick={() => removeArrayItem("requirements", i)}
-                    className="p-2 text-red-400 hover:bg-red-50 rounded-lg"
+                    onClick={() => addArrayItem("responsibilities")}
+                    className="text-brand-gold font-bold text-sm flex items-center gap-1 bg-white dark:bg-[#2a2a2a] px-3 py-1.5 rounded-lg border border-brand-gold/20 hover:bg-brand-gold/10 transition-colors"
                   >
-                    <Trash2 size={18} />
+                    <Plus size={16} /> Add More
                   </button>
                 </div>
-              ))}
-            </div>
+                <div className="space-y-4">
+                  {formData.responsibilities?.map((item, i) => (
+                    <div key={i} className="flex gap-2">
+                      <input
+                        className="flex-grow px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold transition-all dark:bg-slate-800 dark:border-white/10 dark:text-white"
+                        value={item}
+                        onChange={(e) =>
+                          handleArrayChange("responsibilities", i, e.target.value)
+                        }
+                        placeholder={`Responsibility ${i + 1}`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeArrayItem("responsibilities", i)}
+                        className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors border border-transparent hover:border-red-200"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  ))}
+                  {(!formData.responsibilities || formData.responsibilities.length === 0) && (
+                    <div className="text-center py-8 text-slate-400 bg-white/50 dark:bg-black/20 rounded-xl border border-dashed border-slate-200 dark:border-white/10">
+                      No responsibilities added yet
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
+            {activeDetailsTab === "requirements" && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <div className="flex justify-between items-center mb-4">
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-200">
+                    Requirements
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => addArrayItem("requirements")}
+                    className="text-brand-gold font-bold text-sm flex items-center gap-1 bg-white dark:bg-[#2a2a2a] px-3 py-1.5 rounded-lg border border-brand-gold/20 hover:bg-brand-gold/10 transition-colors"
+                  >
+                    <Plus size={16} /> Add More
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  {formData.requirements?.map((item, i) => (
+                    <div key={i} className="flex gap-2">
+                      <input
+                        className="flex-grow px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold transition-all dark:bg-slate-800 dark:border-white/10 dark:text-white"
+                        value={item}
+                        onChange={(e) =>
+                          handleArrayChange("requirements", i, e.target.value)
+                        }
+                        placeholder={`Requirement ${i + 1}`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeArrayItem("requirements", i)}
+                        className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors border border-transparent hover:border-red-200"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  ))}
+                  {(!formData.requirements || formData.requirements.length === 0) && (
+                    <div className="text-center py-8 text-slate-400 bg-white/50 dark:bg-black/20 rounded-xl border border-dashed border-slate-200 dark:border-white/10">
+                      No requirements added yet
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
           </div>
 
           {/* Required Documents */}

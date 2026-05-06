@@ -503,17 +503,17 @@ export default function AdminSystemSettings() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white w-full max-w-4xl rounded-[4rem] shadow-2xl relative z-10 overflow-hidden flex flex-col md:flex-row"
+              className="bg-white dark:bg-slate-900 w-full max-w-4xl rounded-[4rem] shadow-2xl relative z-10 overflow-hidden flex flex-col md:flex-row"
             >
-              <div className="w-full md:w-[40%] bg-slate-950 p-12 text-white flex flex-col justify-between">
+              <div className="w-full md:w-[40%] bg-white dark:bg-slate-900 p-12 flex flex-col justify-between border-r border-slate-100 dark:border-white/5">
                 <div>
-                  <div className="w-16 h-16 bg-brand-gold rounded-2xl flex items-center justify-center text-slate-950 mb-8">
+                  <div className="w-16 h-16 bg-brand-gold/10 text-brand-gold rounded-2xl flex items-center justify-center mb-8">
                     <Plus size={32} />
                   </div>
-                  <h2 className="text-4xl font-black tracking-tight uppercase italic mb-6 leading-tight">
+                  <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight uppercase italic mb-6 leading-tight">
                     Provision New Node
                   </h2>
-                  <p className="text-slate-400 font-bold text-xs uppercase tracking-widest leading-relaxed">
+                  <p className="text-slate-500 dark:text-slate-400 font-bold text-xs uppercase tracking-widest leading-relaxed">
                     Extend the intelligence cluster by adding a new provider
                     endpoint to the configuration stack.
                   </p>
@@ -536,7 +536,7 @@ export default function AdminSystemSettings() {
                     </label>
                     <input
                       type="text"
-                      className="w-full px-8 py-5 rounded-3xl border border-slate-100 bg-slate-50 dark:bg-white/5 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold placeholder:text-slate-300"
+                      className="w-full px-8 py-5 rounded-3xl border border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/5 outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-brand-gold transition-all text-sm font-bold placeholder:text-slate-300 dark:text-white"
                       placeholder="e.g., Gemini-1.5-Production"
                       value={newConfig.label}
                       onChange={(e) =>
@@ -559,8 +559,8 @@ export default function AdminSystemSettings() {
                           className={cn(
                             "py-4 rounded-2xl border-2 font-black text-[10px] uppercase tracking-widest transition-all",
                             newConfig.provider === p
-                              ? "bg-slate-950 text-white border-slate-950"
-                              : "bg-slate-50 border-transparent text-slate-400",
+                              ? "bg-slate-950 dark:bg-brand-gold text-white dark:text-slate-950 border-slate-950 dark:border-brand-gold"
+                              : "bg-slate-50 dark:bg-white/5 border-transparent text-slate-400 dark:text-slate-500",
                           )}
                         >
                           {p}
@@ -575,7 +575,7 @@ export default function AdminSystemSettings() {
                     </label>
                     <input
                       type="password"
-                      className="w-full px-8 py-5 rounded-3xl border border-slate-100 bg-slate-50 dark:bg-white/5 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold"
+                      className="w-full px-8 py-5 rounded-3xl border border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/5 outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-brand-gold transition-all text-sm font-bold dark:text-white"
                       placeholder="Enter credentials..."
                       value={newConfig.apiKey}
                       onChange={(e) =>
@@ -591,7 +591,7 @@ export default function AdminSystemSettings() {
                       </label>
                       <input
                         type="text"
-                        className="w-full px-8 py-5 rounded-3xl border border-slate-100 bg-slate-50 dark:bg-white/5 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold"
+                        className="w-full px-8 py-5 rounded-3xl border border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/5 outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-brand-gold transition-all text-sm font-bold placeholder:text-slate-300 dark:text-white"
                         placeholder="e.g. gemini-1.5-flash"
                         value={newConfig.modelName}
                         onChange={(e) =>
@@ -609,7 +609,7 @@ export default function AdminSystemSettings() {
                         </label>
                         <input
                           type="text"
-                          className="w-full px-8 py-5 rounded-3xl border border-slate-100 bg-slate-50 dark:bg-white/5 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm font-bold"
+                          className="w-full px-8 py-5 rounded-3xl border border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/5 outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-brand-gold transition-all text-sm font-bold placeholder:text-slate-300 dark:text-white"
                           placeholder="https://apiUrl.com/v1"
                           value={newConfig.endpoint}
                           onChange={(e) =>
@@ -627,13 +627,13 @@ export default function AdminSystemSettings() {
                 <div className="flex gap-4 pt-8">
                   <button
                     onClick={() => setIsAddingNew(false)}
-                    className="flex-grow py-5 rounded-3xl font-black text-[10px] uppercase tracking-widest text-slate-400 hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100"
+                    className="flex-grow py-5 rounded-3xl font-black text-[10px] uppercase tracking-widest text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-all border border-transparent hover:border-slate-100 dark:hover:border-white/10"
                   >
                     Abort Operation
                   </button>
                   <button
                     onClick={addConfig}
-                    className="flex-grow bg-slate-950 text-white py-5 rounded-3xl font-black text-[10px] uppercase tracking-widest hover:bg-brand-gold hover:text-slate-950 transition-all shadow-2xl shadow-slate-950/20 active:scale-95"
+                    className="flex-grow bg-slate-950 dark:bg-brand-gold text-white dark:text-slate-950 py-5 rounded-3xl font-black text-[10px] uppercase tracking-widest hover:bg-brand-gold dark:hover:bg-white hover:text-slate-950 transition-all shadow-2xl shadow-slate-950/20 active:scale-95"
                   >
                     Commit Node to Cluster
                   </button>

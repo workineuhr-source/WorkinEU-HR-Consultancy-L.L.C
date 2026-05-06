@@ -496,9 +496,9 @@ export default function JobDetailsPage() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className="prose prose-slate dark:prose-invert max-w-none"
+                      className="prose prose-slate dark:prose-invert max-w-none prose-p:text-slate-600 dark:prose-p:text-slate-300 prose-headings:text-slate-900 dark:prose-headings:text-white prose-strong:text-slate-900 dark:prose-strong:text-white prose-ul:text-slate-600 dark:prose-ul:text-slate-300 prose-li:text-slate-600 dark:prose-li:text-slate-300 prose-a:text-brand-blue dark:prose-a:text-brand-gold"
                     >
-                      <div className="text-lg text-slate-800 dark:text-slate-200 leading-relaxed font-light">
+                      <div className="text-lg leading-relaxed font-light">
                         <Markdown>{job.description}</Markdown>
                       </div>
                     </motion.div>
@@ -515,12 +515,12 @@ export default function JobDetailsPage() {
                         {job.responsibilities.map((item, i) => (
                           <li
                             key={i}
-                            className="flex items-start gap-4 p-5 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5 group hover:border-brand-gold transition-colors"
+                            className="flex items-start gap-4 p-5 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-white/10 group hover:border-brand-gold transition-colors"
                           >
                             <div className="w-8 h-8 bg-brand-gold/10 text-brand-gold rounded-lg flex items-center justify-center shrink-0">
                               <CheckCircle2 size={16} />
                             </div>
-                            <span className="text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
+                            <span className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
                               <Markdown>{item}</Markdown>
                             </span>
                           </li>
@@ -540,12 +540,12 @@ export default function JobDetailsPage() {
                         {job.requirements.map((item, i) => (
                           <li
                             key={i}
-                            className="flex items-start gap-4 p-5 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5 group hover:border-brand-gold transition-colors"
+                            className="flex items-start gap-4 p-5 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-white/10 group hover:border-brand-gold transition-colors"
                           >
                             <div className="w-8 h-8 bg-brand-gold/10 text-brand-gold rounded-lg flex items-center justify-center shrink-0">
                               <CheckCircle2 size={16} />
                             </div>
-                            <span className="text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
+                            <span className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
                               <Markdown>{item}</Markdown>
                             </span>
                           </li>

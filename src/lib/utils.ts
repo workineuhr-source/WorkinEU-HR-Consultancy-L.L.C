@@ -29,6 +29,22 @@ export function getDirectImageUrl(url: string | undefined | null): string {
         return `https://i.imgur.com/${match[1]}.jpg`;
       }
     }
+
+    // Proxy for external URLs (not Firebase storage or Unsplash)
+    // Helps bypass basic CORS and hotlinking restrictions (like FB, LinkedIn, etc.)
+    if (
+      url.startsWith("http") && 
+      !url.includes("firebasestorage.googleapis.com") &&
+      !url.includes("unsplash.com") &&
+      !url.includes("drive.google.com") &&
+      !url.includes("dropbox") &&
+      !url.includes("imgur.com") &&
+      !url.includes("pravatar.cc") &&
+      !url.includes("flagcdn.com")
+    ) {
+      // images.weserv.nl is a free caching image proxy
+      return `https://images.weserv.nl/?url=${encodeURIComponent(url)}`;
+    }
   } catch (error) {
     console.error("Error formatting image URL:", error);
   }

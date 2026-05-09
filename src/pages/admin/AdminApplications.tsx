@@ -619,7 +619,7 @@ export default function AdminApplications() {
                         Nationality
                       </p>
                       <p className="text-sm md:text-base font-medium">
-                        {selectedApp.nationality}
+                        {selectedApp.nationality} {selectedApp.gender ? `(${selectedApp.gender})` : ''}
                       </p>
                     </div>
                     <div>

@@ -33,6 +33,7 @@ const schema = z.object({
   phone: z.string().min(10, "Phone number is required"),
   passportNumber: z.string().min(5, "Passport number is required"),
   nationality: z.string().min(2, "Nationality is required"),
+  gender: z.string().min(1, "Gender is required").optional(),
   experience: z.string().min(1, "Experience is required"),
   education: z.string().min(1, "Education is required"),
   appliedPosition: z.string().min(2, "Position is required"),
@@ -146,6 +147,7 @@ export default function ApplicationForm({
         "phone",
         "passportNumber",
         "nationality",
+        "gender",
         "password",
         "confirmPassword"
       ];
@@ -209,6 +211,8 @@ export default function ApplicationForm({
       setValue("passportNumber", candidateProfile.passportNumber);
     if (candidateProfile.nationality)
       setValue("nationality", candidateProfile.nationality);
+    if (candidateProfile.gender)
+      setValue("gender", candidateProfile.gender);
     if (candidateProfile.experience)
       setValue("experience", candidateProfile.experience);
     if (candidateProfile.education)
@@ -235,6 +239,7 @@ export default function ApplicationForm({
       "phone",
       "passportNumber",
       "nationality",
+      "gender",
       "experience",
       "education",
     ]);
@@ -341,6 +346,7 @@ export default function ApplicationForm({
             phone: data.phone,
             passportNumber: data.passportNumber,
             nationality: data.nationality,
+            gender: data.gender,
             experience: data.experience,
             education: data.education,
             skills: skills,
@@ -594,26 +600,48 @@ export default function ApplicationForm({
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-6">
-                  Nationality
-                </label>
-                <input
-                  {...register("nationality")}
-                  list="applicant-countries"
-                  className="w-full px-10 py-6 rounded-[2rem] border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-brand-gold focus:ring-8 focus:ring-brand-gold/5 transition-all duration-500 text-slate-900 dark:text-white font-bold shadow-inner text-lg"
-                  placeholder="e.g. Nepal"
-                />
-                <datalist id="applicant-countries">
-                  {countries.map((c) => (
-                    <option key={c} value={c} />
-                  ))}
-                </datalist>
-                {errors.nationality && (
-                  <p className="text-red-500 text-xs mt-2 font-bold ml-6 uppercase tracking-tighter">
-                    {errors.nationality.message}
-                  </p>
-                )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-3">
+                  <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-6">
+                    Nationality
+                  </label>
+                  <input
+                    {...register("nationality")}
+                    list="applicant-countries"
+                    className="w-full px-10 py-6 rounded-[2rem] border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-brand-gold focus:ring-8 focus:ring-brand-gold/5 transition-all duration-500 text-slate-900 dark:text-white font-bold shadow-inner text-lg"
+                    placeholder="e.g. Nepal"
+                  />
+                  <datalist id="applicant-countries">
+                    {countries.map((c) => (
+                      <option key={c} value={c} />
+                    ))}
+                  </datalist>
+                  {errors.nationality && (
+                    <p className="text-red-500 text-xs mt-2 font-bold ml-6 uppercase tracking-tighter">
+                      {errors.nationality.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-6">
+                    Gender
+                  </label>
+                  <select
+                    {...register("gender")}
+                    className="w-full px-10 py-6 rounded-[2rem] border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-brand-gold focus:ring-8 focus:ring-brand-gold/5 transition-all duration-500 text-slate-900 dark:text-white font-bold shadow-inner text-lg appearance-none"
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  {errors.gender && (
+                    <p className="text-red-500 text-xs mt-2 font-bold ml-6 uppercase tracking-tighter">
+                      {errors.gender.message}
+                    </p>
+                  )}
+                </div>
               </div>
 
               {!auth.currentUser && (

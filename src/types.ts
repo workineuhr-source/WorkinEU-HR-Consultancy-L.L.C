@@ -61,6 +61,7 @@ export interface Application {
   phone: string;
   passportNumber: string;
   nationality?: string;
+  gender?: string;
   experience: string;
   education: string;
   coverLetter: string;

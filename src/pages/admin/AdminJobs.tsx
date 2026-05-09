@@ -241,7 +241,7 @@ export default function AdminJobs() {
                     <span className="text-xs md:text-sm font-medium">
                       Vacancies: {job.vacancies || "-"}
                       {job.vacanciesMale || job.vacanciesFemale
-                        ? ` (M: ${job.vacanciesMale || 0}, F: ${job.vacanciesFemale || 0})`
+                        ? ` (Male: ${job.vacanciesMale || 0}, Female: ${job.vacanciesFemale || 0})`
                         : ""}
                     </span>
                   </div>

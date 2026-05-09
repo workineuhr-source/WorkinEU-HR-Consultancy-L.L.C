@@ -5,6 +5,7 @@ import { Job, Application, SiteContent, CandidateProfile } from "../types";
 import { collection, addDoc, doc, getDoc, setDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import {
@@ -24,7 +25,7 @@ import {
   COUNTRIES,
   JOB_POSITIONS as DEFAULT_JOB_POSITIONS,
 } from "../constants";
-import { cn } from "../lib/utils";
+import { cn, getDirectImageUrl } from "../lib/utils";
 
 const schema = z.object({
   fullName: z.string().min(3, "Full name is required"),
@@ -106,8 +107,9 @@ export default function ApplicationForm({
 }: ApplicationFormProps) {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [files, setFiles] = useState<
-    { name: string; type: string; url: string }[]
+    { name: string; type: string; url: string; uploadedAt: number }[]
   >([]);
   const [skills, setSkills] = useState<{ name: string; level: string }[]>([]);
   const [newSkill, setNewSkill] = useState("");
@@ -221,6 +223,7 @@ export default function ApplicationForm({
         name: d.name,
         type: d.type,
         url: d.url,
+        uploadedAt: d.uploadedAt || Date.now()
       }));
       setFiles(profileDocs);
     }
@@ -262,14 +265,45 @@ export default function ApplicationForm({
     fetchSettings();
   }, []);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const newFiles = Array.from(e.target.files).map((file) => ({
-        name: file.name,
-        type: file.type,
-        url: URL.createObjectURL(file), // Mock URL for demo
-      }));
-      setFiles([...files, ...newFiles]);
+      const selectedFiles = Array.from(e.target.files);
+      if (selectedFiles.length === 0) return;
+
+      setIsUploading(true);
+      const newFiles = [];
+      const storage = getStorage();
+
+      try {
+        for (const file of selectedFiles) {
+          if (file.size > 5 * 1024 * 1024) {
+            toast.error(`File ${file.name} is too large (max 5MB)`);
+            continue;
+          }
+          
+          let userId = auth.currentUser?.uid;
+          const storageRef = ref(storage, `applications/${userId || 'guest'}-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '')}`);
+          await uploadBytes(storageRef, file);
+          const url = await getDownloadURL(storageRef);
+          
+          newFiles.push({
+            name: file.name,
+            type: file.type,
+            url: url,
+            uploadedAt: Date.now()
+          });
+        }
+
+        if (newFiles.length > 0) {
+          setFiles((prev) => [...prev, ...newFiles]);
+          toast.success(`${newFiles.length} file(s) uploaded successfully`);
+        }
+      } catch (error) {
+        console.error("Error uploading files:", error);
+        toast.error("Failed to upload files. Please try again.");
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
@@ -309,7 +343,6 @@ export default function ApplicationForm({
             nationality: data.nationality,
             experience: data.experience,
             education: data.education,
-            appliedPosition: data.appliedPosition,
             skills: skills,
             documents: files,
             createdAt: Date.now()
@@ -845,18 +878,22 @@ export default function ApplicationForm({
                       animate={{ opacity: 1, scale: 1 }}
                       className="flex items-center justify-between bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-white/10 shadow-sm group hover:border-brand-gold transition-all"
                     >
-                      <div className="flex items-center gap-4 overflow-hidden">
-                        <div className="w-12 h-12 bg-slate-50 dark:bg-slate-700 text-slate-400 dark:text-slate-500 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-brand-gold group-hover:text-white transition-all">
-                          <FileText size={24} />
+                      <a href={getDirectImageUrl(file.url)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 overflow-hidden flex-1 group-hover:opacity-80 transition-opacity">
+                        <div className="w-12 h-12 bg-slate-50 dark:bg-slate-700 text-slate-400 dark:text-slate-500 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-brand-gold group-hover:text-white transition-all overflow-hidden">
+                          {file.type?.startsWith("image/") ? (
+                            <img src={getDirectImageUrl(file.url)} alt={file.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <FileText size={24} />
+                          )}
                         </div>
                         <span className="text-sm font-bold text-slate-900 dark:text-white truncate">
                           {file.name}
                         </span>
-                      </div>
+                      </a>
                       <button
                         type="button"
                         onClick={() => removeFile(i)}
-                        className="w-10 h-10 rounded-full hover:bg-red-50 dark:hover:bg-red-500/10 text-slate-300 hover:text-red-500 transition-all flex items-center justify-center"
+                        className="w-10 h-10 rounded-full hover:bg-red-50 dark:hover:bg-red-500/10 text-slate-300 hover:text-red-500 transition-all flex items-center justify-center ml-2 shrink-0"
                       >
                         <X size={20} />
                       </button>
@@ -864,13 +901,17 @@ export default function ApplicationForm({
                   ))}
                 </div>
 
-                <label className="flex flex-col items-center justify-center w-full h-56 border-4 border-dashed border-slate-100 dark:border-white/5 rounded-[4rem] cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 hover:border-brand-gold transition-all duration-700 group relative overflow-hidden">
+                <label className={`flex flex-col items-center justify-center w-full h-56 border-4 border-dashed rounded-[4rem] transition-all duration-700 relative overflow-hidden ${isUploading ? 'border-brand-gold/50 bg-brand-gold/5 cursor-wait' : 'border-slate-100 dark:border-white/5 cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 hover:border-brand-gold group'}`}>
                   <div className="flex flex-col items-center justify-center pt-5 pb-6 relative z-10">
                     <div className="w-20 h-20 bg-slate-50 dark:bg-slate-700 text-slate-300 dark:text-slate-500 rounded-3xl flex items-center justify-center mb-6 group-hover:bg-brand-gold group-hover:text-white transition-all duration-700 shadow-inner group-hover:rotate-12 group-hover:scale-110">
-                      <Upload size={36} />
+                      {isUploading ? (
+                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brand-gold"></div>
+                      ) : (
+                        <Upload size={36} />
+                      )}
                     </div>
                     <p className="text-sm text-slate-400 dark:text-slate-500 font-bold uppercase tracking-[0.3em] mb-2">
-                      Upload Files
+                       {isUploading ? "Uploading..." : "Upload Files"}
                     </p>
                     <p className="text-xs text-slate-300 dark:text-slate-500 font-medium">
                       PDF, PNG, JPG (Max 5MB each)
@@ -882,6 +923,7 @@ export default function ApplicationForm({
                     multiple
                     onChange={handleFileChange}
                     accept=".pdf,.png,.jpg,.jpeg"
+                    disabled={isUploading}
                   />
                 </label>
               </div>
@@ -918,7 +960,7 @@ export default function ApplicationForm({
               whileHover={{ scale: 1.02, y: -5 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isUploading}
               className="flex-[2] btn-premium bg-brand-blue dark:bg-brand-gold text-white dark:text-brand-blue py-6 rounded-[2rem] font-bold text-xl shadow-2xl flex items-center justify-center gap-4 disabled:opacity-70"
             >
               {isSubmitting ? (

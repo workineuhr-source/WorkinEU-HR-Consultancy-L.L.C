@@ -141,6 +141,22 @@ export default function AdminJobs() {
         </button>
       </div>
 
+      {!loading && (
+        <div className="bg-white dark:bg-[#121212] p-6 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm flex items-center justify-between">
+          <div>
+            <p className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">
+              Total Active Jobs
+            </p>
+            <p className="text-3xl font-black text-brand-blue dark:text-white">
+              {jobs.length}
+            </p>
+          </div>
+          <div className="h-12 w-12 bg-brand-teal/10 rounded-xl flex items-center justify-center text-brand-teal">
+            <Briefcase size={24} />
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {[1, 2, 3].map((i) => (

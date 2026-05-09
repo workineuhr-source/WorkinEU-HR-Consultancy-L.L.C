@@ -199,7 +199,7 @@ export default function AboutPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
             {(
-              content?.values || [
+              content?.values?.length && content.values.length > 0 ? content.values : [
                 {
                   title: "Integrity",
                   description:
@@ -221,24 +221,36 @@ export default function AboutPage() {
                     "Understanding the dreams and challenges of those seeking international careers.",
                 },
               ]
-            ).map((value, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ y: -10 }}
-                className="p-12 bg-slate-50 dark:bg-white/5 rounded-[4rem] border border-slate-100 dark:border-white/10 hover:bg-white dark:hover:bg-slate-900 hover:shadow-premium transition-all duration-700 group overflow-hidden"
-              >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-teal/5 rounded-bl-[4rem] -mr-10 -mt-10 group-hover:bg-brand-teal/10 transition-all"></div>
-                <div className="w-20 h-20 bg-[#121212] dark:bg-brand-teal text-white dark:text-[#121212] rounded-[1.5rem] flex items-center justify-center mb-12 shadow-xl group-hover:scale-110 transition-transform duration-500">
-                  <CheckCircle2 size={32} />
-                </div>
-                <h4 className="text-2xl font-black text-slate-900 dark:text-white mb-6 uppercase tracking-tight">
-                  {value.title}
-                </h4>
-                <p className="text-slate-600 dark:text-slate-300 text-base leading-relaxed font-semibold">
-                  {value.description}
-                </p>
-              </motion.div>
-            ))}
+            ).map((value, i) => {
+              const valueIcons = [
+                <CheckCircle2 size={32} />,
+                <Eye size={32} />,
+                <Target size={32} />,
+                <ShieldCheck size={32} />,
+                <Award size={32} />,
+                <Users2 size={32} />
+              ];
+              const CurrentIcon = valueIcons[i % valueIcons.length];
+
+              return (
+                <motion.div
+                  key={i}
+                  whileHover={{ y: -10 }}
+                  className="p-12 bg-slate-50 dark:bg-white/5 rounded-[4rem] border border-slate-100 dark:border-white/10 hover:bg-white dark:hover:bg-slate-900 hover:shadow-premium transition-all duration-700 group overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-brand-teal/5 rounded-bl-[4rem] -mr-10 -mt-10 group-hover:bg-brand-teal/10 transition-all"></div>
+                  <div className="w-20 h-20 bg-[#121212] dark:bg-brand-teal text-white dark:text-[#121212] rounded-[1.5rem] flex items-center justify-center mb-12 shadow-xl group-hover:scale-110 transition-transform duration-500">
+                    {CurrentIcon}
+                  </div>
+                  <h4 className="text-2xl font-black text-slate-900 dark:text-white mb-6 uppercase tracking-tight">
+                    {value.title}
+                  </h4>
+                  <p className="text-slate-600 dark:text-slate-300 text-base leading-relaxed font-semibold">
+                    {value.description}
+                  </p>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -253,46 +265,57 @@ export default function AboutPage() {
                 The Advantage
               </span>
               <h2 className="text-5xl md:text-8xl font-bold text-slate-900 dark:text-white mb-12 tracking-tighter leading-none">
-                Why Partner <br />{" "}
+                {content?.whyChooseUs?.title || "Why Partner"}{" "}
                 <span className="text-brand-gold italic">With Us?</span>
               </h2>
               <div className="space-y-12">
-                {[
-                  {
-                    icon: <Award size={32} />,
-                    title: "Licensed & Certified",
-                    desc: "Fully compliant with international recruitment laws and regulations.",
-                  },
-                  {
-                    icon: <Globe2 size={32} />,
-                    title: "Global Network",
-                    desc: "Direct partnerships with top-tier employers across the EU and Gulf.",
-                  },
-                  {
-                    icon: <ShieldCheck size={32} />,
-                    title: "Candidate Protection",
-                    desc: "We prioritize your safety and legal rights throughout the journey.",
-                  },
-                  {
-                    icon: <Users2 size={32} />,
-                    title: "Expert Team",
-                    desc: "Decades of combined experience in international HR and visa processing.",
-                  },
-                ].map((item, i) => (
-                  <div key={i} className="flex gap-8 group">
-                    <div className="w-16 h-16 bg-white dark:bg-white/5 rounded-2xl flex items-center justify-center text-brand-gold shrink-0 border border-slate-100 dark:border-white/10 group-hover:bg-brand-gold group-hover:text-slate-900 dark:group-hover:text-slate-900 transition-all duration-500 shadow-xl">
-                      {item.icon}
+                {(content?.whyChooseUs?.points?.length && content.whyChooseUs.points.length > 0 
+                  ? content.whyChooseUs.points 
+                  : [
+                      {
+                        title: "Licensed & Certified",
+                        description: "Fully compliant with international recruitment laws and regulations.",
+                      },
+                      {
+                        title: "Global Network",
+                        description: "Direct partnerships with top-tier employers across the EU and Gulf.",
+                      },
+                      {
+                        title: "Candidate Protection",
+                        description: "We prioritize your safety and legal rights throughout the journey.",
+                      },
+                      {
+                        title: "Expert Team",
+                        description: "Decades of combined experience in international HR and visa processing.",
+                      },
+                    ]
+                ).map((item, i) => {
+                  const whyChooseUsIcons = [
+                    <Award size={32} />,
+                    <Globe2 size={32} />,
+                    <ShieldCheck size={32} />,
+                    <Users2 size={32} />,
+                    <Target size={32} />,
+                    <CheckCircle2 size={32} />
+                  ];
+                  const CurrentIcon = whyChooseUsIcons[i % whyChooseUsIcons.length];
+
+                  return (
+                    <div key={i} className="flex gap-8 group">
+                      <div className="w-16 h-16 bg-white dark:bg-white/5 rounded-2xl flex items-center justify-center text-brand-gold shrink-0 border border-slate-100 dark:border-white/10 group-hover:bg-brand-gold group-hover:text-slate-900 dark:group-hover:text-slate-900 transition-all duration-500 shadow-xl">
+                        {CurrentIcon}
+                      </div>
+                      <div>
+                        <h4 className="text-2xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">
+                          {item.title}
+                        </h4>
+                        <p className="text-slate-600 dark:text-slate-400 font-medium text-lg leading-relaxed">
+                          {item.description || (item as any).desc /* fallback for old hardcoded format if mixed up */}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="text-2xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">
-                        {item.title}
-                      </h4>
-                      <p className="text-slate-600 dark:text-slate-400 font-medium text-lg leading-relaxed">
-                        {item.desc}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
             <div className="relative">

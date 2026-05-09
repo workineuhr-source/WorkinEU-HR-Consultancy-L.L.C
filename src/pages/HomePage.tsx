@@ -901,8 +901,10 @@ export default function HomePage() {
                               <div className="flex flex-wrap gap-2 text-xs sm:text-sm font-medium opacity-90">
                                  <span className="bg-white/20 backdrop-blur-sm px-2 py-1 rounded-md border border-white/10">{heroItems[currentHeroIndex].job?.country}</span>
                                  <span className="bg-white/20 backdrop-blur-sm px-2 py-1 rounded-md border border-white/10">{heroItems[currentHeroIndex].job?.experience} Exp</span>
-                                 {heroItems[currentHeroIndex].job?.salary && (
-                                   <span className="bg-brand-teal/80 backdrop-blur-sm px-2 py-1 rounded-md text-white border border-brand-teal/20">{heroItems[currentHeroIndex].job?.salary}</span>
+                                 {(heroItems[currentHeroIndex].job?.minSalary || heroItems[currentHeroIndex].job?.maxSalary) && (
+                                   <span className="bg-brand-teal/80 backdrop-blur-sm px-2 py-1 rounded-md text-white border border-brand-teal/20">
+                                     {heroItems[currentHeroIndex].job?.currency || '€'}{heroItems[currentHeroIndex].job?.minSalary}{heroItems[currentHeroIndex].job?.maxSalary ? ` - ${heroItems[currentHeroIndex].job?.maxSalary}` : ''}
+                                   </span>
                                  )}
                               </div>
                             </div>

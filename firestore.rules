@@ -22,7 +22,8 @@ service cloud.firestore {
       return data.title is string && data.title.size() > 0 &&
              data.country is string && data.country.size() > 0 &&
              data.category is string &&
-             data.salary is string &&
+             data.minSalary is string &&
+             data.maxSalary is string &&
              data.description is string &&
              data.deadline is string;
     }

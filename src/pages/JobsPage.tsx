@@ -643,38 +643,11 @@ export default function JobsPage() {
                         ({catJobs.length})
                       </span>
                     </h2>
-
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => {
-                          const el = document.getElementById(
-                            `scroll-${category}`,
-                          );
-                          if (el)
-                            el.scrollBy({ left: -320, behavior: "smooth" });
-                        }}
-                        className="p-3 rounded-full bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-white transition-colors"
-                      >
-                        <ChevronLeft size={24} />
-                      </button>
-                      <button
-                        onClick={() => {
-                          const el = document.getElementById(
-                            `scroll-${category}`,
-                          );
-                          if (el)
-                            el.scrollBy({ left: 320, behavior: "smooth" });
-                        }}
-                        className="p-3 rounded-full bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-white transition-colors"
-                      >
-                        <ChevronRight size={24} />
-                      </button>
-                    </div>
                   </div>
 
                   <div
                     id={`scroll-${category}`}
-                    className="flex overflow-x-auto snap-x snap-mandatory gap-6 md:gap-8 pb-12 px-4 md:px-0 hide-scrollbar"
+                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:gap-8 pb-12 px-4 md:px-0"
                   >
                     {catJobs.map((job, i) => (
                       <motion.div
@@ -683,7 +656,7 @@ export default function JobsPage() {
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.05 }}
                         viewport={{ once: true }}
-                        className="snap-start shrink-0 w-[85vw] sm:w-[calc(50%-12px)] md:w-[calc(33.333%-16px)] lg:w-[calc(20%-25.6px)]"
+                        className="w-full"
                       >
                         <JobCard
                           job={job}

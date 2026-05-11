@@ -150,7 +150,7 @@ export default function DiaryDetailsPage() {
               `https://images.unsplash.com/photo-1541746972996-4e0b0f43e01a?auto=format&fit=crop&q=80&w=1200`
             )}
             alt={post.title}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-cover"
             referrerPolicy="no-referrer"
           />
         </motion.div>

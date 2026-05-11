@@ -37,6 +37,7 @@ export default function JobCard({ job, onQuickApply }: JobCardProps) {
   const diffTime = deadlineDate.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   const isApproaching = diffDays >= 0 && diffDays <= 7;
+  const isUrgent = job.urgent || false;
 
   const jobUrl = `${window.location.origin}/jobs/${job.id}`;
 
@@ -105,7 +106,9 @@ export default function JobCard({ job, onQuickApply }: JobCardProps) {
       whileHover={{ y: -8 }}
       className={cn(
         "group relative bg-white dark:bg-[#0f172a]/40 rounded-[2rem] overflow-hidden border transition-all duration-700 flex flex-col h-full",
-        isApproaching
+        isUrgent
+          ? "border-brand-gold/40 dark:border-brand-gold/50 shadow-[0_15px_35px_-10px_rgba(212,175,55,0.15)] ring-2 ring-brand-gold/20"
+          : isApproaching
           ? "border-brand-rose/20 dark:border-brand-rose/30 hover:border-brand-rose/50 shadow-[0_15px_35px_-10px_rgba(251,113,133,0.1)]"
           : "border-slate-100 dark:border-white/5 hover:border-brand-teal/20 hover:shadow-[0_40px_80px_-20px_rgba(15,23,42,0.12)]",
       )}
@@ -219,7 +222,20 @@ export default function JobCard({ job, onQuickApply }: JobCardProps) {
               </span>
             </div>
 
-            {isApproaching && (
+            {isUrgent && (
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                className="flex items-center gap-1.5 bg-brand-gold px-3 py-1.5 rounded-full shadow-md text-slate-900"
+              >
+                <Sparkles size={12} className="animate-pulse" />
+                <span className="text-[9px] font-black uppercase tracking-[0.2em]">
+                  Urgent Hiring
+                </span>
+              </motion.div>
+            )}
+
+            {!isUrgent && isApproaching && (
               <motion.div
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
@@ -241,7 +257,9 @@ export default function JobCard({ job, onQuickApply }: JobCardProps) {
             <div
               className={cn(
                 "w-7 h-7 rounded-lg flex items-center justify-center border transition-all duration-500",
-                isApproaching
+                isUrgent
+                  ? "bg-brand-gold/10 border-brand-gold/20 text-brand-gold"
+                  : isApproaching
                   ? "bg-brand-rose/10 border-brand-rose/20 text-brand-rose"
                   : "bg-slate-50 dark:bg-white/5 border-slate-100 dark:border-white/10 group-hover:bg-brand-teal group-hover:text-white group-hover:border-brand-teal",
               )}
@@ -272,7 +290,9 @@ export default function JobCard({ job, onQuickApply }: JobCardProps) {
             <h3
               className={cn(
                 "text-xl md:text-2xl font-black transition-all leading-[1.15] tracking-tight font-sans mb-4 line-clamp-2",
-                isApproaching
+                isUrgent
+                  ? "text-slate-900 dark:text-white group-hover/title:text-brand-gold"
+                  : isApproaching
                   ? "text-slate-900 dark:text-white group-hover/title:text-brand-rose"
                   : "text-slate-900 dark:text-white group-hover/title:text-brand-teal",
               )}
@@ -319,9 +339,16 @@ export default function JobCard({ job, onQuickApply }: JobCardProps) {
           </div>
 
           <div className="flex flex-col gap-3">
-            {isApproaching && (
-              <div className="flex items-center gap-2 text-brand-rose text-[10px] font-black uppercase tracking-[0.3em] bg-brand-rose/10 px-4 py-2 rounded-xl w-fit border border-brand-rose/20">
+            {isUrgent && (
+              <div className="flex items-center gap-2 text-brand-gold text-[10px] font-black uppercase tracking-[0.3em] bg-brand-gold/10 px-4 py-2 rounded-xl w-fit border border-brand-gold/20 shadow-[0_0_15px_rgba(212,175,55,0.15)] ring-1 ring-brand-gold/30">
                 <Sparkles size={12} className="animate-pulse" />
+                <span>Urgent Priority</span>
+              </div>
+            )}
+
+            {!isUrgent && isApproaching && (
+              <div className="flex items-center gap-2 text-brand-rose text-[10px] font-black uppercase tracking-[0.3em] bg-brand-rose/10 px-4 py-2 rounded-xl w-fit border border-brand-rose/20">
+                <AlertCircle size={12} className="animate-pulse" />
                 <span>Expiring Soon</span>
               </div>
             )}
@@ -378,7 +405,9 @@ export default function JobCard({ job, onQuickApply }: JobCardProps) {
               to={`/jobs/${job.id}`}
               className={cn(
                 "flex-1 sm:flex-none px-4 py-3 md:px-5 md:py-3.5 rounded-xl font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] transition-all duration-300 shadow-md flex items-center justify-center gap-2 group/btn",
-                isApproaching
+                isUrgent
+                  ? "bg-brand-gold text-slate-900 border border-brand-gold/50 shadow-brand-gold/10 hover:shadow-brand-gold/30 hover:-translate-y-0.5"
+                  : isApproaching
                   ? "bg-brand-rose text-white hover:shadow-brand-rose/20"
                   : "bg-slate-900 dark:bg-premium-gradient-animated text-white hover:shadow-brand-teal/20 hover:-translate-y-0.5",
               )}
@@ -397,7 +426,9 @@ export default function JobCard({ job, onQuickApply }: JobCardProps) {
       <div
         className={cn(
           "absolute inset-0 border-2 border-transparent rounded-[2rem] pointer-events-none transition-all duration-700",
-          isApproaching
+          isUrgent
+            ? "group-hover:border-brand-gold/30"
+            : isApproaching
             ? "group-hover:border-brand-rose/30"
             : "group-hover:border-brand-teal/20",
         )}

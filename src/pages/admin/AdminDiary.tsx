@@ -143,7 +143,7 @@ export default function AdminDiary() {
                     "https://images.unsplash.com/photo-1541746972996-4e0b0f43e01a?auto=format&fit=crop&q=80&w=800"
                   )}
                   alt={post.title}
-                  className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute top-4 left-4">
@@ -510,7 +510,7 @@ function DiaryModal({ post, onClose, onSuccess }: DiaryModalProps) {
                       referrerPolicy="no-referrer"
                       src={getDirectImageUrl(formData.imageUrl)}
                       alt="Preview"
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-cover"
                     />
                   </div>
                 )}

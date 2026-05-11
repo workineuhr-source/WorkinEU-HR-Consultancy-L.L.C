@@ -26,9 +26,10 @@ import {
   ShieldCheck,
   CheckCircle2,
   Eye,
+  Upload,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { cn } from "../lib/utils";
+import { cn, getDirectImageUrl } from "../lib/utils";
 import EuropassCV from "../components/EuropassCV";
 import jsPDF from "jspdf";
 import { toPng } from "html-to-image";
@@ -42,6 +43,54 @@ export default function CandidateProfilePage() {
     "classic" | "modern" | "professional" | "elegant"
   >("classic");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !auth.currentUser || !profile) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload a valid image file");
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Photo size must be less than 2MB");
+      return;
+    }
+
+    setUploadingPhoto(true);
+    const toastId = toast.loading("Processing photo...");
+
+    try {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64 = event.target?.result as string;
+
+        try {
+          await updateDoc(doc(db, "candidates", auth.currentUser!.uid), {
+            photoUrl: base64,
+          });
+
+          setProfile({ ...profile, photoUrl: base64 });
+          toast.success("Profile photo updated!", { id: toastId });
+        } catch (dbError) {
+          console.error("Firestore update error:", dbError);
+          toast.error(
+            "Cloud document size limit reached. Please use a smaller photo.",
+            { id: toastId },
+          );
+        } finally {
+          setUploadingPhoto(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error("Error processing photo:", error);
+      toast.error("Failed to process photo.", { id: toastId });
+      setUploadingPhoto(false);
+    }
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -261,6 +310,66 @@ export default function CandidateProfilePage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-white/5 print:bg-white pb-20 pt-28 font-sans">
       <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+        {/* Profile Photo Upload Section (Owner Only) */}
+        {isOwner && (
+          <div className="mb-8 print:hidden flex flex-col md:flex-row items-center justify-between gap-6 bg-white dark:bg-[#121212] p-6 rounded-3xl border border-gray-100 shadow-sm relative z-50">
+            <div className="flex items-center gap-4">
+              <div className="relative group shrink-0">
+                <div className="w-16 h-16 rounded-2xl border-2 border-gray-100 dark:border-white/10 overflow-hidden flex items-center justify-center bg-gray-50 dark:bg-white/5">
+                  {profile.photoUrl ? (
+                    <img
+                      src={getDirectImageUrl(profile.photoUrl)}
+                      alt={profile.fullName}
+                      className="w-full h-full object-contain"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400 font-black text-xl">
+                      {profile.fullName?.charAt(0) || "U"}
+                    </div>
+                  )}
+                </div>
+                {uploadingPhoto && (
+                  <div className="absolute inset-0 bg-white/60 dark:bg-black/60 flex items-center justify-center rounded-2xl">
+                    <Loader2 className="animate-spin text-brand-blue" size={20} />
+                  </div>
+                )}
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-brand-blue dark:text-white">Profile Photo</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Upload a professional photo (Max 2MB)</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4 w-full md:w-auto">
+              {profile.photoUrl && (
+                <button
+                  onClick={async () => {
+                    if (!auth.currentUser) return;
+                    await updateDoc(doc(db, "candidates", auth.currentUser.uid), { photoUrl: null });
+                    setProfile({ ...profile, photoUrl: undefined });
+                    toast.success("Photo removed");
+                  }}
+                  className="text-red-500 hover:text-red-600 font-bold text-sm px-4 py-2 transition-colors"
+                >
+                  Remove
+                </button>
+              )}
+              <label className="flex-1 md:flex-none text-center bg-brand-gold text-brand-blue px-6 py-3 rounded-xl font-bold text-sm cursor-pointer hover:bg-brand-gold/90 transition-all flex items-center justify-center gap-2 shadow-sm">
+                <Upload size={16} />
+                Upload Photo
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handlePhotoUpload}
+                  disabled={uploadingPhoto}
+                />
+              </label>
+            </div>
+          </div>
+        )}
+
         {/* Header Actions & Theme Selector */}
         <div className="mb-8 print:hidden flex flex-col md:flex-row items-center justify-between gap-6 bg-white dark:bg-[#121212] p-6 rounded-3xl border border-gray-100 shadow-sm relative z-50">
           <div className="flex items-center gap-4">

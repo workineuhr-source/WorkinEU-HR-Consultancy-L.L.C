@@ -186,9 +186,16 @@ export default function AdminJobs() {
               )}
               <div className="p-6 md:p-8">
                 <div className="flex justify-between items-start mb-4 md:mb-6">
-                  <h3 className="text-lg md:text-xl font-bold text-brand-blue line-clamp-1">
-                    {job.title}
-                  </h3>
+                  <div>
+                    <h3 className="text-lg md:text-xl font-bold text-brand-blue line-clamp-1 flex items-center gap-2">
+                      {job.title}
+                      {job.urgent && (
+                        <span className="bg-brand-gold text-slate-900 text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md">
+                          Urgent
+                        </span>
+                      )}
+                    </h3>
+                  </div>
                   <div className="flex gap-1 md:gap-2 transition-opacity">
                     <button
                       onClick={() => openEditModal(job)}
@@ -357,6 +364,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
       experience: "Entry Level",
       type: "Full-time",
       description: "",
+      urgent: false,
       responsibilities: [""],
       requirements: [""],
       requiredDocuments: ["Passport Copy (Front & Back)", "Europass CV"],
@@ -818,6 +826,24 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                 <option value="Part-time">Part-time</option>
                 <option value="Contract">Contract</option>
               </select>
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">
+                Urgent Priority
+              </label>
+              <label className="flex items-center gap-3 mt-4 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="w-5 h-5 rounded border-gray-300 text-brand-gold focus:ring-brand-gold"
+                  checked={formData.urgent || false}
+                  onChange={(e) =>
+                    setFormData({ ...formData, urgent: e.target.checked })
+                  }
+                />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Mark as Urgent
+                </span>
+              </label>
             </div>
           </div>
 

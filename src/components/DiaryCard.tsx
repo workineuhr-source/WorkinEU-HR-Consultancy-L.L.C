@@ -17,41 +17,37 @@ export default function DiaryCard({ post }: DiaryCardProps) {
 
   return (
     <motion.div
-      whileHover={{ y: -15 }}
-      className="bg-white rounded-[3rem] overflow-hidden border border-slate-100 group flex flex-col h-full transition-all duration-700 hover:shadow-[0_60px_100px_-20px_rgba(15,23,42,0.15)] relative"
+      whileHover={{ y: -8 }}
+      className="bg-white dark:bg-white/5 rounded-3xl overflow-hidden border border-slate-100 dark:border-white/5 group flex flex-col h-full transition-all duration-700 hover:shadow-2xl hover:shadow-brand-teal/10 relative"
     >
       <Link to={`/diary/${post.id}`} className="flex flex-col h-full">
-        <div className="relative h-80 overflow-hidden">
+        <div className="relative h-64 overflow-hidden">
           <img
             src={getDirectImageUrl(
               post.imageUrl ||
               `https://images.unsplash.com/photo-1541746972996-4e0b0f43e01a?auto=format&fit=crop&q=80&w=800`
             )}
             alt={post.title}
-            className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-1000"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
             referrerPolicy="no-referrer"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-700"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-700"></div>
 
-          <div className="absolute top-6 right-6">
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] shadow-2xl"
-            >
+          <div className="absolute top-5 right-5">
+            <span className="bg-brand-gold text-slate-900 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
               {post.category || "Updates"}
-            </motion.div>
+            </span>
           </div>
 
-          <div className="absolute bottom-8 left-8 right-8">
-            <div className="flex items-center gap-6 text-white/80 text-[10px] font-bold uppercase tracking-[0.2em]">
-              <div className="flex items-center gap-2">
-                <Calendar size={14} className="text-brand-gold" />
+          <div className="absolute bottom-5 left-6 right-6">
+            <div className="flex flex-wrap items-center gap-4 text-white/90 text-xs font-bold uppercase tracking-wider">
+              <div className="flex items-center gap-1.5">
+                <Calendar size={14} className="text-brand-teal" />
                 {date}
               </div>
               {post.author && (
-                <div className="flex items-center gap-2">
-                  <User size={14} className="text-brand-gold" />
+                <div className="flex items-center gap-1.5">
+                  <User size={14} className="text-brand-teal" />
                   {post.author}
                 </div>
               )}
@@ -59,24 +55,21 @@ export default function DiaryCard({ post }: DiaryCardProps) {
           </div>
         </div>
 
-        <div className="p-10 flex flex-col flex-grow relative">
-          <div className="absolute top-0 right-10 -translate-y-1/2 w-16 h-16 bg-brand-gold text-slate-900 dark:text-white rounded-2xl flex items-center justify-center shadow-2xl group-hover:rotate-12 transition-transform duration-500">
-            <ArrowRight size={28} />
-          </div>
-
-          <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-6 group-hover:text-brand-gold transition-colors leading-[1.1] tracking-tighter font-serif">
+        <div className="p-8 flex flex-col flex-grow bg-white dark:bg-transparent">
+          <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 group-hover:text-brand-teal transition-colors leading-snug tracking-tight font-sans line-clamp-2">
             {post.title}
           </h3>
 
-          <p className="text-slate-500 line-clamp-3 mb-10 leading-relaxed font-light flex-grow text-lg">
+          <p className="text-slate-500 dark:text-slate-400 line-clamp-3 mb-8 leading-relaxed font-normal flex-grow text-base">
             {post.content}
           </p>
 
-          <div className="flex items-center justify-between pt-8 border-t border-slate-50">
-            <span className="text-slate-900 dark:text-white font-bold text-xs uppercase tracking-[0.3em] group-hover:text-brand-gold transition-colors">
-              Read Full Story
+          <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-white/5 mt-auto">
+            <span className="text-slate-900 dark:text-white font-black text-[10px] uppercase tracking-[0.3em] group-hover:text-brand-teal transition-colors flex items-center gap-2">
+              Read Story
+              <ArrowRight size={14} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
             </span>
-            <div className="w-10 h-1 bg-slate-100 group-hover:w-20 group-hover:bg-brand-gold transition-all duration-500 rounded-full"></div>
+            <div className="w-8 h-1 bg-slate-200 dark:bg-white/10 group-hover:w-16 group-hover:bg-brand-teal transition-all duration-500 rounded-full"></div>
           </div>
         </div>
       </Link>

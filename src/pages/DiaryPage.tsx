@@ -116,41 +116,34 @@ export default function DiaryPage() {
           </motion.div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-10 mb-20 items-center justify-between bg-white dark:bg-[#121212] p-10 rounded-[4rem] shadow-[0_50px_100px_-20px_rgba(15,23,42,0.1)] border border-slate-100 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-brand-gold/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
-
-          <div className="relative w-full lg:w-[450px] group">
+        <div className="flex flex-col lg:flex-row gap-6 mb-16 items-center justify-between border-b border-slate-200 dark:border-white/10 pb-8">
+          <div className="relative w-full lg:w-[400px]">
             <Search
-              className="absolute left-8 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-gold transition-colors"
-              size={24}
+              className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"
+              size={20}
             />
             <input
               type="text"
               placeholder="Search stories..."
-              className="w-full pl-20 pr-10 py-6 rounded-[2rem] bg-slate-50 dark:bg-white/5 border border-slate-100 focus:border-brand-gold focus:bg-white outline-none focus:ring-8 focus:ring-brand-gold/5 transition-all duration-500 text-slate-900 dark:text-white font-medium shadow-inner text-lg"
+              className="w-full pl-14 pr-6 py-4 rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-brand-teal focus:ring-2 focus:ring-brand-teal/20 outline-none transition-all text-slate-900 dark:text-white font-medium"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
 
-          <div className="flex items-center gap-6 overflow-x-auto w-full lg:w-auto pb-4 lg:pb-0 no-scrollbar relative z-10">
-            <div className="w-12 h-12 bg-brand-gold/10 text-brand-gold rounded-2xl flex items-center justify-center shrink-0 shadow-inner">
-              <Filter size={24} />
-            </div>
+          <div className="flex items-center gap-3 overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0 scrollbar-hide">
             {categories.map((cat) => (
-              <motion.button
+              <button
                 key={cat}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedCategory(cat || "All")}
-                className={`px-10 py-5 rounded-2xl font-bold text-sm transition-all whitespace-nowrap shadow-sm ${
+                className={`px-6 py-3 rounded-full font-semibold text-sm transition-colors whitespace-nowrap ${
                   selectedCategory === (cat || "All")
-                    ? "bg-slate-900 text-white shadow-xl"
-                    : "bg-slate-50 text-slate-500 hover:bg-slate-100 border border-slate-100"
+                    ? "bg-brand-teal text-white shadow-md shadow-brand-teal/20"
+                    : "bg-white dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10"
                 }`}
               >
                 {cat}
-              </motion.button>
+              </button>
             ))}
           </div>
         </div>

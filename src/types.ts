@@ -13,6 +13,7 @@ export interface Job {
   requirements: string[];
   requiredDocuments: string[];
   deadline: string;
+  urgent?: boolean;
   vacancies?: number;
   vacanciesMale?: number;
   vacanciesFemale?: number;

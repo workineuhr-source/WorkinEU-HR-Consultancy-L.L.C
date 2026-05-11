@@ -670,7 +670,7 @@ export default function HomePage() {
     if (heroItems.length <= 1) return;
     const interval = setInterval(() => {
       setCurrentHeroIndex((prev) => (prev + 1) % heroItems.length);
-    }, 5000);
+    }, 3000);
     return () => clearInterval(interval);
   }, [heroItems.length]);
 
@@ -873,36 +873,37 @@ export default function HomePage() {
                 transition={{ duration: 1, delay: 0.2 }}
                 className="relative z-10"
               >
-                <div className="relative h-[550px] sm:h-[650px] lg:h-[780px] max-w-[450px] lg:max-w-[550px] w-full mx-auto rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white dark:border-[#121212] bg-slate-50 dark:bg-white/5 group/slider">
+                <div className="relative h-[500px] sm:h-[600px] lg:h-[700px] w-full max-w-lg lg:max-w-none mx-auto rounded-[2rem] lg:rounded-[3rem] overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border-[0.5rem] lg:border-[1rem] border-white dark:border-[#121212]/50 backdrop-blur-sm bg-slate-50 dark:bg-white/5 group/slider transform-gpu hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.4)] transition-all duration-700 hover:-translate-y-2">
                   <AnimatePresence mode="popLayout" initial={false}>
                     <motion.div
                       key={`slide-${currentHeroIndex}`}
-                      initial={{ opacity: 0, x: 100 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -100 }}
-                      transition={{ duration: 0.6, ease: "circOut" }}
+                      initial={{ opacity: 0, scale: 1.05 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.8, ease: "circOut" }}
                       className="absolute inset-0"
                     >
                       {heroItems[currentHeroIndex]?.link ? (
                         <Link to={heroItems[currentHeroIndex].link!} className="absolute inset-0 block group/link">
                           <img
-                            src={getDirectImageUrl(heroItems[currentHeroIndex].url)}
+                            src={heroItems[currentHeroIndex].url?.includes("unsplash.com") ? `${heroItems[currentHeroIndex].url.split('?')[0]}?auto=format&fit=crop&w=3840&q=100` : getDirectImageUrl(heroItems[currentHeroIndex].url)}
                             alt={heroItems[currentHeroIndex].title || "Professional recruitment"}
-                            className="w-full h-full object-cover bg-slate-100 dark:bg-[#121212]"
+                            className="w-full h-full object-cover transition-transform duration-1000 group-hover/slider:scale-110"
                             referrerPolicy="no-referrer"
                             loading="eager"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent pointer-events-none"></div>
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#0f2e2e]/90 via-[#0f2e2e]/50 to-transparent pointer-events-none"></div>
+                          <div className="absolute inset-0 bg-gradient-to-tr from-brand-teal/30 via-transparent to-transparent opacity-80 mix-blend-multiply pointer-events-none"></div>
                           {heroItems[currentHeroIndex]?.job && (
                             <div className="absolute bottom-[4.5rem] left-6 right-6 text-white pointer-events-none">
-                              <h3 className="text-xl sm:text-2xl font-black mb-2 leading-tight drop-shadow-md line-clamp-2">
+                              <h3 className="text-xl sm:text-3xl font-black mb-3 leading-tight drop-shadow-md line-clamp-2">
                                 {heroItems[currentHeroIndex].job?.title}
                               </h3>
-                              <div className="flex flex-wrap gap-2 text-xs sm:text-sm font-medium opacity-90">
-                                 <span className="bg-white/20 backdrop-blur-sm px-2 py-1 rounded-md border border-white/10">{heroItems[currentHeroIndex].job?.country}</span>
-                                 <span className="bg-white/20 backdrop-blur-sm px-2 py-1 rounded-md border border-white/10">{heroItems[currentHeroIndex].job?.experience} Exp</span>
+                              <div className="flex flex-wrap gap-2 text-xs sm:text-sm font-medium opacity-95">
+                                 <span className="bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-md border border-white/10 shadow-sm">{heroItems[currentHeroIndex].job?.country}</span>
+                                 <span className="bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-md border border-white/10 shadow-sm">{heroItems[currentHeroIndex].job?.experience} Exp</span>
                                  {(heroItems[currentHeroIndex].job?.minSalary || heroItems[currentHeroIndex].job?.maxSalary) && (
-                                   <span className="bg-brand-teal/80 backdrop-blur-sm px-2 py-1 rounded-md text-white border border-brand-teal/20">
+                                   <span className="bg-brand-teal/80 backdrop-blur-sm px-3 py-1.5 rounded-md text-white border border-brand-teal/20 shadow-sm">
                                      {heroItems[currentHeroIndex].job?.currency || '€'}{heroItems[currentHeroIndex].job?.minSalary}{heroItems[currentHeroIndex].job?.maxSalary ? ` - ${heroItems[currentHeroIndex].job?.maxSalary}` : ''}
                                    </span>
                                  )}
@@ -919,13 +920,14 @@ export default function HomePage() {
                       ) : (
                         <div className="absolute inset-0">
                            <img
-                             src={getDirectImageUrl(heroItems[currentHeroIndex]?.url)}
+                             src={heroItems[currentHeroIndex].url?.includes("unsplash.com") ? `${heroItems[currentHeroIndex].url.split('?')[0]}?auto=format&fit=crop&w=3840&q=100` : getDirectImageUrl(heroItems[currentHeroIndex].url)}
                              alt="Professional recruitment"
-                             className="w-full h-full object-cover bg-slate-100 dark:bg-[#121212]"
+                             className="w-full h-full object-cover transition-transform duration-1000 group-hover/slider:scale-110"
                              referrerPolicy="no-referrer"
                              loading="eager"
                            />
-                           <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/40 to-transparent pointer-events-none"></div>
+                           <div className="absolute inset-0 bg-gradient-to-t from-[#0f2e2e]/60 to-transparent pointer-events-none mix-blend-overlay"></div>
+                           <div className="absolute inset-0 bg-gradient-to-tr from-brand-teal/20 via-transparent to-transparent opacity-0 group-hover/slider:opacity-100 transition-opacity duration-1000 pointer-events-none mix-blend-overlay"></div>
                         </div>
                       )}
                     </motion.div>
@@ -1423,21 +1425,32 @@ export default function HomePage() {
           className="bg-slate-50/50 dark:bg-transparent"
         >
           {/* Professional HR Solutions Highlight - New Section Requested */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-12 pb-12 border-b border-slate-100 dark:border-white/5">
+          <div className="mb-16 pb-16 border-b border-slate-100 dark:border-white/5">
+            {/* Top Bar: Badge and Title Inline */}
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
+              className="flex flex-col md:flex-row items-start md:items-center gap-4 mb-8"
             >
-              <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-brand-teal/10 border border-brand-teal/20 text-brand-teal text-[10px] font-black uppercase tracking-[0.3em] mb-8">
+              <div className="inline-flex shrink-0 items-center gap-2 px-6 py-2 rounded-full bg-brand-teal/10 border border-brand-teal/20 text-brand-teal text-[10px] font-black uppercase tracking-[0.3em]">
                 <ShieldCheck size={16} />{" "}
                 {content.professionalHrSolutionsBadge || "Elite HR Consultancy"}
               </div>
-              <h3 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-8 tracking-tighter leading-tight">
+              <h3 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
                 {content.professionalHrSolutionsTitle ||
                   "Professional HR Solutions"}
               </h3>
-              <div className="text-slate-800 dark:text-slate-300 text-lg leading-relaxed font-medium space-y-6">
+            </motion.div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                className="w-full text-left"
+              >
+                <div className="text-slate-800 dark:text-slate-300 text-lg md:text-[19px] leading-relaxed font-medium">
                 {content.professionalHrSolutionsDescription ? (
                   <div className="whitespace-pre-wrap">
                     {content.professionalHrSolutionsDescription}
@@ -1460,7 +1473,7 @@ export default function HomePage() {
                   </p>
                 )}
               </div>
-              <div className="mt-12 flex flex-wrap gap-4">
+              <div className="mt-10 flex flex-wrap gap-4">
                 <div className="px-6 py-3 bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-2xl flex items-center gap-3 shadow-sm">
                   <div className="w-8 h-8 bg-brand-teal rounded-lg flex items-center justify-center text-white">
                     <Check size={16} />
@@ -1480,26 +1493,27 @@ export default function HomePage() {
               </div>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1 }}
-              className="relative rounded-[4rem] overflow-hidden shadow-premium aspect-[4/3] group"
-            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1 }}
+                className="relative rounded-[3rem] lg:rounded-[4rem] overflow-hidden shadow-premium aspect-[4/3] md:aspect-[16/9] group w-full"
+              >
               <img
                 src={getDirectImageUrl(
                   content.professionalHrSolutionsImageUrl ||
                   "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200"
                 )}
                 alt="Professional HR Solutions"
-                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-1000"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute inset-0 bg-gradient-to-tr from-brand-teal/20 to-transparent"></div>
-              <div className="absolute top-8 right-8 w-24 h-24 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 flex items-center justify-center">
-                <Target size={40} className="text-white" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent pointer-events-none"></div>
+              <div className="absolute bottom-6 right-6 lg:bottom-10 lg:right-10 w-20 h-20 md:w-24 md:h-24 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 flex items-center justify-center">
+                <Target size={32} className="text-white md:w-10 md:h-10" />
               </div>
             </motion.div>
+            </div>
           </div>
 
           {/* Professional Edge & Core Strengths - Reorganized for Better Alignment */}

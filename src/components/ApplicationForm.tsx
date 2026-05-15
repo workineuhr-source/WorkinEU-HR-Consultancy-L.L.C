@@ -909,7 +909,7 @@ export default function ApplicationForm({
                       <a href={getDirectImageUrl(file.url)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 overflow-hidden flex-1 group-hover:opacity-80 transition-opacity">
                         <div className="w-12 h-12 bg-slate-50 dark:bg-slate-700 text-slate-400 dark:text-slate-500 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-brand-gold group-hover:text-white transition-all overflow-hidden">
                           {file.type?.startsWith("image/") ? (
-                            <img src={getDirectImageUrl(file.url)} alt={file.name} className="w-full h-full object-cover" />
+                            <img referrerPolicy="no-referrer" src={getDirectImageUrl(file.url)} alt={file.name} className="w-full h-full object-cover" />
                           ) : (
                             <FileText size={24} />
                           )}

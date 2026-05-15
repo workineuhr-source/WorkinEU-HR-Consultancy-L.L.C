@@ -435,6 +435,38 @@ export default function AdminContent() {
       vision:
         content.vision ||
         "To be the leading HR partner for growth-minded businesses in Europe and the Gulf, driving success through strategic talent acquisition, ethical recruitment, and global workforce mobility.",
+      companyStoryTitle: content.companyStoryTitle || "A Decade of Excellence",
+      companyStoryTagline: content.companyStoryTagline || "Our Legacy",
+      companyStoryDescription: content.companyStoryDescription || "Founded with a vision to bridge the gap between burgeoning global industries and unparalleled talent, our agency has grown into a beacon of ethical recruitment. Over the years, we've transformed thousands of lives while helping businesses across the UAE and Europe scale with the right workforce.",
+      coreStrengthsTitle: content.coreStrengthsTitle || "Our Core Strengths",
+      coreStrengths: content.coreStrengths?.length ? content.coreStrengths : [
+        "Rapid Deployment Models",
+        "Rigorous Background Checks",
+        "Expertise in Visa & Compliance",
+        "Deep Industry Networks",
+        "Scalable Workforce Solutions"
+      ],
+      professionalHrSolutionsBadge: content.professionalHrSolutionsBadge || "Industry Leaders",
+      professionalEdgeTitle: content.professionalEdgeTitle || "The Professional Edge",
+      professionalEdgeSubtitle: content.professionalEdgeSubtitle || "Empowering Your Corporate Vision",
+      professionalEdgeDescription: content.professionalEdgeDescription || "Our seasoned team of recruitment consultants brings decades of combined experience, offering deep insights into market trends and the foresight necessary to navigate complex global hiring landscapes.",
+      servicesTagline: content.servicesTagline || "Our Expertise",
+      servicesTitle: content.servicesTitle || "Comprehensive HR Solutions",
+      servicesSubtitle: content.servicesSubtitle || "Tailored recruitment models designed to bridge the gap between global employers and elite talent.",
+      ourProcessTitle: content.ourProcessTitle || "How We Work",
+      jobsTagline: content.jobsTagline || "Career Opportunities",
+      jobsTitle: content.jobsTitle || "Explore Your Potential",
+      successStoriesTagline: content.successStoriesTagline || "Triumphs",
+      successStoriesTitle: content.successStoriesTitle || "Inspiring Success Journeys",
+      contactEmail: content.contactEmail || "info@workineu.com",
+      contactPhone: content.contactPhone || "+971 55 299 7311",
+      contactAddress: content.contactAddress || "Mai Tower, Dubai, UAE",
+      whatsappNumber: content.whatsappNumber || "971552997311",
+      navHome: content.navHome || "Home",
+      navJobs: content.navJobs || "Jobs",
+      navAbout: content.navAbout || "About",
+      navContact: content.navContact || "Contact",
+      navDiary: content.navDiary || "Diary",
       values: [
         {
           title: "Integrity & Transparency",

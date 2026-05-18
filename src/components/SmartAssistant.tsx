@@ -72,7 +72,7 @@ export default function SmartAssistant({
         const jobsSnapshot = await getDocs(collection(db, "jobs"));
         const jobsData = jobsSnapshot.docs.map(
           (doc) => ({ id: doc.id, ...doc.data() }) as Job,
-        );
+        ).filter(j => j.status !== "hidden");
         setJobs(jobsData);
       } catch (error) {
         console.error("Error fetching jobs for AI:", error);

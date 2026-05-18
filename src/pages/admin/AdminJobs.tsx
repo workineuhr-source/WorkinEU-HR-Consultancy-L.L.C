@@ -30,6 +30,8 @@ import {
   Image as ImageIcon,
   CreditCard,
   Users,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "motion/react";
@@ -109,6 +111,18 @@ export default function AdminJobs() {
       fetchJobs();
     } catch (error) {
       toast.error("Failed to delete job");
+    }
+  };
+
+  const handleToggleStatus = async (job: Job) => {
+    try {
+      const newStatus = job.status === "hidden" ? "open" : "hidden";
+      await updateDoc(doc(db, "jobs", job.id), { status: newStatus });
+      toast.success(newStatus === "hidden" ? "Job is now hidden" : "Job is now visible");
+      fetchJobs();
+    } catch (error) {
+      console.error("Error toggling status:", error);
+      toast.error("Failed to toggle job visibility");
     }
   };
 
@@ -198,14 +212,31 @@ export default function AdminJobs() {
                   </div>
                   <div className="flex gap-1 md:gap-2 transition-opacity">
                     <button
+                      onClick={() => handleToggleStatus(job)}
+                      className={`p-2 rounded-lg transition-colors ${
+                        job.status === "hidden"
+                          ? "text-gray-400 hover:bg-gray-100"
+                          : "text-green-500 hover:bg-green-50"
+                      }`}
+                      title={job.status === "hidden" ? "Show Job" : "Hide Job"}
+                    >
+                      {job.status === "hidden" ? (
+                        <EyeOff size={16} className="md:w-[18px] md:h-[18px]" />
+                      ) : (
+                        <Eye size={16} className="md:w-[18px] md:h-[18px]" />
+                      )}
+                    </button>
+                    <button
                       onClick={() => openEditModal(job)}
                       className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                      title="Edit Job"
                     >
                       <Edit2 size={16} className="md:w-[18px] md:h-[18px]" />
                     </button>
                     <button
                       onClick={() => setDeleteConfirmId(job.id)}
                       className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Delete Job"
                     >
                       <Trash2 size={16} className="md:w-[18px] md:h-[18px]" />
                     </button>
@@ -358,6 +389,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
       title: "",
       country: "",
       category: "",
+      status: "open",
       minSalary: "",
       maxSalary: "",
       currency: "€",
@@ -691,10 +723,10 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                 placeholder="e.g. Warehouse Worker"
               />
               <datalist id="job-positions">
-                {(formData.category && CATEGORY_TO_POSITIONS[formData.category]
-                  ? CATEGORY_TO_POSITIONS[formData.category]
-                  : lists.positions
-                ).map((pos) => (
+                {Array.from(new Set([
+                  ...lists.positions,
+                  ...(formData.category && CATEGORY_TO_POSITIONS[formData.category] ? CATEGORY_TO_POSITIONS[formData.category] : [])
+                ])).map((pos) => (
                   <option key={pos} value={pos} />
                 ))}
               </datalist>
@@ -798,34 +830,42 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
               <label className="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">
                 Experience
               </label>
-              <select
+              <input
+                required
+                list="job-experience-levels"
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all"
                 value={formData.experience}
                 onChange={(e) =>
                   setFormData({ ...formData, experience: e.target.value })
                 }
-              >
-                <option value="Entry Level">Entry Level</option>
-                <option value="1-3 Years">1-3 Years</option>
-                <option value="3-5 Years">3-5 Years</option>
-                <option value="5+ Years">5+ Years</option>
-              </select>
+                placeholder="e.g. 1-3 Years"
+              />
+              <datalist id="job-experience-levels">
+                <option value="Entry Level" />
+                <option value="1-3 Years" />
+                <option value="3-5 Years" />
+                <option value="5+ Years" />
+              </datalist>
             </div>
             <div>
               <label className="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">
                 Job Type
               </label>
-              <select
+              <input
+                required
+                list="job-types"
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all"
                 value={formData.type}
                 onChange={(e) =>
                   setFormData({ ...formData, type: e.target.value })
                 }
-              >
-                <option value="Full-time">Full-time</option>
-                <option value="Part-time">Part-time</option>
-                <option value="Contract">Contract</option>
-              </select>
+                placeholder="e.g. Full-time"
+              />
+              <datalist id="job-types">
+                <option value="Full-time" />
+                <option value="Part-time" />
+                <option value="Contract" />
+              </datalist>
             </div>
             <div>
               <label className="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">

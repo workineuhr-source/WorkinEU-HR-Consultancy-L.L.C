@@ -372,15 +372,19 @@ export default function AdminContent() {
       const url = await getDownloadURL(storageRef);
 
       if (field.startsWith("service_") && index !== undefined) {
-        const newServices = [...(content.services || [])];
-        newServices[index] = { ...newServices[index], imageUrl: url };
-        setContent({ ...content, services: newServices });
+        setContent((prev) => {
+          const newServices = [...(prev.services || [])];
+          newServices[index] = { ...newServices[index], imageUrl: url };
+          return { ...prev, services: newServices };
+        });
       } else if (field.startsWith("heroImageUrls_") && index !== undefined) {
-        const newImages = [...(content.heroImageUrls || [])];
-        newImages[index] = url;
-        setContent({ ...content, heroImageUrls: newImages });
+        setContent((prev) => {
+          const newImages = [...(prev.heroImageUrls || [])];
+          newImages[index] = url;
+          return { ...prev, heroImageUrls: newImages };
+        });
       } else {
-        setContent({ ...content, [field]: url });
+        setContent((prev) => ({ ...prev, [field]: url }));
       }
 
       toast.success("File uploaded successfully");

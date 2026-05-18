@@ -622,7 +622,7 @@ export default function AdminCandidateDetail() {
           >
             <div className="absolute top-0 right-0 w-32 h-32 bg-brand-teal/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
             <div className="relative z-10 flex flex-col items-center text-center">
-              <div className="relative group w-24 h-24 mb-6">
+              <div className="relative group w-24 h-24 mb-4">
                 <div className="w-24 h-24 bg-brand-blue text-white rounded-3xl flex items-center justify-center text-4xl font-black shadow-2xl overflow-hidden">
                   {editingProfile.photoUrl ? (
                     <img
@@ -648,6 +648,18 @@ export default function AdminCandidateDetail() {
                   />
                 </label>
               </div>
+              <input
+                type="text"
+                placeholder="Or paste photo link (e.g., Google Drive)"
+                className="w-full max-w-xs mb-6 px-4 py-2 text-[10px] rounded-xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-brand-gold transition-all text-center"
+                value={editingProfile.photoUrl?.startsWith("data:") ? "" : (editingProfile.photoUrl || "")}
+                onChange={(e) =>
+                  setEditingProfile((prev) => ({
+                    ...prev,
+                    photoUrl: e.target.value,
+                  }))
+                }
+              />
               <h2 className="text-2xl font-black text-brand-blue mb-2">
                 {editingProfile.fullName || "Candidate Name"}
               </h2>

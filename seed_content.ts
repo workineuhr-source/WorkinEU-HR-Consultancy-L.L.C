@@ -16,7 +16,7 @@ const seedData = async () => {
   try {
     const docRef = doc(db, "settings", "siteContent");
     const docSnap = await getDoc(docRef);
-    let currentData = {};
+    let currentData: Record<string, any> = {};
     if (docSnap.exists()) {
       currentData = docSnap.data();
     }

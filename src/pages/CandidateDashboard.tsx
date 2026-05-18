@@ -486,7 +486,7 @@ export default function CandidateDashboard() {
       const jobsSnap = await getDocs(collection(db, "jobs"));
       const allJobs = jobsSnap.docs.map(
         (doc) => ({ id: doc.id, ...doc.data() }) as Job,
-      );
+      ).filter(job => job.status !== "hidden");
 
       const recommendedIds = await getJobRecommendations(
         currentProfile,

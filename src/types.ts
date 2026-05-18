@@ -18,6 +18,7 @@ export interface Job {
   vacanciesMale?: number;
   vacanciesFemale?: number;
   imageUrl?: string;
+  status?: "open" | "hidden";
   createdAt: number;
   // Fee related fields
   totalAmount?: string;

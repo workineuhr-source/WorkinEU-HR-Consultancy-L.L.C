@@ -132,7 +132,7 @@ export default function JobsPage() {
       (snapshot) => {
         const jobsData = snapshot.docs.map(
           (doc) => ({ id: doc.id, ...doc.data() }) as Job,
-        );
+        ).filter(job => job.status !== "hidden");
         setJobs(jobsData);
         setFilteredJobs(jobsData);
         setLoading(false);

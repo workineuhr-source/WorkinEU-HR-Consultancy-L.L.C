@@ -88,11 +88,11 @@ export default function AdminDashboard() {
               "link[rel~='icon']",
             ) as HTMLLinkElement;
             if (link) {
-              link.href = data.faviconUrl;
+              link.href = getDirectImageUrl(data.faviconUrl);
             } else {
               const newLink = document.createElement("link");
               newLink.rel = "icon";
-              newLink.href = data.faviconUrl;
+              newLink.href = getDirectImageUrl(data.faviconUrl);
               document.head.appendChild(newLink);
             }
           }

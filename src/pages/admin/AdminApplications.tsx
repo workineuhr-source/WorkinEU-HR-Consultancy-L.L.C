@@ -27,6 +27,7 @@ import {
   Globe,
   Calendar,
   Building2,
+  Edit2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "motion/react";
@@ -100,7 +101,10 @@ export default function AdminApplications() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [deleteAppId, setDeleteAppId] = useState<string | null>(null);
+  const [editingApp, setEditingApp] = useState<Application | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [availableCountries, setAvailableCountries] = useState<string[]>([]);
+  const [availablePositions, setAvailablePositions] = useState<string[]>([]);
   const [isShiftingCountry, setIsShiftingCountry] = useState(false);
   const [newTargetCountry, setNewTargetCountry] = useState("");
 
@@ -116,6 +120,7 @@ export default function AdminApplications() {
       if (docSnap.exists()) {
         const data = docSnap.data();
         if (data.countries) setAvailableCountries(data.countries);
+        if (data.jobPositions) setAvailablePositions(data.jobPositions);
       }
     } catch (error) {
       console.error("Error fetching settings:", error);
@@ -354,6 +359,32 @@ export default function AdminApplications() {
     }
   };
 
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingApp) return;
+    setIsUpdating(true);
+    try {
+      await updateDoc(doc(db, "applications", editingApp.id), {
+        fullName: editingApp.fullName,
+        email: editingApp.email,
+        phone: editingApp.phone,
+        passportNumber: editingApp.passportNumber,
+        targetCountry: editingApp.targetCountry,
+        jobTitle: editingApp.jobTitle,
+        appliedCountry: editingApp.appliedCountry,
+        status: editingApp.status
+      });
+      toast.success("Application updated successfully");
+      setEditingApp(null);
+      fetchApplications();
+    } catch (error) {
+      toast.error("Failed to update application");
+      console.error(error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -481,12 +512,29 @@ export default function AdminApplications() {
                         {new Date(app.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-8 py-6 text-right">
-                        <button
-                          onClick={() => setSelectedApp(app)}
-                          className="p-2 text-brand-blue hover:bg-brand-blue/5 rounded-lg transition-colors"
-                        >
-                          <Eye size={20} />
-                        </button>
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => setEditingApp(app)}
+                            className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="Edit Application"
+                          >
+                            <Edit2 size={20} />
+                          </button>
+                          <button
+                            onClick={() => setSelectedApp(app)}
+                            className="p-2 text-brand-blue hover:bg-brand-blue/5 rounded-lg transition-colors"
+                            title="View Details"
+                          >
+                            <Eye size={20} />
+                          </button>
+                          <button
+                            onClick={() => setDeleteAppId(app.id)}
+                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Delete Application"
+                          >
+                            <Trash2 size={20} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -1037,6 +1085,129 @@ export default function AdminApplications() {
                   Delete
                 </button>
               </div>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Edit Application Modal */}
+        {editingApp && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-brand-blue/60 backdrop-blur-sm"
+              onClick={() => setEditingApp(null)}
+            ></motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative z-10 p-6 md:p-8"
+            >
+              <div className="flex justify-between items-start mb-6">
+                <h3 className="text-2xl font-bold text-brand-blue">Edit Application</h3>
+                <button
+                  onClick={() => setEditingApp(null)}
+                  className="text-gray-400 hover:text-brand-blue transition-colors p-2"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              <form onSubmit={handleEditSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-bold text-brand-blue mb-2">Candidate Name</label>
+                    <input
+                      type="text"
+                      value={editingApp.fullName}
+                      onChange={e => setEditingApp({ ...editingApp, fullName: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-gold outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-brand-blue mb-2">Email</label>
+                    <input
+                      type="email"
+                      value={editingApp.email}
+                      onChange={e => setEditingApp({ ...editingApp, email: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-gold outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-brand-blue mb-2">Phone</label>
+                    <input
+                      type="text"
+                      value={editingApp.phone}
+                      onChange={e => setEditingApp({ ...editingApp, phone: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-gold outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-brand-blue mb-2">Passport Number</label>
+                    <input
+                      type="text"
+                      value={editingApp.passportNumber}
+                      onChange={e => setEditingApp({ ...editingApp, passportNumber: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-gold outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-brand-blue mb-2">Target Country</label>
+                    <input
+                      type="text"
+                      list="edit-countries-list"
+                      value={editingApp.targetCountry || ""}
+                      onChange={e => setEditingApp({ ...editingApp, targetCountry: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-gold outline-none"
+                    />
+                    <datalist id="edit-countries-list">
+                      {availableCountries.map(c => <option key={c} value={c} />)}
+                    </datalist>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-brand-blue mb-2">Job Title</label>
+                    <input
+                      type="text"
+                      list="edit-positions-list"
+                      value={editingApp.jobTitle || ""}
+                      onChange={e => setEditingApp({ ...editingApp, jobTitle: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-gold outline-none"
+                    />
+                    <datalist id="edit-positions-list">
+                      {availablePositions.map(p => <option key={p} value={p} />)}
+                    </datalist>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-brand-blue mb-2">Status</label>
+                    <select
+                        value={editingApp.status}
+                        onChange={e => setEditingApp({ ...editingApp, status: e.target.value as any })}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-gold outline-none"
+                    >
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="flex gap-4 pt-4 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => setEditingApp(null)}
+                    className="flex-1 px-6 py-3 rounded-xl font-bold bg-gray-100 hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isUpdating}
+                    className="flex-1 px-6 py-3 rounded-xl font-bold text-slate-900 bg-brand-gold hover:bg-yellow-400 transition-colors flex justify-center items-center gap-2"
+                  >
+                    {isUpdating ? <Loader2 className="animate-spin" size={20} /> : "Save Changes"}
+                  </button>
+                </div>
+              </form>
             </motion.div>
           </div>
         )}

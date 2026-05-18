@@ -39,6 +39,7 @@ const schema = z.object({
   appliedPosition: z.string().min(2, "Position is required"),
   appliedCountry: z.string().min(2, "Country is required"),
   coverLetter: z.string().optional(),
+  photoUrl: z.string().optional(),
   password: z.string().optional(),
   confirmPassword: z.string().optional(),
 }).superRefine((data, ctx) => {
@@ -213,6 +214,8 @@ export default function ApplicationForm({
       setValue("nationality", candidateProfile.nationality);
     if (candidateProfile.gender)
       setValue("gender", candidateProfile.gender);
+    if (candidateProfile.photoUrl)
+      setValue("photoUrl", candidateProfile.photoUrl);
     if (candidateProfile.experience)
       setValue("experience", candidateProfile.experience);
     if (candidateProfile.education)
@@ -347,6 +350,7 @@ export default function ApplicationForm({
             passportNumber: data.passportNumber,
             nationality: data.nationality,
             gender: data.gender,
+            photoUrl: data.photoUrl,
             experience: data.experience,
             education: data.education,
             skills: skills,
@@ -627,18 +631,36 @@ export default function ApplicationForm({
                   <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-6">
                     Gender
                   </label>
-                  <select
+                  <input
                     {...register("gender")}
-                    className="w-full px-10 py-6 rounded-[2rem] border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-brand-gold focus:ring-8 focus:ring-brand-gold/5 transition-all duration-500 text-slate-900 dark:text-white font-bold shadow-inner text-lg appearance-none"
-                  >
-                    <option value="">Select Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                  </select>
+                    list="gender-options"
+                    placeholder="e.g. Male"
+                    className="w-full px-10 py-6 rounded-[2rem] border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-brand-gold focus:ring-8 focus:ring-brand-gold/5 transition-all duration-500 text-slate-900 dark:text-white font-bold shadow-inner text-lg"
+                  />
+                  <datalist id="gender-options">
+                    <option value="Male" />
+                    <option value="Female" />
+                    <option value="Other" />
+                  </datalist>
                   {errors.gender && (
                     <p className="text-red-500 text-xs mt-2 font-bold ml-6 uppercase tracking-tighter">
                       {errors.gender.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-3 md:col-span-2">
+                  <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-6">
+                    Professional Photo (Google Drive Link)
+                  </label>
+                  <input
+                    {...register("photoUrl")}
+                    placeholder="e.g. https://drive.google.com/file/d/.../view"
+                    className="w-full px-10 py-6 rounded-[2rem] border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-brand-gold focus:ring-8 focus:ring-brand-gold/5 transition-all duration-500 text-slate-900 dark:text-white font-bold shadow-inner text-lg"
+                  />
+                  {errors.photoUrl && (
+                    <p className="text-red-500 text-xs mt-2 font-bold ml-6 uppercase tracking-tighter">
+                      {errors.photoUrl.message}
                     </p>
                   )}
                 </div>
@@ -696,29 +718,19 @@ export default function ApplicationForm({
                   <label className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-6">
                     Years of Experience
                   </label>
-                  <select
+                  <input
                     {...register("experience")}
-                    className="w-full px-10 py-6 rounded-[2rem] border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-brand-gold focus:ring-8 focus:ring-brand-gold/5 transition-all duration-500 text-slate-900 dark:text-white font-bold shadow-inner appearance-none cursor-pointer text-lg"
-                  >
-                    <option value="" className="dark:bg-slate-800">
-                      Select Experience
-                    </option>
-                    <option value="Entry Level" className="dark:bg-slate-800">
-                      Entry Level
-                    </option>
-                    <option value="1-3 Years" className="dark:bg-slate-800">
-                      1-3 Years
-                    </option>
-                    <option value="3-5 Years" className="dark:bg-slate-800">
-                      3-5 Years
-                    </option>
-                    <option value="5-10 Years" className="dark:bg-slate-800">
-                      5-10 Years
-                    </option>
-                    <option value="10+ Years" className="dark:bg-slate-800">
-                      10+ Years
-                    </option>
-                  </select>
+                    list="experience-options"
+                    placeholder="e.g. 1-3 Years"
+                    className="w-full px-10 py-6 rounded-[2rem] border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 outline-none focus:bg-white dark:focus:bg-slate-800 focus:border-brand-gold focus:ring-8 focus:ring-brand-gold/5 transition-all duration-500 text-slate-900 dark:text-white font-bold shadow-inner text-lg"
+                  />
+                  <datalist id="experience-options">
+                    <option value="Entry Level" />
+                    <option value="1-3 Years" />
+                    <option value="3-5 Years" />
+                    <option value="5-10 Years" />
+                    <option value="10+ Years" />
+                  </datalist>
                   {errors.experience && (
                     <p className="text-red-500 text-xs mt-2 font-bold ml-6 uppercase tracking-tighter">
                       {errors.experience.message}

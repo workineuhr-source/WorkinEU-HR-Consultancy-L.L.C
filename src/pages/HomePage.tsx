@@ -453,7 +453,9 @@ export default function HomePage() {
         const snapshot = await getDocs(q);
         const counts: Record<string, number> = {};
         snapshot.docs.forEach((doc) => {
-          const country = doc.data().country;
+          const data = doc.data() as Job;
+          if (data.status === "hidden") return;
+          const country = data.country;
           if (country) {
             counts[country] = (counts[country] || 0) + 1;
           }
@@ -510,11 +512,10 @@ export default function HomePage() {
           ]);
 
         unsubJobs = onSnapshot(
-          query(collection(db, "jobs"), orderBy("createdAt", "desc"), limit(3)),
+          query(collection(db, "jobs"), orderBy("createdAt", "desc"), limit(20)),
           (snap) => {
-            setFeaturedJobs(
-              snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Job),
-            );
+            const jobsList = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Job);
+            setFeaturedJobs(jobsList.filter((j) => j.status !== "hidden").slice(0, 3));
           },
         );
 

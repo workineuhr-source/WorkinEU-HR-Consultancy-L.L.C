@@ -198,8 +198,49 @@ export default function AdminRefunds() {
     }
   };
 
+  const handleUpdateLocalInstallment = (index: number, field: string, value: string | number) => {
+    if (!selectedCandidate || !selectedCandidate.refundRequest) return;
+    const newInstallments = [...selectedCandidate.refundRequest.installments];
+    newInstallments[index] = {
+      ...newInstallments[index],
+      [field]: value,
+    };
+    setSelectedCandidate({
+      ...selectedCandidate,
+      refundRequest: {
+        ...selectedCandidate.refundRequest,
+        installments: newInstallments,
+      },
+    });
+  };
+
+  const handleSaveInstallmentChanges = async () => {
+    if (!selectedCandidate || !selectedCandidate.refundRequest) return;
+    setSaving(true);
+    try {
+      await updateDoc(doc(db, "candidates", selectedCandidate.uid), {
+        refundRequest: selectedCandidate.refundRequest,
+        updatedAt: serverTimestamp(),
+      });
+      toast.success("Installment details saved!");
+      fetchCandidates();
+    } catch (error) {
+      toast.error("Failed to save installment details.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
+      <datalist id="payment-currency-options">
+        <option value="EUR">EUR (€)</option>
+        <option value="NPR">NPR (Rs)</option>
+        <option value="INR">INR (₹)</option>
+        <option value="AED">AED (د.إ)</option>
+        <option value="USD">USD ($)</option>
+      </datalist>
+
       <div>
         <h1 className="text-3xl font-bold text-brand-blue">
           Refund Management
@@ -525,10 +566,19 @@ export default function AdminRefunds() {
                 {(selectedCandidate.refundRequest.status === "processing" ||
                   selectedCandidate.refundRequest.status === "completed") && (
                   <div className="space-y-6">
-                    <h4 className="text-xl font-bold text-brand-blue flex items-center gap-2">
-                      <Calendar className="text-brand-gold" size={24} />{" "}
-                      Installment Tracking (90 Days)
-                    </h4>
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xl font-bold text-brand-blue flex items-center gap-2">
+                        <Calendar className="text-brand-gold" size={24} />{" "}
+                        Installment Tracking (90 Days)
+                      </h4>
+                      <button
+                        onClick={handleSaveInstallmentChanges}
+                        disabled={saving}
+                        className="bg-brand-blue text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-brand-gold hover:text-brand-blue transition-all disabled:opacity-50 flex items-center gap-2"
+                      >
+                        {saving ? <Loader2 size={16} className="animate-spin" /> : "Save Changes"}
+                      </button>
+                    </div>
                     <div className="space-y-4">
                       {selectedCandidate.refundRequest.installments.map(
                         (inst, i) => (
@@ -539,7 +589,7 @@ export default function AdminRefunds() {
                             <div className="flex items-center gap-4">
                               <div
                                 className={cn(
-                                  "w-12 h-12 rounded-xl flex items-center justify-center",
+                                  "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
                                   inst.status === "paid"
                                     ? "bg-green-50 text-green-600"
                                     : "bg-orange-50 text-orange-600",
@@ -555,10 +605,25 @@ export default function AdminRefunds() {
                                 <p className="font-bold text-brand-blue text-lg">
                                   Installment {i + 1}
                                 </p>
-                                <p className="text-sm text-gray-400">
+                                <p className="text-sm text-gray-400 mb-2">
                                   Due:{" "}
                                   {new Date(inst.dueDate).toLocaleDateString()}
                                 </p>
+                                <div className="flex flex-wrap gap-2">
+                                  <input
+                                    list="payment-currency-options"
+                                    placeholder="Paid Currency (e.g. AED)"
+                                    className="px-3 py-1.5 text-xs text-black border border-slate-200 rounded-lg outline-none focus:border-brand-blue"
+                                    value={inst.currency || ""}
+                                    onChange={e => handleUpdateLocalInstallment(i, 'currency', e.target.value)}
+                                  />
+                                  <input
+                                    placeholder="Amount in Local Currency"
+                                    className="px-3 py-1.5 text-xs text-black border border-slate-200 rounded-lg outline-none focus:border-brand-blue"
+                                    value={inst.equivalentAmount || ""}
+                                    onChange={e => handleUpdateLocalInstallment(i, 'equivalentAmount', e.target.value)}
+                                  />
+                                </div>
                               </div>
                             </div>
                             <div className="flex items-center gap-8">

@@ -103,7 +103,7 @@ export default function AdminFinancialAccounts() {
     const tot = parseFloat(c.totalAmount || "0") || 0;
     const ris = c.riskAmount || 0;
     const gross = (c.paymentHistory || []).reduce(
-      (acc, curr) => acc + (parseFloat(curr.amount) || 0),
+      (acc, curr) => acc + (curr.equivalentAmount ? parseFloat(curr.equivalentAmount) : parseFloat(curr.amount) || 0),
       0,
     );
     const net = gross - ris;

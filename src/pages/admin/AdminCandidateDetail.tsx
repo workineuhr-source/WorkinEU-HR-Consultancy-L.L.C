@@ -508,7 +508,7 @@ export default function AdminCandidateDetail() {
   const calcTotalAmount = parseFloat(editingProfile.totalAmount || "0") || 0;
   const calcRiskAmount = editingProfile.riskAmount || 0;
   const calcRawPaidAmount = (editingProfile.paymentHistory || []).reduce(
-    (acc, curr) => acc + (parseFloat(curr.amount) || 0),
+    (acc, curr) => acc + (curr.equivalentAmount ? parseFloat(curr.equivalentAmount) : parseFloat(curr.amount) || 0),
     0,
   );
   const calcActualPaidAmount = calcRawPaidAmount - calcRiskAmount;
@@ -2130,7 +2130,7 @@ export default function AdminCandidateDetail() {
                   {editingProfile.paymentHistory?.map((p, i) => (
                     <div
                       key={i}
-                      className="bg-white p-6 rounded-2xl border border-slate-100 grid grid-cols-1 md:grid-cols-5 gap-4 relative group"
+                      className="bg-white p-6 rounded-2xl border border-slate-100 grid grid-cols-1 md:grid-cols-7 gap-4 relative group"
                     >
                       <button
                         onClick={() => {
@@ -2169,7 +2169,7 @@ export default function AdminCandidateDetail() {
                       </div>
                       <div>
                         <label className="block text-[8px] font-black text-gray-400 mb-1 uppercase">
-                          Amount ({editingProfile.paymentCurrency})
+                          Paid Amount
                         </label>
                         <input
                           className="w-full text-xs font-bold outline-none text-brand-blue"
@@ -2184,6 +2184,48 @@ export default function AdminCandidateDetail() {
                               paymentHistory: newH,
                             });
                           }}
+                          placeholder="0.00"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[8px] font-black text-gray-400 mb-1 uppercase">
+                          Currency
+                        </label>
+                        <input
+                          list="payment-currency-options"
+                          className="w-full text-xs font-bold outline-none uppercase"
+                          value={p.currency || editingProfile.paymentCurrency || "EUR"}
+                          onChange={(e) => {
+                            const newH = [
+                              ...(editingProfile.paymentHistory || []),
+                            ];
+                            newH[i] = { ...p, currency: e.target.value };
+                            setEditingProfile({
+                              ...editingProfile,
+                              paymentHistory: newH,
+                            });
+                          }}
+                          placeholder="EUR"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[8px] font-black text-gray-400 mb-1 uppercase">
+                          Eqv ({editingProfile.paymentCurrency || "EUR"})
+                        </label>
+                        <input
+                          className="w-full text-xs font-bold outline-none text-brand-blue"
+                          value={p.equivalentAmount || ""}
+                          onChange={(e) => {
+                            const newH = [
+                              ...(editingProfile.paymentHistory || []),
+                            ];
+                            newH[i] = { ...p, equivalentAmount: e.target.value };
+                            setEditingProfile({
+                              ...editingProfile,
+                              paymentHistory: newH,
+                            });
+                          }}
+                          placeholder="0.00"
                         />
                       </div>
                       <div>

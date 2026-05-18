@@ -4,7 +4,7 @@ import { Job } from "../types";
 import {
   MapPin,
   Briefcase,
-  Calendar,
+  Calendar as CalendarIcon,
   ChevronRight,
   DollarSign,
   AlertCircle,
@@ -18,6 +18,7 @@ import {
   Plane,
   CheckCircle2,
   Users,
+  Clock,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "../lib/utils";
@@ -303,19 +304,29 @@ export default function JobCard({ job, onQuickApply }: JobCardProps) {
 
           <div className="flex flex-wrap gap-2 mb-4">
             <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200 text-[10px] font-bold uppercase tracking-[0.2em] bg-slate-50 dark:bg-white/5 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-white/5">
-              <Calendar size={12} className="text-brand-teal shrink-0" />
+              <CalendarIcon size={12} className="text-brand-teal shrink-0" />
               <span className="truncate">{job.experience} Exp</span>
             </div>
+
+            {job.workingHours && (
+              <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200 text-[10px] font-bold uppercase tracking-[0.2em] bg-slate-50 dark:bg-white/5 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-white/5">
+                <Clock size={12} className="text-brand-teal shrink-0" />
+                <span className="truncate">{job.workingHours}</span>
+              </div>
+            )}
 
             {job.vacancies !== undefined && job.vacancies > 0 && (
               <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200 text-[10px] font-bold uppercase tracking-[0.2em] bg-slate-50 dark:bg-white/5 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-white/5">
                 <Users size={12} className="text-brand-teal shrink-0" />
-                <span className="truncate">
-                  {job.vacancies} Reqs
-                  {job.vacanciesMale || job.vacanciesFemale
-                    ? ` (M:${job.vacanciesMale || 0} F:${job.vacanciesFemale || 0})`
-                    : ""}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span>{job.vacancies} Reqs</span>
+                  {(job.vacanciesMale || job.vacanciesFemale) ? (
+                    <div className="flex items-center gap-1 border-l border-slate-200 dark:border-white/10 pl-1.5">
+                      {job.vacanciesMale ? <span className="text-blue-500">M:{job.vacanciesMale}</span> : null}
+                      {job.vacanciesFemale ? <span className="text-pink-500">F:{job.vacanciesFemale}</span> : null}
+                    </div>
+                  ) : null}
+                </div>
               </div>
             )}
 

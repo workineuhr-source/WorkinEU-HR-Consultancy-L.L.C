@@ -895,7 +895,7 @@ export default function HomePage() {
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-[#0f2e2e]/90 via-[#0f2e2e]/50 to-transparent pointer-events-none"></div>
                           <div className="absolute inset-0 bg-gradient-to-tr from-brand-teal/30 via-transparent to-transparent opacity-80 mix-blend-multiply pointer-events-none"></div>
-                          {heroItems[currentHeroIndex]?.job && (
+                           {heroItems[currentHeroIndex]?.job && (
                             <div className="absolute bottom-[4.5rem] left-6 right-6 text-white pointer-events-none">
                               <h3 className="text-xl sm:text-3xl font-black mb-3 leading-tight drop-shadow-md line-clamp-2">
                                 {heroItems[currentHeroIndex].job?.title}
@@ -903,6 +903,21 @@ export default function HomePage() {
                               <div className="flex flex-wrap gap-2 text-xs sm:text-sm font-medium opacity-95">
                                  <span className="bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-md border border-white/10 shadow-sm">{heroItems[currentHeroIndex].job?.country}</span>
                                  <span className="bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-md border border-white/10 shadow-sm">{heroItems[currentHeroIndex].job?.experience} Exp</span>
+                                 
+                                 {heroItems[currentHeroIndex].job?.workingHours && (
+                                   <span className="bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-md border border-white/10 shadow-sm">{heroItems[currentHeroIndex].job?.workingHours}</span>
+                                 )}
+                                 
+                                 {heroItems[currentHeroIndex].job?.vacancies !== undefined && heroItems[currentHeroIndex].job?.vacancies! > 0 && (
+                                   <span className="bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-md border border-white/10 shadow-sm">
+                                     {heroItems[currentHeroIndex].job?.vacancies} Reqs
+                                     {(heroItems[currentHeroIndex].job?.vacanciesMale || heroItems[currentHeroIndex].job?.vacanciesFemale) ? 
+                                       ` (${heroItems[currentHeroIndex].job?.vacanciesMale ? `M:${heroItems[currentHeroIndex].job?.vacanciesMale}` : ''}${heroItems[currentHeroIndex].job?.vacanciesMale && heroItems[currentHeroIndex].job?.vacanciesFemale ? ', ' : ''}${heroItems[currentHeroIndex].job?.vacanciesFemale ? `F:${heroItems[currentHeroIndex].job?.vacanciesFemale}` : ''})`
+                                       : ''
+                                     }
+                                   </span>
+                                 )}
+
                                  {(heroItems[currentHeroIndex].job?.minSalary || heroItems[currentHeroIndex].job?.maxSalary) && (
                                    <span className="bg-brand-teal/80 backdrop-blur-sm px-3 py-1.5 rounded-md text-white border border-brand-teal/20 shadow-sm">
                                      {heroItems[currentHeroIndex].job?.currency || '€'}{heroItems[currentHeroIndex].job?.minSalary}{heroItems[currentHeroIndex].job?.maxSalary ? ` - ${heroItems[currentHeroIndex].job?.maxSalary}` : ''}

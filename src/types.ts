@@ -8,6 +8,7 @@ export interface Job {
   currency?: string;
   experience: string;
   type: string; // Full-time, Part-time, etc.
+  workingHours?: string;
   description: string;
   responsibilities: string[];
   requirements: string[];
@@ -205,6 +206,8 @@ export interface CandidateProfile {
     receiptUrl?: string;
     note?: string;
     transactionId?: string;
+    currency?: string;
+    equivalentAmount?: string;
   }[];
   createdAt: number;
   updatedAt: number;
@@ -248,6 +251,8 @@ export interface RefundRequest {
     status: "pending" | "paid";
     paidAt?: number;
     note?: string;
+    currency?: string;
+    equivalentAmount?: string;
   }[];
   createdAt: number;
   updatedAt: number;

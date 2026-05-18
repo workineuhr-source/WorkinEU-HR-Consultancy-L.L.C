@@ -2,7 +2,7 @@ import express from "express";
 import OpenAI from "openai";
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
-import firebaseConfig from "./firebase-applet-config.json" assert { type: "json" };
+import firebaseConfig from "./firebase-applet-config.json" with { type: "json" };
 
 const app = express();
 app.use(express.json());
@@ -82,6 +82,66 @@ app.post("/api/ai/recommend", async (req, res) => {
   } catch (error) {
     console.error("AI Error:", error);
     res.status(500).json({ error: "Failed to get AI recommendations" });
+  }
+});
+
+import { GoogleGenAI } from "@google/genai";
+
+app.post("/api/generate-job-image", async (req, res) => {
+  try {
+    const { title, country, description, category } = req.body;
+    
+    // Default to GEMINI_API_KEY for internal generation tasks
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: "Gemini API key is required" });
+    }
+    
+    const ai = new GoogleGenAI({ apiKey, httpOptions: { headers: { 'User-Agent': 'aistudio-build' } }});
+    
+    const prompt = `Create a professional, high-quality promotional banner image for a job offering.
+Job Title: ${title || "Job Opportunity"}
+Industry: ${category || "Corporate"}
+Location: ${country || "Global"}
+Job Description Context: ${description ? description.substring(0, 200) : "We're hiring!"}
+
+Requirements for the image:
+- The design should be modern, clean, and corporate.
+- Include a subtle integration of our company/website logo or a placeholder "WorkInEU" logo if needed.
+- Explicitly include visual elements matching the job title and industry.
+- Explicitly include the national flag of the country (${country || "Unknown"}) somewhere visible in the design.
+- Do NOT include random messy text. If you include text, make it minimalistic and readable, like a sleek title.
+- Ensure the image is photorealistic or a high-quality sleek 3D render.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.1-flash-image-preview',
+      contents: prompt,
+      config: {
+        imageConfig: {
+          aspectRatio: "16:9",
+          imageSize: "1K"
+        }
+      }
+    });
+    
+    let base64Image = null;
+    if (response?.candidates?.[0]?.content?.parts) {
+      for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData) {
+          base64Image = `data:${part.inlineData.mimeType || "image/png"};base64,${part.inlineData.data}`;
+          break;
+        }
+      }
+    }
+    
+    if (base64Image) {
+      res.json({ imageUrl: base64Image });
+    } else {
+      res.status(500).json({ error: "No image received from model" });
+    }
+  } catch (error) {
+    console.error("Image Gen Error:", error);
+    res.status(500).json({ error: error instanceof Error ? error.message : "Failed to generate image" });
   }
 });
 

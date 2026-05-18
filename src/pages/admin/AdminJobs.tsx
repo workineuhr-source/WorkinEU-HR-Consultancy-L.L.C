@@ -442,6 +442,49 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+
+  const generateImageWithAI = async () => {
+    if (!formData.title && !formData.category) {
+      toast.error("Please enter at least a Job Title or Category first.");
+      return;
+    }
+    setIsGeneratingImage(true);
+    const toastId = toast.loading("AI is designing your banner, please wait... (30s max)");
+    try {
+      const res = await fetch("/api/generate-job-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: formData.title,
+          country: formData.country,
+          description: formData.description,
+          category: formData.category
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to generate image");
+      
+      toast.loading("Uploading AI generated image...", { id: toastId });
+      
+      // Upload generated base64 to Firebase storage
+      const base64Response = await fetch(data.imageUrl);
+      const blob = await base64Response.blob();
+      
+      const storage = getStorage();
+      const fileRef = ref(storage, `jobs/ai_${Date.now()}.png`);
+      await uploadBytes(fileRef, blob);
+      const url = await getDownloadURL(fileRef);
+      
+      setFormData({ ...formData, imageUrl: url });
+      toast.success("AI Banner generated and uploaded!", { id: toastId });
+    } catch (error) {
+      console.error("AI Image Generation Error:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to generate image", { id: toastId });
+    } finally {
+      setIsGeneratingImage(false);
+    }
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -610,9 +653,23 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Job Image */}
           <div className="space-y-4">
-            <label className="block text-sm font-bold text-gray-700 dark:text-gray-200">
-              Job Image (Optional)
-            </label>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-200">
+                Job Image (Optional)
+              </label>
+              <button
+                type="button"
+                onClick={generateImageWithAI}
+                disabled={isGeneratingImage}
+                className="text-brand-gold font-bold text-[10px] md:text-xs flex items-center gap-1 hover:text-brand-blue transition-colors disabled:opacity-50"
+              >
+                {isGeneratingImage ? (
+                  <><Loader2 size={12} className="animate-spin" /> Generating...</>
+                ) : (
+                  <><ImageIcon size={12} /> AI Generate Photo</>
+                )}
+              </button>
+            </div>
             <div className="flex flex-col sm:flex-row gap-6 items-start">
               <div className="w-full sm:w-48 h-32 bg-gray-50 dark:bg-white/5 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden relative group">
                 {formData.imageUrl && formData.imageUrl !== "" ? (
@@ -768,13 +825,11 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                 placeholder="e.g. € or USD"
               />
               <datalist id="currency-options">
-                <option value="€">Euro (€)</option>
-                <option value="$">US Dollar ($)</option>
-                <option value="£">British Pound (£)</option>
-                <option value="AED">UAE Dirham (AED)</option>
-                <option value="NPR">Nepalese Rupee (NPR)</option>
-                <option value="PLN">Polish Zloty (PLN)</option>
-                <option value="RON">Romanian Leu (RON)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="NPR">NPR (Rs)</option>
+                <option value="INR">INR (₹)</option>
+                <option value="AED">AED (د.إ)</option>
+                <option value="USD">USD ($)</option>
               </datalist>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
@@ -865,6 +920,29 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                 <option value="Full-time" />
                 <option value="Part-time" />
                 <option value="Contract" />
+              </datalist>
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">
+                Working Hours
+              </label>
+              <input
+                list="working-hours-options"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all"
+                value={formData.workingHours || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, workingHours: e.target.value })
+                }
+                placeholder="e.g. 8 Hours/Day, 6 Days/Week"
+              />
+              <datalist id="working-hours-options">
+                <option value="8 Hours/Day, 6 Days/Week" />
+                <option value="8 Hours/Day, 5 Days/Week" />
+                <option value="9 Hours/Day, 6 Days/Week" />
+                <option value="10 Hours/Day, 6 Days/Week" />
+                <option value="12 Hours/Day, 6 Days/Week" />
+                <option value="Flexible" />
+                <option value="Shift Rotation" />
               </datalist>
             </div>
             <div>
@@ -1000,6 +1078,7 @@ function JobModal({ job, lists, onClose, onSuccess }: JobModalProps) {
                         Currency
                       </label>
                       <input
+                        list="currency-options"
                         className="w-full px-4 py-2 rounded-lg border border-gray-200 outline-none focus:border-brand-gold bg-white dark:bg-[#121212] text-sm"
                         value={pricing.currency || ""}
                         onChange={(e) =>

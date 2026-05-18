@@ -269,8 +269,8 @@ export default function JobDetailsPage() {
                     </div>
                   </div>
 
-                  <div className="flex gap-4">
-                    <div className="px-6 py-3 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl">
+                  <div className="flex flex-wrap gap-4">
+                    <div className="px-6 py-3 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl flex-grow md:flex-grow-0">
                       <p className="text-[9px] font-black text-white/60 uppercase tracking-widest mb-1">
                         Experience
                       </p>
@@ -278,15 +278,27 @@ export default function JobDetailsPage() {
                         {job.experience}
                       </p>
                     </div>
+
+                    {job.workingHours && (
+                      <div className="px-6 py-3 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl flex-grow md:flex-grow-0">
+                        <p className="text-[9px] font-black text-white/60 uppercase tracking-widest mb-1">
+                          Working Hours
+                        </p>
+                        <p className="text-white font-black text-lg">
+                          {job.workingHours}
+                        </p>
+                      </div>
+                    )}
+
                     {job.vacancies !== undefined && (
-                      <div className="px-6 py-3 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl">
+                      <div className="px-6 py-3 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl flex-grow md:flex-grow-0">
                         <p className="text-[9px] font-black text-white/60 uppercase tracking-widest mb-1">
                           Vacancies
                         </p>
                         <p className="text-white font-black text-lg">
                           {job.vacancies || "Open"}
                           {job.vacanciesMale || job.vacanciesFemale
-                            ? <span className="text-sm font-medium text-white/90 ml-2 block sm:inline">({job.vacanciesMale ? `Male: ${job.vacanciesMale}` : ''}{job.vacanciesMale && job.vacanciesFemale ? ', ' : ''}{job.vacanciesFemale ? `Female: ${job.vacanciesFemale}` : ''})</span>
+                            ? <span className="text-sm font-medium text-white/90 ml-2 block sm:inline">({job.vacanciesMale ? `M: ${job.vacanciesMale}` : ''}{job.vacanciesMale && job.vacanciesFemale ? ', ' : ''}{job.vacanciesFemale ? `F: ${job.vacanciesFemale}` : ''})</span>
                             : null}
                         </p>
                       </div>

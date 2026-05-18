@@ -600,7 +600,7 @@ export default function CandidateDashboard() {
   const calcTotalAmount = parseFloat(profile.totalAmount || "0") || 0;
   const calcRiskAmount = profile.riskAmount || 0;
   const calcRawPaidAmount = (profile.paymentHistory || []).reduce(
-    (acc, curr) => acc + (parseFloat(curr.amount) || 0),
+    (acc, curr) => acc + (curr.equivalentAmount ? parseFloat(curr.equivalentAmount) : parseFloat(curr.amount) || 0),
     0,
   );
   const calcActualPaidAmount = calcRawPaidAmount - calcRiskAmount;
@@ -1854,12 +1854,17 @@ export default function CandidateDashboard() {
                                     )}
                                   </td>
                                   <td className="px-8 py-6 text-sm font-bold text-green-600 dark:text-green-400">
-                                    {
-                                      CURRENCY_SYMBOLS[
-                                        profile.paymentCurrency || "EUR"
-                                      ]
-                                    }{" "}
-                                    {payment.amount}
+                                    <div className="flex flex-col gap-1">
+                                      <span>
+                                        {payment.currency || CURRENCY_SYMBOLS[profile.paymentCurrency || "EUR"] || profile.paymentCurrency || "EUR"}{" "}
+                                        {payment.amount}
+                                      </span>
+                                      {payment.equivalentAmount && payment.currency && (
+                                        <span className="text-[10px] text-gray-500 font-medium">
+                                          Eqv: {CURRENCY_SYMBOLS[profile.paymentCurrency || "EUR"] || profile.paymentCurrency || "EUR"} {payment.equivalentAmount}
+                                        </span>
+                                      )}
+                                    </div>
                                   </td>
                                   <td className="px-8 py-6 text-sm text-gray-400 dark:text-gray-500 italic font-medium">
                                     {payment.note || "-"}
@@ -2165,9 +2170,17 @@ export default function CandidateDashboard() {
                                         </div>
                                       </div>
                                       <div className="text-right">
-                                        <p className="font-bold text-brand-blue dark:text-white">
-                                          € {inst.amount}
-                                        </p>
+                                        <div className="flex flex-col gap-1 items-end">
+                                          <span className="font-bold text-brand-blue dark:text-white">
+                                            {inst.currency || "€"}{" "}
+                                            {inst.equivalentAmount || inst.amount}
+                                          </span>
+                                          {inst.equivalentAmount && inst.currency && (
+                                            <span className="text-[10px] text-gray-500 font-medium">
+                                              Eqv: € {inst.amount}
+                                            </span>
+                                          )}
+                                        </div>
                                         <p
                                           className={cn(
                                             "text-[10px] font-black uppercase tracking-widest",

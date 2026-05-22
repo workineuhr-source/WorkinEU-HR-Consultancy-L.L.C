@@ -19,12 +19,16 @@ import {
   Loader2,
   Save,
   Wallet,
+  Download,
+  FileText,
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "../../lib/utils";
 import { useNavigate } from "react-router-dom";
 import { CURRENCY_SYMBOLS } from "../../constants";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export default function AdminFinancialAccounts() {
   const [candidates, setCandidates] = useState<CandidateProfile[]>([]);
@@ -135,6 +139,153 @@ export default function AdminFinancialAccounts() {
     acc[cur].rem += m.rem;
     return acc;
   }, {} as CurrencyTotals);
+
+  const generateInvoice = (candidate: CandidateProfile) => {
+    if (!candidate.paymentHistory || candidate.paymentHistory.length === 0) {
+      toast.error("No payment history to generate an invoice.");
+      return;
+    }
+
+    try {
+      const pdf = new jsPDF("p", "pt", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const math = getMath(candidate);
+
+      // Header Details
+      pdf.setFontSize(24);
+      pdf.setTextColor(20, 40, 70);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("WorkInEU HR Solutions", 40, 60);
+
+      pdf.setFontSize(10);
+      pdf.setTextColor(100);
+      pdf.setFont("helvetica", "normal");
+      pdf.text("International Recruitment Professionals", 40, 75);
+      
+      // Invoice Title
+      pdf.setFontSize(28);
+      pdf.setTextColor(200, 200, 200);
+      pdf.setFont("helvetica", "bold");
+      const invoiceText = "RECEIPT";
+      const invoiceWidth = pdf.getStringUnitWidth(invoiceText) * 28;
+      pdf.text(invoiceText, pageWidth - invoiceWidth - 40, 65);
+      
+      pdf.setDrawColor(220, 220, 220);
+      pdf.line(40, 95, pageWidth - 40, 95);
+
+      // Candidate Info & Pkg
+      pdf.setFontSize(10);
+      pdf.setTextColor(100);
+      pdf.text("BILLED TO:", 40, 115);
+      
+      pdf.setFontSize(12);
+      pdf.setTextColor(20, 40, 70);
+      pdf.setFont("helvetica", "bold");
+      pdf.text(candidate.fullName, 40, 130);
+      
+      pdf.setFontSize(10);
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(100);
+      if (candidate.email) pdf.text(candidate.email, 40, 145);
+      if (candidate.assignedCompany) pdf.text(`Company: ${candidate.assignedCompany}`, 40, 160);
+      
+      // Receipt Details
+      pdf.setFontSize(10);
+      pdf.setTextColor(100);
+      pdf.text("PACKAGE DETAILS:", pageWidth - 200, 115);
+      
+      pdf.setFontSize(11);
+      pdf.setTextColor(20, 40, 70);
+      pdf.setFont("helvetica", "bold");
+      pdf.text(`${math.sym} ${math.tot.toLocaleString()}`, pageWidth - 200, 130);
+      
+      pdf.setFontSize(10);
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(100);
+      const invoiceDate = new Date().toLocaleDateString();
+      pdf.text(`Date Issued: ${invoiceDate}`, pageWidth - 200, 145);
+      
+      // Table Data
+      const tableHeaders = [
+        [
+          "Date",
+          "Method",
+          "Transaction ID",
+          "Raw Amount",
+          "Equivalent",
+        ]
+      ];
+      const tableData = candidate.paymentHistory.map((p) => [
+        p.date ? new Date(p.date).toLocaleDateString() : "-",
+        p.method || "-",
+        p.transactionId || "-",
+        `${CURRENCY_SYMBOLS[p.currency || "EUR"] || p.currency || "EUR"} ${parseFloat(p.amount || "0").toLocaleString()}`,
+        p.equivalentAmount ? `${math.sym} ${parseFloat(p.equivalentAmount).toLocaleString()}` : "-",
+      ]);
+      
+      autoTable(pdf, {
+        startY: 190,
+        head: tableHeaders,
+        body: tableData,
+        theme: 'grid',
+        headStyles: {
+          fillColor: [20, 40, 70],
+          textColor: 255,
+          fontStyle: "bold",
+        },
+        styles: {
+          fontSize: 9,
+          cellPadding: 6,
+        },
+        alternateRowStyles: {
+          fillColor: [248, 250, 252],
+        }
+      });
+      
+      // Summary section (below the table)
+      const finalY = (pdf as any).lastAutoTable.finalY || 190;
+      const startX = pageWidth - 240;
+      
+      pdf.setFontSize(10);
+      pdf.setTextColor(100);
+      pdf.setFont("helvetica", "normal");
+      pdf.text("Gross Collected:", startX, finalY + 30);
+      pdf.text("Risk Deductions:", startX, finalY + 45);
+      
+      pdf.setFontSize(12);
+      pdf.setTextColor(20, 40, 70);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Net Received:", startX, finalY + 65);
+      pdf.text("Remaining Due:", startX, finalY + 80);
+      
+      // Values
+      pdf.setFontSize(10);
+      pdf.setFont("helvetica", "normal");
+      pdf.text(`${math.sym} ${math.gross.toLocaleString()}`, startX + 110, finalY + 30);
+      pdf.setTextColor(234, 88, 12); // Orange for risk
+      pdf.text(`-${math.sym} ${math.ris.toLocaleString()}`, startX + 110, finalY + 45);
+      
+      pdf.setFontSize(12);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(20, 40, 70);
+      pdf.text(`${math.sym} ${math.net.toLocaleString()}`, startX + 110, finalY + 65);
+      
+      pdf.setTextColor(225, 29, 72); // Rose/Red for remaining
+      pdf.text(`${math.sym} ${math.rem.toLocaleString()}`, startX + 110, finalY + 80);
+      
+      // Footer
+      pdf.setFontSize(8);
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(150);
+      pdf.text("This is an electronically generated receipt and does not require a signature.", 40, pdf.internal.pageSize.getHeight() - 40);
+
+      pdf.save(`Receipt_${candidate.fullName.replace(/\s+/g, "_")}.pdf`);
+      toast.success("Invoice downloaded!");
+    } catch (err) {
+      console.error("PDF Gen Error:", err);
+      toast.error("Failed to generate PDF invoice");
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -353,15 +504,25 @@ export default function AdminFinancialAccounts() {
                         </p>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button
-                          onClick={() =>
-                            navigate(`/admin/candidates/${candidate.uid}`)
-                          }
-                          className="text-brand-blue p-2 hover:bg-brand-blue/10 rounded-xl transition-colors"
-                          title="View Full Intel"
-                        >
-                          <ArrowRight size={18} />
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => generateInvoice(candidate)}
+                            disabled={!candidate.paymentHistory || candidate.paymentHistory.length === 0}
+                            className={`p-2 rounded-xl transition-colors flex items-center justify-center ${!candidate.paymentHistory || candidate.paymentHistory.length === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-brand-blue hover:bg-brand-blue/10'}`}
+                            title="Download Invoice/Receipt"
+                          >
+                            <FileText size={18} />
+                          </button>
+                          <button
+                            onClick={() =>
+                              navigate(`/admin/candidates/${candidate.uid}`)
+                            }
+                            className="text-brand-blue p-2 hover:bg-brand-blue/10 rounded-xl transition-colors"
+                            title="View Full Intel"
+                          >
+                            <ArrowRight size={18} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );

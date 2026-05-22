@@ -18,6 +18,11 @@ import {
   Settings2,
   Eye,
   EyeOff,
+  Database,
+  FileText,
+  Download,
+  CreditCard,
+  Lock,
 } from "lucide-react";
 import { db } from "../../firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -30,6 +35,17 @@ export default function AdminSystemSettings() {
   const [settings, setSettings] = useState<SystemSettings>({
     activeConfigId: "",
     apiConfigs: [],
+    rateLimiting: {
+      isEnabled: true,
+      maxRequests: 100,
+    },
+    paymentGateway: {
+      mode: "sandbox",
+    },
+    legalContent: {
+      privacyPolicy: "",
+      termsConditions: "",
+    },
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -168,6 +184,28 @@ export default function AdminSystemSettings() {
     toast.info(
       `Routing logic shifted to: ${settings.apiConfigs.find((c) => c.id === id)?.label}`,
     );
+  };
+
+  const downloadDatabaseBackup = async () => {
+    const toastId = toast.loading("Initiating secure database backup...");
+    try {
+      const response = await fetch('/api/backup');
+      if (!response.ok) throw new Error("Failed to fetch backup");
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `workineu-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
+      toast.success("Database backup downloaded successfully!", { id: toastId });
+    } catch (e) {
+      console.error(e);
+      toast.error("An error occurred during database backup.", { id: toastId });
+    }
   };
 
   if (loading) {
@@ -416,6 +454,175 @@ export default function AdminSystemSettings() {
               ))}
             </AnimatePresence>
           </div>
+          
+          {/* Advanced Security & API Rate Limiting */}
+          <div className="flex justify-between items-center bg-white dark:bg-[#121212] p-10 rounded-[3rem] shadow-sm border border-slate-100 mt-10">
+            <div>
+              <h2 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight flex items-center gap-4">
+                <ShieldCheck className="text-brand-gold" size={32} />
+                Endpoint Security
+              </h2>
+              <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-2">
+                Configure API Rate Limiting to prevent DDoS and Brute Force Attacks
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-black uppercase tracking-widest text-slate-500">
+                {settings.rateLimiting?.isEnabled ? 'ENABLED' : 'DISABLED'}
+              </span>
+              <button
+                onClick={() => setSettings({
+                  ...settings,
+                  rateLimiting: {
+                    ...settings.rateLimiting || { maxRequests: 100, isEnabled: false },
+                    isEnabled: !settings.rateLimiting?.isEnabled
+                  }
+                })}
+                className={cn(
+                  "w-14 h-8 rounded-full transition-colors relative",
+                  settings.rateLimiting?.isEnabled ? "bg-emerald-500" : "bg-slate-300"
+                )}
+              >
+                <div className={cn(
+                  "w-6 h-6 bg-white rounded-full absolute top-1 transition-all shadow-md",
+                  settings.rateLimiting?.isEnabled ? "left-7" : "left-1"
+                )}></div>
+              </button>
+            </div>
+          </div>
+          
+          {settings.rateLimiting?.isEnabled && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-[2.5rem] p-10 border-2 border-brand-gold/20 shadow-lg relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 p-8 opacity-5">
+                <ShieldCheck size={120} />
+              </div>
+              
+              <div className="relative z-10 max-w-xl">
+                <h3 className="text-lg font-black text-slate-900 uppercase tracking-widest mb-4">
+                  Rate Limit Threshold
+                </h3>
+                <p className="text-slate-500 text-sm font-medium mb-8">
+                  Define the maximum number of requests allowed per IP address within a 15-minute window. Exceeding this limit will trigger a 429 Too Many Requests response.
+                </p>
+                
+                <div className="space-y-4">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Max Requests per 15 minutes
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="range"
+                      min="10"
+                      max="1000"
+                      step="10"
+                      value={settings.rateLimiting.maxRequests || 100}
+                      onChange={(e) => setSettings({
+                        ...settings,
+                        rateLimiting: {
+                          ...settings.rateLimiting,
+                          isEnabled: true,
+                          maxRequests: parseInt(e.target.value)
+                        }
+                      })}
+                      className="flex-grow accent-brand-gold"
+                    />
+                    <div className="w-24 px-4 py-2 bg-slate-900 text-brand-gold rounded-xl font-black text-center shadow-inner">
+                      {settings.rateLimiting.maxRequests || 100}
+                    </div>
+                  </div>
+                  <div className="flex justify-between text-[10px] font-bold text-slate-400">
+                    <span>10 (Strict)</span>
+                    <span>1000 (Permissive)</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+          
+          {/* Payment Gateway Toggle */}
+          <div className="flex justify-between items-center bg-white dark:bg-[#121212] p-10 rounded-[3rem] shadow-sm border border-slate-100 mt-10">
+            <div>
+              <h2 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight flex items-center gap-4">
+                <CreditCard className="text-brand-gold" size={32} />
+                Payment Gateway
+              </h2>
+              <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-2">
+                Toggle between Sandbox Testing and Live Production transactions
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-black uppercase tracking-widest text-slate-500">
+                {settings.paymentGateway?.mode === "live" ? 'LIVE MODE' : 'SANDBOX MODE'}
+              </span>
+              <button
+                onClick={() => setSettings({
+                  ...settings,
+                  paymentGateway: {
+                    ...settings.paymentGateway,
+                    mode: settings.paymentGateway?.mode === "live" ? "sandbox" : "live"
+                  }
+                })}
+                className={cn(
+                  "w-14 h-8 rounded-full transition-colors relative",
+                  settings.paymentGateway?.mode === "live" ? "bg-emerald-500" : "bg-slate-300"
+                )}
+              >
+                <div className={cn(
+                  "w-6 h-6 bg-white rounded-full absolute top-1 transition-all shadow-md",
+                  settings.paymentGateway?.mode === "live" ? "left-7" : "left-1"
+                )}></div>
+              </button>
+            </div>
+          </div>
+
+          {/* Legal Compliance */}
+          <div className="bg-white dark:bg-[#121212] p-10 rounded-[3rem] shadow-sm border border-slate-100 mt-10 space-y-8">
+            <h2 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight flex items-center gap-4">
+              <FileText className="text-brand-gold" size={32} />
+              Legal Compliance Pages
+            </h2>
+            <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">
+              Manage the content for Privacy Policy and Terms & Conditions pages.
+            </p>
+            
+            <div className="space-y-6">
+              <div>
+                <label className="text-xs font-black uppercase tracking-widest text-brand-blue mb-2 block">Privacy Policy Content</label>
+                <textarea 
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 min-h-[200px]"
+                  value={settings.legalContent?.privacyPolicy || ''}
+                  onChange={(e) => setSettings({
+                    ...settings,
+                    legalContent: {
+                      ...settings.legalContent || { privacyPolicy: "", termsConditions: "" },
+                      privacyPolicy: e.target.value
+                    }
+                  })}
+                  placeholder="Enter Privacy Policy content..."
+                />
+              </div>
+              
+              <div>
+                <label className="text-xs font-black uppercase tracking-widest text-brand-blue mb-2 block">Terms & Conditions Content</label>
+                <textarea 
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 min-h-[200px]"
+                  value={settings.legalContent?.termsConditions || ''}
+                  onChange={(e) => setSettings({
+                    ...settings,
+                    legalContent: {
+                      ...settings.legalContent || { privacyPolicy: "", termsConditions: "" },
+                      termsConditions: e.target.value
+                    }
+                  })}
+                  placeholder="Enter Terms & Conditions content..."
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Global Action & Instructions Sidebar */}
@@ -459,6 +666,26 @@ export default function AdminSystemSettings() {
                 )}
               </button>
             </div>
+          </div>
+
+          <div className="bg-white rounded-[3rem] p-10 border border-slate-100 space-y-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-brand-blue/5 text-brand-blue rounded-xl">
+                <Database size={20} />
+              </div>
+              <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">
+                System Backup
+              </h4>
+            </div>
+            <p className="text-xs text-slate-500 font-bold leading-relaxed">
+              Generate and download a unified JSON snapshot of your current Cloud Database (Jobs, Candidates, Applications).
+            </p>
+            <button
+              onClick={downloadDatabaseBackup}
+              className="w-full bg-slate-900 text-white p-4 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-brand-blue transition-colors shadow-lg"
+            >
+              <Download size={16} /> Trigger DB Backup
+            </button>
           </div>
 
           <div className="bg-white rounded-[3rem] p-10 border border-slate-100 space-y-6">

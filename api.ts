@@ -1,15 +1,110 @@
 import express from "express";
+import rateLimit from "express-rate-limit";
+import cors from "cors";
 import OpenAI from "openai";
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, collection, getDocs } from "firebase/firestore";
 import firebaseConfig from "./firebase-applet-config.json" with { type: "json" };
 
 const app = express();
 app.use(express.json());
 
+// Content Security & HTTPs rules
+app.use((req, res, next) => {
+  if (req.headers["x-forwarded-proto"] && req.headers["x-forwarded-proto"] !== "https") {
+    return res.redirect(`https://${req.hostname}${req.url}`);
+  }
+  next();
+});
+
+// Configure CORS
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' ? true : '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE']
+}));
+
 // Initialize Firebase for Backend
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
+
+// Global settings cache for rate limiting
+let rateLimitSettings = { isEnabled: true, maxRequests: 100 };
+let lastSettingsFetch = 0;
+
+// Fetch settings helper
+const getRateLimitSettings = async () => {
+  const now = Date.now();
+  if (now - lastSettingsFetch > 60000) { // Cache for 1 minute
+    try {
+      const settingsDoc = await getDoc(doc(db, "settings", "system"));
+      if (settingsDoc.exists()) {
+        const data = settingsDoc.data();
+        if (data.rateLimiting) {
+          rateLimitSettings = data.rateLimiting;
+        }
+      }
+      lastSettingsFetch = now;
+    } catch (e) {
+      console.error("Failed to fetch rate limit settings:", e);
+    }
+  }
+  return rateLimitSettings;
+};
+
+// Start initial background fetch
+getRateLimitSettings();
+
+// Dynamic Rate Limiter Middleware
+const dynamicRateLimiter = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const settings = await getRateLimitSettings();
+  
+  if (!settings.isEnabled) {
+    return next();
+  }
+
+  // Create an on-the-fly limiter configuration or pull from cache 
+  // We can just use the rateLimit module directly configured
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    max: settings.maxRequests || 100, 
+    message: { error: "Too many requests. API Rate Limit exceeded." },
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: (req) => {
+      // Basic IP based key generator
+      return req.ip || req.headers['x-forwarded-for']?.toString() || 'unknown';
+    }
+  });
+
+  return limiter(req, res, next);
+};
+
+// Apply rate limiting globally to all /api/ endpoints
+app.use("/api/", dynamicRateLimiter);
+
+// DB Backup Route
+app.get("/api/backup", async (req, res, next) => {
+  try {
+    const collectionsToBackup = ["jobs", "candidates", "applications", "users"];
+    const backupData: any = {};
+    
+    for (const colName of collectionsToBackup) {
+      const colRef = collection(db, colName);
+      const snapshot = await getDocs(colRef);
+      backupData[colName] = {};
+      snapshot.forEach(docSnap => {
+        backupData[colName][docSnap.id] = docSnap.data();
+      });
+    }
+
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename=backup-${new Date().toISOString().split('T')[0]}.json`);
+    res.json(backupData);
+  } catch (error) {
+    next(error);
+  }
+});
+
 
 // AI Recommendation Route
 app.post("/api/ai/recommend", async (req, res) => {
@@ -151,5 +246,17 @@ app.get("/api/health", (req, res) => {
 });
 
 // You can add more API routes here
+
+// Global Error Handler
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error("Global Error Handler Log:", err);
+  const status = err.status || 500;
+  const message = err.message || "Internal Server Error";
+  res.status(status).json({
+    error: {
+      message: process.env.NODE_ENV === 'production' ? "An unexpected error occurred. Please try again later." : message,
+    }
+  });
+});
 
 export default app;

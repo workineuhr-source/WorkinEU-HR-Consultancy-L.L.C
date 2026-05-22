@@ -262,6 +262,17 @@ export interface SystemSettings {
   activeConfigId?: string;
   apiConfigs: APIConfig[];
   updatedAt?: number;
+  rateLimiting?: {
+    isEnabled: boolean;
+    maxRequests: number;
+  };
+  paymentGateway?: {
+    mode: "sandbox" | "live";
+  };
+  legalContent?: {
+    privacyPolicy: string;
+    termsConditions: string;
+  };
 }
 
 export interface APIConfig {

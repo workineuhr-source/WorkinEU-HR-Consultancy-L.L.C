@@ -10,12 +10,8 @@ const app = express();
 app.use(express.json());
 
 // Content Security & HTTPs rules
-app.use((req, res, next) => {
-  if (req.headers["x-forwarded-proto"] && req.headers["x-forwarded-proto"] !== "https") {
-    return res.redirect(`https://${req.hostname}${req.url}`);
-  }
-  next();
-});
+// HTTPS is handled by the platform ingress
+
 
 // Configure CORS
 app.use(cors({
@@ -186,57 +182,45 @@ app.post("/api/generate-job-image", async (req, res) => {
   try {
     const { title, country, description, category } = req.body;
     
-    // Default to GEMINI_API_KEY for internal generation tasks
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return res.status(500).json({ error: "Gemini API key is required" });
-    }
+    // Instead of paid Imagen API, we use Pollinations AI for free high-quality image generation
+    const prompt = `Professional high quality promotional banner for a job offering. ${title || "Job Opportunity"} in ${category || "Corporate"}. Location: ${country || "Global"}. Modern clean corporate branding, photorealistic or sleek 3D render.`;
     
-    const ai = new GoogleGenAI({ apiKey, httpOptions: { headers: { 'User-Agent': 'aistudio-build' } }});
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1200&height=630&nologo=true`;
     
-    const prompt = `Create a professional, high-quality promotional banner image for a job offering.
-Job Title: ${title || "Job Opportunity"}
-Industry: ${category || "Corporate"}
-Location: ${country || "Global"}
-Job Description Context: ${description ? description.substring(0, 200) : "We're hiring!"}
-
-Requirements for the image:
-- The design should be modern, clean, and corporate.
-- Include a subtle integration of our company/website logo or a placeholder "WorkInEU" logo if needed.
-- Explicitly include visual elements matching the job title and industry.
-- Explicitly include the national flag of the country (${country || "Unknown"}) somewhere visible in the design.
-- Do NOT include random messy text. If you include text, make it minimalistic and readable, like a sleek title.
-- Ensure the image is photorealistic or a high-quality sleek 3D render.`;
-
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.1-flash-image-preview',
-      contents: prompt,
-      config: {
-        imageConfig: {
-          aspectRatio: "16:9",
-          imageSize: "1K"
-        }
-      }
-    });
+    // Fetch the image to return as base64
+    const imageRes = await fetch(imageUrl);
+    if (!imageRes.ok) throw new Error("Failed to generate free image from Pollinations");
     
-    let base64Image = null;
-    if (response?.candidates?.[0]?.content?.parts) {
-      for (const part of response.candidates[0].content.parts) {
-        if (part.inlineData) {
-          base64Image = `data:${part.inlineData.mimeType || "image/png"};base64,${part.inlineData.data}`;
-          break;
-        }
-      }
-    }
+    const buffer = await imageRes.arrayBuffer();
+    const base64Image = `data:image/jpeg;base64,${Buffer.from(buffer).toString("base64")}`;
     
-    if (base64Image) {
-      res.json({ imageUrl: base64Image });
-    } else {
-      res.status(500).json({ error: "No image received from model" });
-    }
-  } catch (error) {
+    res.json({ imageUrl: base64Image });
+  } catch (error: any) {
     console.error("Image Gen Error:", error);
-    res.status(500).json({ error: error instanceof Error ? error.message : "Failed to generate image" });
+    res.status(500).json({ error: error.message || "Failed to generate image" });
+  }
+});
+
+app.post("/api/generate-diary-image", async (req, res) => {
+  try {
+    const { title, category, content } = req.body;
+    
+    // Instead of paid Imagen API, we use Pollinations AI for free high-quality image generation
+    const prompt = `High quality professional editorial banner image for a blog post. Title: ${title || "Blog Post"}. Category: ${category || "Corporate"}. Context: ${content ? content.substring(0, 100) : "News"}. Elegant modern design, no text.`;
+    
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1200&height=630&nologo=true`;
+    
+    // Fetch the image to return as base64
+    const imageRes = await fetch(imageUrl);
+    if (!imageRes.ok) throw new Error("Failed to generate free image from Pollinations");
+    
+    const buffer = await imageRes.arrayBuffer();
+    const base64Image = `data:image/jpeg;base64,${Buffer.from(buffer).toString("base64")}`;
+    
+    res.json({ imageUrl: base64Image });
+  } catch (error: any) {
+    console.error("Diary Image Gen Error:", error);
+    res.status(500).json({ error: error.message || "Failed to generate image" });
   }
 });
 

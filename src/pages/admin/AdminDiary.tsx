@@ -308,17 +308,22 @@ function DiaryModal({ post, onClose, onSuccess }: DiaryModalProps) {
     }
 
     setIsGenerating(true);
+    const toastId = toast.loading("AI is writing the story and generating a matching image... (This may take up to 30s)");
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `Write a professional blog post/diary entry for an HR consultancy called WorkinEU. 
-        The title is "${formData.title}". 
+        model: "gemini-3.1-flash-preview",
+        contents: `Write a professional blog post/diary entry for an HR consultancy called WorkinEU.
+        The title is "${formData.title}".
         The category is "${formData.category}".
-        IMPORTANT RULES:
-        - Do NOT use markdown headings (no '#' symbols).
-        - Use bold text (**like this**) for important key points instead of headings.
-        - Make it sound natural, human-written, engaging, professional, and informative.
+        
+        CRITICAL RULES:
+        1. DO NOT use markdown characters like * or #.
+        2. Return the content in clean HTML structure without wrapping html/body tags.
+        3. For headings or subjects, use <h3 class="text-2xl font-bold text-brand-blue mb-4">.
+        4. To make things bold, use <strong class="font-bold text-slate-900 dark:text-white">...</strong>.
+        5. For important notes or tips, use a nice Tailwind styled div: <div class="bg-brand-teal/10 border-l-4 border-brand-teal p-6 rounded-r-2xl my-6"><span class="font-bold text-brand-teal block mb-2">Note</span>...</div>.
+        6. Wrap normal paragraphs in <p class="mb-6">.
         Return the response in JSON format with a single key "content" (string).`,
         config: {
           responseMimeType: "application/json",
@@ -326,14 +331,42 @@ function DiaryModal({ post, onClose, onSuccess }: DiaryModalProps) {
       });
 
       const data = JSON.parse(response.text);
+      let contentString = data.content;
+      
+      // Auto-generate matching image
+      let imageUrl = formData.imageUrl;
+      try {
+        const res = await fetch("/api/generate-diary-image", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: formData.title,
+            category: formData.category,
+            content: contentString
+          })
+        });
+        const imgData = await res.json();
+        if (res.ok && imgData.imageUrl) {
+          toast.loading("Uploading matching AI image...", { id: toastId });
+          const base64Response = await fetch(imgData.imageUrl);
+          const blob = await base64Response.blob();
+          const storageRef = ref(storage, `diary/ai_${Date.now()}.png`);
+          await uploadBytes(storageRef, blob);
+          imageUrl = await getDownloadURL(storageRef);
+        }
+      } catch (imgErr) {
+        console.error("AI Image error:", imgErr);
+      }
+
       setFormData({
         ...formData,
-        content: data.content,
+        content: contentString,
+        imageUrl: imageUrl,
       });
-      toast.success("AI Content Generated!");
+      toast.success("AI Content and Image Generated Successfully!", { id: toastId });
     } catch (error) {
       console.error("AI Generation Error:", error);
-      toast.error("Failed to generate content with AI");
+      toast.error("Failed to generate content with AI", { id: toastId });
     } finally {
       setIsGenerating(false);
     }

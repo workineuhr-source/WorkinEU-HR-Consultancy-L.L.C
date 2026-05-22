@@ -209,6 +209,12 @@ export default function AdminCandidateDetail() {
       return;
     }
 
+    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Invalid file type. Only PDF, PNG, and JPG are allowed.", { id: toastId });
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64 = event.target?.result as string;
@@ -2373,6 +2379,7 @@ export default function AdminCandidateDetail() {
                 <Upload size={14} /> Upload File
                 <input
                   type="file"
+                  accept="application/pdf,image/png,image/jpeg,image/jpg"
                   className="hidden"
                   onChange={handleDocumentUpload}
                 />

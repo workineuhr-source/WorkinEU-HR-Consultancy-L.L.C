@@ -2,6 +2,7 @@ import { getDirectImageUrl } from "../lib/utils";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import SEO from "../components/SEO";
+import { Helmet } from "react-helmet-async";
 import {
   ArrowRight,
   CheckCircle2,
@@ -733,9 +734,29 @@ export default function HomePage() {
     );
   }
 
+  const faqSchema = content.faqs && content.faqs.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": content.faqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
+  } : null;
+
   return (
     <div className="overflow-hidden bg-white dark:bg-[#121212]">
       <SEO title="Jobs in Europe for Nepalese | HR Recruitment Agency" />
+      {faqSchema && (
+        <Helmet>
+          <script type="application/ld+json">
+            {JSON.stringify(faqSchema)}
+          </script>
+        </Helmet>
+      )}
       {/* Hero Section */}
       <section className="relative min-h-[40vh] lg:min-h-[50vh] flex items-center pt-20 pb-8 overflow-hidden bg-white dark:bg-[#121212]">
         <div className="absolute inset-0 z-0">

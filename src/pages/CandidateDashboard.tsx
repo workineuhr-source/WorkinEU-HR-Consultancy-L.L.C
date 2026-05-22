@@ -303,6 +303,12 @@ export default function CandidateDashboard() {
       return;
     }
 
+    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Invalid file type. Only PDF, PNG, and JPG are allowed.");
+      return; // Do NOT clear file input here, as it's uncontrolled, just exit. Wait, the user can re-trigger if they want.
+    }
+
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64 = event.target?.result as string;
@@ -1396,6 +1402,7 @@ export default function CandidateDashboard() {
                               <div className="relative group">
                                 <input
                                   type="file"
+                                  accept="application/pdf,image/png,image/jpeg,image/jpg"
                                   required={!newDoc.url}
                                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                   onChange={handleCandidateDocumentUpload}

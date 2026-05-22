@@ -288,6 +288,12 @@ export default function ApplicationForm({
             toast.error(`File ${file.name} is too large (max 5MB)`);
             continue;
           }
+
+          const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+          if (!allowedTypes.includes(file.type)) {
+            toast.error(`File ${file.name} has invalid type. Only PDF, PNG, and JPG are allowed.`);
+            continue;
+          }
           
           let userId = auth.currentUser?.uid;
           const storageRef = ref(storage, `applications/${userId || 'guest'}-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '')}`);

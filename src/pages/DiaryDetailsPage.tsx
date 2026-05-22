@@ -162,9 +162,10 @@ export default function DiaryDetailsPage() {
           transition={{ delay: 0.4 }}
           className="prose prose-xl prose-slate max-w-none"
         >
-          <div className="text-slate-600 dark:text-slate-300 leading-relaxed font-light whitespace-pre-wrap text-xl">
-            {post.content}
-          </div>
+          <div 
+            className="text-slate-600 dark:text-slate-300 leading-relaxed font-light text-lg md:text-xl"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
         </motion.div>
 
         {/* Footer CTA */}

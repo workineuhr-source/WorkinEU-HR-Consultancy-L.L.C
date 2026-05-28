@@ -93,7 +93,7 @@ export default function OfficePage() {
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-gold/20 backdrop-blur-md border border-brand-gold/30 text-brand-gold text-xs font-bold uppercase tracking-[0.3em] mb-8">
                 <Building2 size={14} /> Visit Our Office
               </span>
-              <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold text-white mb-8 tracking-tight leading-[0.9]">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-8 tracking-tight leading-[0.9]">
                 Where Excellence <br />
                 <span className="text-brand-gold italic font-serif">
                   Meets Ambition.

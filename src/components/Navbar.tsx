@@ -149,7 +149,7 @@ export default function Navbar({ user }: NavbarProps) {
           : "bg-transparent py-5",
       )}
     >
-      <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-12">
+      <div className="max-w-[1700px] mx-auto px-4 md:px-8 lg:px-12">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <Link

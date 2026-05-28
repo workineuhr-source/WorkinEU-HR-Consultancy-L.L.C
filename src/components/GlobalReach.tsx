@@ -59,7 +59,7 @@ export default function GlobalReach({
         </>
       )}
 
-      <div className="max-w-[1920px] mx-auto px-4 md:px-8 relative z-10">
+      <div className="max-w-[1700px] mx-auto px-4 md:px-8 relative z-10">
         <div className="max-w-4xl mb-12 md:mb-16">
           <motion.span
             initial={{ opacity: 0, y: 10 }}

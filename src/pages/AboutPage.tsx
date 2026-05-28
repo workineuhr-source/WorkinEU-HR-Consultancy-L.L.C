@@ -63,7 +63,7 @@ export default function AboutPage() {
 
       {/* Hero Section */}
       <section className="relative py-20 overflow-hidden z-10">
-        <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-12">
+        <div className="max-w-[1700px] mx-auto px-4 md:px-8 lg:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 lg:gap-32 items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -73,7 +73,7 @@ export default function AboutPage() {
               <span className="text-brand-teal font-black uppercase tracking-[0.5em] mb-10 block text-[10px] md:text-xs">
                 The WorkinEU Identity
               </span>
-              <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-slate-900 dark:text-white mb-12 tracking-tight leading-[0.85]">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-12 tracking-tight leading-[0.85]">
                 Dubai Heart, <br />{" "}
                 <span className="text-brand-teal italic font-serif">
                   Global
@@ -148,7 +148,7 @@ export default function AboutPage() {
 
       {/* Mission & Vision */}
       <section className="py-40 relative z-10">
-        <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-12">
+        <div className="max-w-[1700px] mx-auto px-4 md:px-8 lg:px-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
             <motion.div
               whileHover={{ y: -15 }}
@@ -190,7 +190,7 @@ export default function AboutPage() {
       {/* Values */}
       <section className="py-40 bg-white dark:bg-[#121212] relative z-10 overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-brand-teal/5 rounded-full blur-[150px] pointer-events-none"></div>
-        <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-12 relative">
+        <div className="max-w-[1700px] mx-auto px-4 md:px-8 lg:px-12 relative">
           <div className="text-center max-w-4xl mx-auto mb-32">
             <span className="text-brand-teal font-black uppercase tracking-[0.5em] mb-10 block text-[10px] md:text-xs">
               Our Foundation
@@ -260,13 +260,13 @@ export default function AboutPage() {
       {/* Why Choose Us */}
       <section className="py-40 bg-slate-50 dark:bg-white/5 overflow-hidden relative z-10">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-brand-gold/5 skew-x-12 translate-x-1/4"></div>
-        <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-12 relative z-10">
+        <div className="max-w-[1700px] mx-auto px-4 md:px-8 lg:px-12 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
             <div>
               <span className="text-brand-gold font-bold uppercase tracking-[0.5em] mb-8 block text-xs">
                 The Advantage
               </span>
-              <h2 className="text-5xl md:text-8xl font-bold text-slate-900 dark:text-white mb-12 tracking-tighter leading-none">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white mb-12 tracking-tighter leading-none">
                 {content?.whyChooseUs?.title || "Why Partner"}{" "}
                 <span className="text-brand-gold italic">With Us?</span>
               </h2>

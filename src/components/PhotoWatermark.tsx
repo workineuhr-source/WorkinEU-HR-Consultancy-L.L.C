@@ -10,7 +10,7 @@ export const getSiteLogo = async (): Promise<string | null> => {
   if (cachedLogo !== null) return cachedLogo;
   if (!logoPromise) {
     logoPromise = getDoc(doc(db, "settings", "siteContent")).then((snap) => {
-      const url = snap.exists() ? snap.data().logoUrl || null : null;
+      const url = snap.exists() ? snap.data().logoUrl || "/logo.png" : "/logo.png";
       cachedLogo = url;
       return url;
     });

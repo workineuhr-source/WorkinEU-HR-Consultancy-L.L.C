@@ -127,7 +127,7 @@ const Section = ({
         className,
       )}
     >
-      <div className="max-w-[1920px] mx-auto px-4 md:px-8">
+      <div className="max-w-[1700px] mx-auto px-4 md:px-8">
         {(tagline || title || subtitle || image) && (
           <div
             className={cn(
@@ -786,7 +786,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="max-w-[1920px] mx-auto px-4 md:px-8 relative z-10 w-full">
+        <div className="max-w-[1700px] mx-auto px-4 md:px-8 relative z-10 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <div className="order-2 lg:order-1">
               <motion.div
@@ -812,34 +812,46 @@ export default function HomePage() {
                   <Globe2 size={16} />{" "}
                   {content.heroTagline || "Connecting Talent Globally"}
                 </span>
-                <h1
-                  className={cn(
-                    "text-5xl sm:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tight",
-                    getFontClass(content.styles?.heroTitle?.font),
-                    getTextColor(content.styles?.heroTitle?.color),
-                  )}
-                >
-                  {content.autoHeroJobs && featuredJobs.length > 0 ? (
-                    <>
-                      Latest Opening:{" "}
-                      <span className="text-brand-teal">
-                        {featuredJobs[0].title}
-                      </span>{" "}
-                      in{" "}
-                      <span className="text-brand-rose">
-                        {featuredJobs[0].country}
-                      </span>
-                    </>
-                  ) : content.heroTitle ? (
-                    <span dangerouslySetInnerHTML={{ __html: content.heroTitle }} />
-                  ) : (
-                    <>
-                      Connecting <span className="text-brand-teal">Talent</span>{" "}
-                      with Global{" "}
-                      <span className="text-brand-rose">Opportunities</span>
-                    </>
-                  )}
-                </h1>
+
+                {content.heroLeftImageUrl ? (
+                  <div className="relative">
+                    <img
+                      src={getDirectImageUrl(content.heroLeftImageUrl)}
+                      alt="Hero Graphical Text"
+                      className="max-h-[300px] md:max-h-[400px] w-auto object-contain drop-shadow-xl"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                ) : (
+                  <h1
+                    className={cn(
+                      "text-5xl md:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight",
+                      getFontClass(content.styles?.heroTitle?.font),
+                      getTextColor(content.styles?.heroTitle?.color),
+                    )}
+                  >
+                    {content.autoHeroJobs && featuredJobs.length > 0 ? (
+                      <>
+                        Latest Opening:{" "}
+                        <span className="text-brand-teal">
+                          {featuredJobs[0].title}
+                        </span>{" "}
+                        in{" "}
+                        <span className="text-brand-rose">
+                          {featuredJobs[0].country}
+                        </span>
+                      </>
+                    ) : content.heroTitle ? (
+                      <span dangerouslySetInnerHTML={{ __html: content.heroTitle }} />
+                    ) : (
+                      <>
+                        Connecting <span className="text-brand-teal">Talent</span>{" "}
+                        with Global{" "}
+                        <span className="text-brand-rose">Opportunities</span>
+                      </>
+                    )}
+                  </h1>
+                )}
                 <p
                   className={cn(
                     "text-lg md:text-xl font-medium leading-relaxed max-w-xl",
@@ -916,11 +928,19 @@ export default function HomePage() {
                       className="absolute inset-0"
                     >
                       {heroItems[currentHeroIndex]?.link ? (
-                        <Link to={heroItems[currentHeroIndex].link!} className="absolute inset-0 block group/link">
+                        <Link to={heroItems[currentHeroIndex].link!} className="absolute inset-0 block group/link bg-black/40">
+                          <img
+                            src={heroItems[currentHeroIndex].url?.includes("unsplash.com") ? `${heroItems[currentHeroIndex].url.split('?')[0]}?auto=format&fit=crop&w=3840&q=100` : getDirectImageUrl(heroItems[currentHeroIndex].url)}
+                            alt=""
+                            className="absolute inset-0 w-full h-full object-cover opacity-50 blur-3xl transition-transform duration-1000 group-hover/slider:scale-110 -z-10"
+                            referrerPolicy="no-referrer"
+                            loading="eager"
+                            aria-hidden="true"
+                          />
                           <img
                             src={heroItems[currentHeroIndex].url?.includes("unsplash.com") ? `${heroItems[currentHeroIndex].url.split('?')[0]}?auto=format&fit=crop&w=3840&q=100` : getDirectImageUrl(heroItems[currentHeroIndex].url)}
                             alt={heroItems[currentHeroIndex].title || "Professional recruitment"}
-                            className="w-full h-full object-cover transition-transform duration-1000 group-hover/slider:scale-110"
+                            className="relative z-0 w-full h-full object-contain transition-transform duration-1000 group-hover/slider:scale-110"
                             referrerPolicy="no-referrer"
                             loading="eager"
                           />
@@ -966,11 +986,19 @@ export default function HomePage() {
                           </div>
                         </Link>
                       ) : (
-                        <div className="absolute inset-0">
+                        <div className="absolute inset-0 bg-black/40">
+                           <img
+                             src={heroItems[currentHeroIndex].url?.includes("unsplash.com") ? `${heroItems[currentHeroIndex].url.split('?')[0]}?auto=format&fit=crop&w=3840&q=100` : getDirectImageUrl(heroItems[currentHeroIndex].url)}
+                             alt=""
+                             className="absolute inset-0 w-full h-full object-cover opacity-50 blur-3xl transition-transform duration-1000 group-hover/slider:scale-110 -z-10"
+                             referrerPolicy="no-referrer"
+                             loading="eager"
+                             aria-hidden="true"
+                           />
                            <img
                              src={heroItems[currentHeroIndex].url?.includes("unsplash.com") ? `${heroItems[currentHeroIndex].url.split('?')[0]}?auto=format&fit=crop&w=3840&q=100` : getDirectImageUrl(heroItems[currentHeroIndex].url)}
                              alt="Professional recruitment"
-                             className="w-full h-full object-cover transition-transform duration-1000 group-hover/slider:scale-110"
+                             className="relative z-0 w-full h-full object-contain transition-transform duration-1000 group-hover/slider:scale-110"
                              referrerPolicy="no-referrer"
                              loading="eager"
                            />
@@ -1682,7 +1710,7 @@ export default function HomePage() {
               {/* Decorative background glow */}
               <div className="absolute -inset-10 bg-brand-teal/5 rounded-[6rem] blur-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none"></div>
 
-              <div className="max-w-[1920px] mx-auto px-4 md:px-8">
+              <div className="max-w-[1700px] mx-auto px-4 md:px-8">
                 <div className="bg-white dark:bg-[#1A1A1A] border border-slate-200/60 dark:border-white/10 rounded-[4rem] md:rounded-[6rem] overflow-hidden relative shadow-[0_40px_100px_-20px_rgba(0,0,0,0.05)] dark:shadow-none">
                   {/* Animated highlights */}
                   <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-teal/10 rounded-full blur-[100px] translate-x-1/2 -translate-y-1/2 animate-pulse"></div>
@@ -2112,7 +2140,7 @@ export default function HomePage() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-[2rem] sm:text-4xl md:text-5xl lg:text-[60px] xl:text-[4rem] font-black mb-8 tracking-tight leading-[1] text-slate-900 dark:text-white xl:whitespace-nowrap">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-8 tracking-tight leading-[1.1] text-slate-900 dark:text-white">
               Ready to <span className="text-brand-teal italic">Partner</span>{" "}
               With Us?
             </h2>

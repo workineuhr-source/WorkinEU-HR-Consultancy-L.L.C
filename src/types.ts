@@ -334,6 +334,7 @@ export interface SiteContent {
   footerLogoUrl?: string;
   faviconUrl?: string;
   heroImageUrl?: string;
+  heroLeftImageUrl?: string;
   heroImageUrls?: string[];
   aboutImageUrl?: string;
   servicesImageUrl?: string;

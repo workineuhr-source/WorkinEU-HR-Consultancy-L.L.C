@@ -310,7 +310,7 @@ export default function JobsPage() {
         style={{ animationDelay: "2s" }}
       ></div>
 
-      <div className="max-w-[1920px] mx-auto px-4 md:px-12 lg:px-16 relative z-10">
+      <div className="max-w-[1700px] mx-auto px-4 md:px-12 lg:px-16 relative z-10">
         {/* Header */}
         <div className="mb-32 text-center w-full mx-auto relative pt-10">
           <motion.div
@@ -330,7 +330,7 @@ export default function JobsPage() {
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-7xl lg:text-8xl font-black text-slate-900 dark:text-white mb-6 md:mb-8 tracking-tight leading-[0.9]"
+            className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-6 md:mb-8 tracking-tight leading-[0.9]"
           >
             Job{" "}
             <span className="text-brand-teal italic font-serif">Market</span>
@@ -733,7 +733,7 @@ export default function JobsPage() {
             style={{ animationDelay: "2s" }}
           ></div>
 
-          <div className="flex flex-col lg:flex-row relative z-10 items-center justify-between p-6 md:p-10 lg:p-12 gap-8 max-w-[1920px] mx-auto px-4 md:px-12 lg:px-16">
+          <div className="flex flex-col lg:flex-row relative z-10 items-center justify-between p-6 md:p-10 lg:p-12 gap-8 max-w-[1700px] mx-auto px-4 md:px-12 lg:px-16">
             {/* Left Side: Content */}
             <div className="flex-1">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-gold/10 border border-brand-gold/20 text-brand-gold text-[10px] font-black uppercase tracking-[0.4em] mb-4 w-fit">

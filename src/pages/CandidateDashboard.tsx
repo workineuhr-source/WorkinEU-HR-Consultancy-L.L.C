@@ -621,7 +621,7 @@ export default function CandidateDashboard() {
       <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-[0.03] dark:opacity-[0.05] pointer-events-none"></div>
       <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-brand-teal/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2 animate-pulse"></div>
 
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
+      <div className="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
         {/* Mobile Header */}
         <div className="lg:hidden flex items-center justify-between mb-8 px-2 pt-10">
           <Link to="/" className="flex items-center gap-3 group">

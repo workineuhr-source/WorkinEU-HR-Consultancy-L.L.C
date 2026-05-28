@@ -85,7 +85,7 @@ export default function Footer() {
       <div className="absolute top-0 left-0 w-full h-px bg-premium-gradient-animated opacity-20"></div>
       <div className="absolute inset-0 bg-mesh opacity-5 pointer-events-none"></div>
 
-      <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-12 relative z-10">
+      <div className="max-w-[1700px] mx-auto px-4 md:px-8 lg:px-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 mb-20">
           {/* Company Info - 4 columns */}
           <div className="lg:col-span-4 space-y-10">

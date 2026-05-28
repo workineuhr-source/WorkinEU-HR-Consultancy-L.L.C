@@ -1746,6 +1746,40 @@ export default function AdminContent() {
                     <div className="space-y-6">
                       <div className="flex justify-between items-center mb-4">
                         <label className="block text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-widest">
+                          Hero Custom Left Image
+                        </label>
+                      </div>
+                      <div className="flex gap-4 mb-8">
+                        <input
+                          className="flex-grow px-5 py-3 rounded-xl border border-gray-200 outline-none focus:border-brand-gold transition-all text-sm bg-gray-50 dark:bg-white/5"
+                          value={content.heroLeftImageUrl || ""}
+                          onChange={(e) =>
+                            setContent({
+                              ...content,
+                              heroLeftImageUrl: e.target.value,
+                            })
+                          }
+                          placeholder="Leave empty to use 'Connecting Global Talent' text. Enter an image URL to replace it."
+                        />
+                        <label className="bg-brand-blue/5 px-4 rounded-xl cursor-pointer hover:bg-brand-blue/10 transition-all flex items-center gap-2 text-brand-blue font-bold text-xs uppercase tracking-widest">
+                          {uploading === "heroLeftImageUrl" ? (
+                            <Loader2 className="animate-spin" size={16} />
+                          ) : (
+                            <Upload size={16} />
+                          )}
+                          <input
+                            type="file"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={(e) =>
+                              handleFileUpload(e, "heroLeftImageUrl")
+                            }
+                          />
+                        </label>
+                      </div>
+
+                      <div className="flex justify-between items-center mb-4">
+                        <label className="block text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-widest">
                           Hero Background Images (Slider)
                         </label>
                         <button

@@ -156,7 +156,7 @@ export default function AdminApiManagement() {
   }
 
   return (
-    <div className="p-6 md:p-10 max-w-[1920px] mx-auto space-y-10">
+    <div className="p-6 md:p-10 max-w-[1700px] mx-auto space-y-10">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white dark:bg-[#121212] p-8 rounded-[2rem] shadow-sm border border-slate-100">
         <div>
           <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight flex items-center gap-4">

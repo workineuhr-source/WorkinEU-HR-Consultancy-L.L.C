@@ -394,7 +394,7 @@ export default function AdminDashboard() {
 
         {/* Viewport */}
         <div className="flex-grow overflow-y-auto p-4 md:p-8 scroll-smooth">
-          <div className="max-w-[1920px] mx-auto">
+          <div className="max-w-[1700px] mx-auto">
             <ErrorBoundary>
               <Routes>
                 <Route path="/" element={<AdminOverview />} />

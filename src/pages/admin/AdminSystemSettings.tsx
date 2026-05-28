@@ -245,7 +245,7 @@ export default function AdminSystemSettings() {
           ></div>
         </div>
 
-        <div className="max-w-[1920px] mx-auto relative z-10">
+        <div className="max-w-[1700px] mx-auto relative z-10">
           <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-12">
             <div className="space-y-6">
               <div className="flex items-center gap-4">
@@ -305,7 +305,7 @@ export default function AdminSystemSettings() {
         </div>
       </div>
 
-      <div className="max-w-[1920px] mx-auto px-8 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <div className="max-w-[1700px] mx-auto px-8 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12">
         {/* API Nodes Architecture Listing */}
         <div className="lg:col-span-8 space-y-10">
           <div className="flex justify-between items-center bg-white dark:bg-[#121212] p-10 rounded-[3rem] shadow-sm border border-slate-100">

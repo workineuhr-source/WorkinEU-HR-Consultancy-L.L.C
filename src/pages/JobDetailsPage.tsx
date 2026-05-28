@@ -215,7 +215,7 @@ export default function JobDetailsPage() {
       <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-10 dark:opacity-20 pointer-events-none"></div>
       <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-brand-gold/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2 animate-pulse"></div>
 
-      <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:px-12 relative z-10">
+      <div className="max-w-[1700px] mx-auto px-4 md:px-8 lg:px-12 relative z-10">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}

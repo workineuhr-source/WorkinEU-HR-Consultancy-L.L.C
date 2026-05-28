@@ -42,11 +42,44 @@ import {
   Heart,
 } from "lucide-react";
 import ApplicationForm from "../components/ApplicationForm";
+import PhotoWatermark from "../components/PhotoWatermark";
 import { motion, AnimatePresence } from "motion/react";
-import Markdown from "react-markdown";
 import { cn } from "../lib/utils";
 import { toast } from "sonner";
 import SEO from "../components/SEO";
+
+const formatJobText = (text: string) => {
+  if (!text) return null;
+  return text.split("\n").map((line, i) => {
+    const isMainPoint = /^[#*]/.test(line.trim());
+    const cleanLine = line.replace(/[*#]/g, "").trim();
+    if (!cleanLine) return null;
+    return (
+      <div
+        key={i}
+        className={cn(
+          "mb-3",
+          isMainPoint
+            ? "font-bold text-slate-900 dark:text-white mt-6"
+            : "text-slate-600 dark:text-slate-300 font-normal"
+        )}
+      >
+        {cleanLine}
+      </div>
+    );
+  });
+};
+
+const formatListItem = (text: string) => {
+  if (!text) return null;
+  const isMainPoint = /^[#*]/.test(text.trim());
+  const cleanLine = text.replace(/[*#]/g, "").trim();
+  return (
+    <span className={cn(isMainPoint ? "font-bold text-slate-900 dark:text-white" : "")}>
+      {cleanLine}
+    </span>
+  );
+};
 
 export default function JobDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -223,12 +256,15 @@ export default function JobDetailsPage() {
             <div className="absolute -inset-6 bg-brand-gold/10 rounded-[4rem] md:rounded-[6rem] blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
             <div className="h-[450px] md:h-[650px] w-full rounded-[4rem] md:rounded-[5.5rem] overflow-hidden relative shadow-[0_60px_100px_-20px_rgba(15,23,42,0.25)] border-4 border-white/50 dark:border-white/10 group-hover:shadow-[0_80px_120px_-20px_rgba(15,23,42,0.35)] transition-all duration-700">
               {job.imageUrl ? (
-                <img
-                  src={getDirectImageUrl(job.imageUrl)}
-                  alt={job.title}
-                  className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-[2000ms] ease-out"
-                  referrerPolicy="no-referrer"
-                />
+                <>
+                  <img
+                    src={getDirectImageUrl(job.imageUrl)}
+                    alt={job.title}
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-[2000ms] ease-out"
+                    referrerPolicy="no-referrer"
+                  />
+                  <PhotoWatermark />
+                </>
               ) : (
                 <div className="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                   <Briefcase
@@ -523,8 +559,8 @@ export default function JobDetailsPage() {
                       exit={{ opacity: 0, y: -10 }}
                       className="prose prose-slate dark:prose-invert max-w-none prose-p:text-slate-600 dark:prose-p:text-slate-300 prose-headings:text-slate-900 dark:prose-headings:text-white prose-strong:text-slate-900 dark:prose-strong:text-white prose-ul:text-slate-600 dark:prose-ul:text-slate-300 prose-li:text-slate-600 dark:prose-li:text-slate-300 prose-a:text-brand-blue dark:prose-a:text-brand-gold"
                     >
-                      <div className="text-lg leading-relaxed font-light">
-                        <Markdown>{job.description}</Markdown>
+                      <div className="leading-relaxed">
+                        {formatJobText(job.description)}
                       </div>
                     </motion.div>
                   )}
@@ -545,8 +581,8 @@ export default function JobDetailsPage() {
                             <div className="w-8 h-8 bg-brand-gold/10 text-brand-gold rounded-lg flex items-center justify-center shrink-0">
                               <CheckCircle2 size={16} />
                             </div>
-                            <span className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
-                              <Markdown>{item}</Markdown>
+                            <span className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-normal">
+                              {formatListItem(item)}
                             </span>
                           </li>
                         ))}
@@ -570,8 +606,8 @@ export default function JobDetailsPage() {
                             <div className="w-8 h-8 bg-brand-gold/10 text-brand-gold rounded-lg flex items-center justify-center shrink-0">
                               <CheckCircle2 size={16} />
                             </div>
-                            <span className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
-                              <Markdown>{item}</Markdown>
+                            <span className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-normal">
+                              {formatListItem(item)}
                             </span>
                           </li>
                         ))}

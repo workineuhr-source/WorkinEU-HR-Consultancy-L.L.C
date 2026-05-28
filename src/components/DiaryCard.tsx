@@ -1,4 +1,5 @@
 import { getDirectImageUrl } from "../lib/utils";
+import PhotoWatermark from "./PhotoWatermark";
 import { motion } from "motion/react";
 import { Calendar, User, ArrowRight } from "lucide-react";
 import { DiaryPost } from "../types";
@@ -28,18 +29,19 @@ export default function DiaryCard({ post }: DiaryCardProps) {
               `https://images.unsplash.com/photo-1541746972996-4e0b0f43e01a?auto=format&fit=crop&q=80&w=800`
             )}
             alt={post.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+            className="w-full h-full object-contain bg-slate-100 dark:bg-white/5 transition-transform duration-1000 group-hover:scale-105"
             referrerPolicy="no-referrer"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-700"></div>
+          <PhotoWatermark />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-700 pointer-events-none"></div>
 
-          <div className="absolute top-5 right-5">
+          <div className="absolute top-5 right-5 pointer-events-none">
             <span className="bg-brand-gold text-slate-900 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
               {post.category || "Updates"}
             </span>
           </div>
 
-          <div className="absolute bottom-5 left-6 right-6">
+          <div className="absolute bottom-5 left-6 right-6 pointer-events-none">
             <div className="flex flex-wrap items-center gap-4 text-white/90 text-xs font-bold uppercase tracking-wider">
               <div className="flex items-center gap-1.5">
                 <Calendar size={14} className="text-brand-teal" />
@@ -57,11 +59,11 @@ export default function DiaryCard({ post }: DiaryCardProps) {
 
         <div className="p-8 flex flex-col flex-grow bg-white dark:bg-transparent">
           <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 group-hover:text-brand-teal transition-colors leading-snug tracking-tight font-sans line-clamp-2">
-            {post.title}
+            {post.title.replace(/[*#]/g, "")}
           </h3>
 
           <p className="text-slate-500 dark:text-slate-400 line-clamp-3 mb-8 leading-relaxed font-normal flex-grow text-base">
-            {post.content}
+            {post.content.replace(/[*#]/g, "")}
           </p>
 
           <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-white/5 mt-auto">

@@ -78,28 +78,6 @@ const dynamicRateLimiter = async (req: express.Request, res: express.Response, n
 // Apply rate limiting globally to all /api/ endpoints
 app.use("/api/", dynamicRateLimiter);
 
-// DB Backup Route
-app.get("/api/backup", async (req, res, next) => {
-  try {
-    const collectionsToBackup = ["jobs", "candidates", "applications", "users"];
-    const backupData: any = {};
-    
-    for (const colName of collectionsToBackup) {
-      const colRef = collection(db, colName);
-      const snapshot = await getDocs(colRef);
-      backupData[colName] = {};
-      snapshot.forEach(docSnap => {
-        backupData[colName][docSnap.id] = docSnap.data();
-      });
-    }
-
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Content-Disposition', `attachment; filename=backup-${new Date().toISOString().split('T')[0]}.json`);
-    res.json(backupData);
-  } catch (error) {
-    next(error);
-  }
-});
 
 
 // AI Recommendation Route
@@ -221,6 +199,49 @@ app.post("/api/generate-diary-image", async (req, res) => {
   } catch (error: any) {
     console.error("Diary Image Gen Error:", error);
     res.status(500).json({ error: error.message || "Failed to generate image" });
+  }
+});
+
+app.post("/api/generate-success-story", async (req, res) => {
+  try {
+    const { name, country, position } = req.body;
+    
+    const prompt = `Write a short 2-3 sentence success story about a candidate named ${name} who successfully secured a job as a ${position} in ${country} through WorkinEU Human Resources.
+    
+CRITICAL RULES:
+1. DO NOT use ANY markdown symbols like * or #.
+2. If you want to make text bold, use standard HTML <b> tag.
+3. If you want to highlight a note, wrap it in a <div class="bg-brand-gold/10 p-4 rounded-xl mt-4 border-l-4 border-brand-gold"><b>Note:</b> ...</div>.
+4. Clean HTML only, no markdown markdown code blocks.`;
+
+    // Try using Pollinations AI text endpoint
+    const response = await fetch("https://text.pollinations.ai/openai", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer sk_FhJCovrPXCWEjXPSBaS6Ttk9AwRtsfaF"
+      },
+      body: JSON.stringify({
+        messages: [{ role: "user", content: prompt }],
+        model: "openai"
+      })
+    });
+    
+    const data = await response.json();
+    const storyText = data.choices[0].message.content;
+    
+    // Generate an image
+    const imagePrompt = `Professional photorealistic portrait of ${name}, a ${position} from ${country}, happy and smiling at work, high quality corporate headshot photography.`;
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=512&height=512&nologo=true`;
+    
+    const imageRes = await fetch(imageUrl);
+    const buffer = await imageRes.arrayBuffer();
+    const base64Image = `data:image/jpeg;base64,${Buffer.from(buffer).toString("base64")}`;
+
+    res.json({ story: storyText, imageUrl: base64Image });
+  } catch (error: any) {
+    console.error("Success Story Gen Error:", error);
+    res.status(500).json({ error: error.message || "Failed to generate story" });
   }
 });
 

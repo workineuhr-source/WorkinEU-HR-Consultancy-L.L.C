@@ -18,6 +18,7 @@ import {
 import { Link } from "react-router-dom";
 
 import BottomCTA from "../components/BottomCTA";
+import PhotoWatermark from "../components/PhotoWatermark";
 import SEO from "../components/SEO";
 
 export default function AboutPage() {
@@ -119,6 +120,7 @@ export default function AboutPage() {
                   referrerPolicy="no-referrer"
                   loading="lazy"
                 />
+                <PhotoWatermark />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/60 via-transparent to-transparent"></div>
               </div>
               <motion.div
@@ -332,6 +334,7 @@ export default function AboutPage() {
                   className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-1000"
                   referrerPolicy="no-referrer"
                 />
+                <PhotoWatermark />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/60 via-transparent to-transparent"></div>
               </motion.div>
             </div>

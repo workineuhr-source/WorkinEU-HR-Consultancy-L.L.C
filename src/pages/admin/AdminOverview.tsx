@@ -107,6 +107,8 @@ export default function AdminOverview() {
   const [distributionError, setDistributionError] = useState<string | null>(
     null,
   );
+  const [categoryData, setCategoryData] = useState<any[]>([]);
+  const [categoryError, setCategoryError] = useState<string | null>(null);
   const [recentAppsError, setRecentAppsError] = useState<string | null>(null);
   const [allApplications, setAllApplications] = useState<Application[]>([]);
   const [recentAppsStatusFilter, setRecentAppsStatusFilter] = useState("all");
@@ -125,6 +127,7 @@ export default function AdminOverview() {
         setErrorMessage(null);
         setTrendsError(null);
         setDistributionError(null);
+        setCategoryError(null);
         setRecentAppsError(null);
 
         const [jobsSnap, appsSnap, messagesSnap, candidatesSnap, diarySnap] =
@@ -215,6 +218,31 @@ export default function AdminOverview() {
             ]);
           } catch (err) {
             setDistributionError("Failed to process status distribution");
+          }
+
+          // Prepare Category Data
+          try {
+            const rawJobs = (jobsSnap as any).docs.map((doc: any) => ({
+              id: doc.id,
+              ...doc.data(),
+            })) as Job[];
+            const jobCategoryMap: Record<string, string> = {};
+            rawJobs.forEach((job) => {
+              jobCategoryMap[job.id] = job.category || "Unknown";
+            });
+
+            const categoryCounts: Record<string, number> = {};
+            apps.forEach((app: Application) => {
+              const cat = jobCategoryMap[app.jobId] || "Other";
+              categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+            });
+            const sortedCategories = Object.entries(categoryCounts)
+              .map(([name, count]) => ({ name, value: count }))
+              .sort((a, b) => b.value - a.value)
+              .slice(0, 5); // top 5
+            setCategoryData(sortedCategories);
+          } catch (err) {
+            setCategoryError("Failed to process category distribution");
           }
         } else {
           setStats((prev) => ({ ...prev, totalJobs: jobsSnap.size }));
@@ -450,6 +478,69 @@ export default function AdminOverview() {
                 </span>
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Category Chart Section */}
+      <div className="grid grid-cols-1 gap-8">
+        <div className="bg-white dark:bg-[#121212] p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-6 md:mb-8">
+            <div>
+              <h3 className="text-lg md:text-xl font-bold text-brand-blue">
+                Applications by Category
+              </h3>
+              <p className="text-xs md:text-sm text-gray-400">
+                Top 5 high-demand job sectors based on applications
+              </p>
+            </div>
+            <div className="p-2 md:p-3 bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400 rounded-xl">
+              <BarChart3 size={20} />
+            </div>
+          </div>
+          <div className="h-[250px] md:h-[300px] w-full relative">
+            {categoryError ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-red-500 bg-red-50/50 rounded-2xl border border-red-100 p-4 text-center">
+                <AlertCircle size={32} className="mb-2 opacity-50" />
+                <p className="font-bold text-sm">{categoryError}</p>
+                <p className="text-xs opacity-70 mt-1">
+                  Please try refreshing the page
+                </p>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={categoryData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                  <XAxis 
+                    dataKey="name" 
+                    tick={{fill: '#9CA3AF', fontSize: 12}} 
+                    axisLine={false} 
+                    tickLine={false} 
+                  />
+                  <YAxis 
+                    tick={{fill: '#9CA3AF', fontSize: 12}} 
+                    axisLine={false} 
+                    tickLine={false} 
+                    allowDecimals={false}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#FFF', 
+                      borderRadius: '16px', 
+                      border: 'none', 
+                      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' 
+                    }}
+                    cursor={{fill: '#F9FAFB'}} 
+                  />
+                  <Bar 
+                    dataKey="value" 
+                    fill="#8B5CF6" 
+                    radius={[6, 6, 0, 0]} 
+                    barSize={40} 
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
       </div>

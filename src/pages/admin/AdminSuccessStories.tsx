@@ -12,6 +12,7 @@ import {
   FileText,
   Save,
   X,
+  Sparkles,
 } from "lucide-react";
 import { db } from "../../firebase";
 import {
@@ -40,6 +41,7 @@ export default function AdminSuccessStories() {
     null,
   );
   const [uploading, setUploading] = useState<"photo" | "visa" | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [newStory, setNewStory] = useState<Partial<VisaSuccessStory>>({
     candidateName: "",
     candidatePhotoUrl: "",
@@ -49,6 +51,56 @@ export default function AdminSuccessStories() {
     story: "",
     order: 0,
   });
+
+  const handleGenerateAI = async () => {
+    if (!newStory.candidateName || !newStory.country || !newStory.position) {
+      toast.error("Please enter Candidate Name, Country, and Position first.");
+      return;
+    }
+
+    setIsGenerating(true);
+    const toastId = toast.loading("AI is generating story and candidate photo...");
+    try {
+      const response = await fetch("/api/generate-success-story", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newStory.candidateName,
+          country: newStory.country,
+          position: newStory.position,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to generate AI data");
+
+      const data = await response.json();
+      
+      let finalPhotoUrl = newStory.candidatePhotoUrl;
+      // If AI generated an image, upload it to storage
+      if (data.imageUrl) {
+        toast.loading("Uploading generated photo...", { id: toastId });
+        const base64Response = await fetch(data.imageUrl);
+        const blob = await base64Response.blob();
+        const storage = getStorage();
+        const storageRef = ref(storage, `success-stories/ai-photo-${Date.now()}`);
+        await uploadBytes(storageRef, blob);
+        finalPhotoUrl = await getDownloadURL(storageRef);
+      }
+
+      setNewStory((prev) => ({
+        ...prev,
+        story: data.story || prev.story,
+        candidatePhotoUrl: finalPhotoUrl,
+      }));
+      
+      toast.success("AI Generation Complete!", { id: toastId });
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to generate with AI", { id: toastId });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   useEffect(() => {
     const q = query(
@@ -418,9 +470,20 @@ export default function AdminSuccessStories() {
 
                 {/* Story Note */}
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-widest mb-2">
-                    Short Story/Note (Optional)
-                  </label>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-widest">
+                      Short Story/Note (Optional)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleGenerateAI}
+                      disabled={isGenerating}
+                      className="text-[10px] font-black uppercase tracking-widest bg-brand-gold/10 text-brand-gold px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:bg-brand-gold/20 transition-all disabled:opacity-50"
+                    >
+                      {isGenerating ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                      AI Auto-Fill
+                    </button>
+                  </div>
                   <textarea
                     rows={6}
                     className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 dark:bg-white/5 outline-none focus:bg-white focus:border-brand-gold transition-all text-sm"
@@ -513,9 +576,10 @@ export default function AdminSuccessStories() {
                 </span>
               </div>
               {story.story && (
-                <p className="text-gray-500 dark:text-gray-300 text-sm line-clamp-3 italic">
-                  "{story.story}"
-                </p>
+                <div 
+                  className="text-gray-500 dark:text-gray-300 text-sm line-clamp-3 italic prose-sm"
+                  dangerouslySetInnerHTML={{ __html: `"${story.story}"` }} 
+                />
               )}
               <div className="mt-4 pt-4 border-t border-gray-50 flex justify-between items-center">
                 <span className="text-[10px] text-gray-400 font-medium">

@@ -1,6 +1,7 @@
 import { getDirectImageUrl } from "../lib/utils";
 import { CandidateProfile } from "../types";
 import { cn } from "../lib/utils";
+import { motion } from "motion/react";
 import {
   Mail,
   Phone,
@@ -154,7 +155,11 @@ export default function EuropassCV({
   const styles = getThemeStyles(theme);
 
   return (
-    <div
+    <motion.div
+      key={theme}
+      initial={{ opacity: 0, filter: "blur(4px)" }}
+      animate={{ opacity: 1, filter: "blur(0px)" }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
       id={id}
       contentEditable={id === "europass-cv-live-preview"}
       suppressContentEditableWarning={true}
@@ -626,6 +631,6 @@ export default function EuropassCV({
           Generated via WorkinEU HR • Europass Protocol • {theme} Design
         </p>
       </div>
-    </div>
+    </motion.div>
   );
 }

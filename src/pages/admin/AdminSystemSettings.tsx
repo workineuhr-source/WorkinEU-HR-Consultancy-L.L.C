@@ -25,7 +25,7 @@ import {
   Lock,
 } from "lucide-react";
 import { db } from "../../firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, getDocs } from "firebase/firestore";
 import { toast } from "sonner";
 import { SystemSettings, APIConfig } from "../../types";
 import { motion, AnimatePresence } from "motion/react";
@@ -189,10 +189,19 @@ export default function AdminSystemSettings() {
   const downloadDatabaseBackup = async () => {
     const toastId = toast.loading("Initiating secure database backup...");
     try {
-      const response = await fetch('/api/backup');
-      if (!response.ok) throw new Error("Failed to fetch backup");
+      const collectionsToBackup = ["jobs", "candidates", "applications", "users"];
+      const backupData: any = {};
       
-      const blob = await response.blob();
+      for (const colName of collectionsToBackup) {
+        const colRef = collection(db, colName);
+        const snapshot = await getDocs(colRef);
+        backupData[colName] = {};
+        snapshot.forEach(docSnap => {
+          backupData[colName][docSnap.id] = docSnap.data();
+        });
+      }
+      
+      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

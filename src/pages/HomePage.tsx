@@ -1,7 +1,26 @@
 import { getDirectImageUrl } from "../lib/utils";
+import heroHrOffice from "../assets/images/hero_hr_office_1779791450512.png";
+import successConstruction from "../assets/images/success_construction_1779791468955.png";
+import successVisa from "../assets/images/success_visa_1779791485057.png";
+import successNepal from "../assets/images/success_nepal_1779791507636.png";
+import aboutGlobalHr from "../assets/images/about_global_hr_1779791524425.png";
+import partnerIcon1 from "../assets/images/partner_icon_1_1779791602669.png";
+import partnerIcon2 from "../assets/images/partner_icon_2_1779791619170.png";
+import partnerIcon3 from "../assets/images/partner_icon_3_1779791634653.png";
+import partnerIcon4 from "../assets/images/partner_icon_4_1779791654265.png";
+import hrSolutions from "../assets/images/hr_solutions_1779791542804.png";
+import coreExpertiseTeam from "../assets/images/core_expertise_team_1779791558726.png";
+import workineuStandards from "../assets/images/workineu_standards_1779791577687.png";
+import livingInEurope from "../assets/images/living_in_europe_1779791669600.png";
+import step1Interview from "../assets/images/step_1_interview_1779791684404.png";
+import step2Visa from "../assets/images/step_2_visa_1779791701608.png";
+import step3Flight from "../assets/images/step_3_flight_1779791720681.png";
+import step4Arrival from "../assets/images/step_4_arrival_1779791739427.png";
+
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import SEO from "../components/SEO";
+import PhotoWatermark from "../components/PhotoWatermark";
 import { Helmet } from "react-helmet-async";
 import {
   ArrowRight,
@@ -172,7 +191,7 @@ const Section = ({
                 <img
                   src={getDirectImageUrl(image)}
                   alt={title || "Section visual"}
-                  className="w-full h-full object-contain transition-transform duration-1000 hover:scale-105"
+                  className="w-full h-full object-cover transition-transform duration-1000 hover:scale-105"
                   referrerPolicy="no-referrer"
                   loading="lazy"
                 />
@@ -203,8 +222,7 @@ export default function HomePage() {
       title: "Successful Placement of 50+ Candidates in Poland",
       content:
         "We are thrilled to announce the successful placement of over 50 skilled workers in the construction and logistics sectors across Poland this month.",
-      imageUrl:
-        "https://images.unsplash.com/photo-1541746972996-4e0b0f43e01a?auto=format&fit=crop&q=80&w=800",
+      imageUrl: successConstruction,
       author: "Admin",
       category: "Success Stories",
       createdAt: Date.now() - 86400000 * 2,
@@ -214,8 +232,7 @@ export default function HomePage() {
       title: "New Visa Regulations for Germany: What You Know",
       content:
         "Germany has recently updated its skilled migration laws, making it easier for qualified professionals from non-EU countries to secure work permits.",
-      imageUrl:
-        "https://images.unsplash.com/photo-1589252392322-45cbbdad6f73?auto=format&fit=crop&q=80&w=800",
+      imageUrl: successVisa,
       author: "Legal Team",
       category: "Visa Updates",
       createdAt: Date.now() - 86400000 * 5,
@@ -225,8 +242,7 @@ export default function HomePage() {
       title: "Expanding Our Reach: New Branch Office in Nepal",
       content:
         "To better serve our candidates in South Asia, WorkinEU has officially opened its new branch office in Kathmandu, Nepal.",
-      imageUrl:
-        "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800",
+      imageUrl: successNepal,
       author: "Management",
       category: "Company News",
       createdAt: Date.now() - 86400000 * 10,
@@ -249,8 +265,7 @@ export default function HomePage() {
       "WorkinEU Human Resources Consultancies LLC is a Dubai-based international recruitment agency specializing in sourcing and placing skilled and unskilled workers from Asia, Africa, and the Gulf into industries across Europe and the Middle East.",
     mission:
       "To empower organizations by aligning their HR strategy with business objectives, enhancing efficiency and productivity through expert workforce solutions.",
-    servicesImageUrl:
-      "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&q=80&w=1200",
+    servicesImageUrl: aboutGlobalHr,
     vision:
       "To be the leading HR partner for growth-minded businesses in Europe and the Gulf, driving success through strategic talent acquisition.",
     values: [
@@ -379,30 +394,25 @@ export default function HomePage() {
     partners: [
       {
         name: "EU Logistics",
-        logoUrl:
-          "https://images.unsplash.com/photo-1586528116311-ad86d7c71798?auto=format&fit=crop&q=80&w=200",
+        logoUrl: partnerIcon1,
       },
       {
         name: "Global Health",
-        logoUrl:
-          "https://images.unsplash.com/photo-1505751172107-573228a64227?auto=format&fit=crop&q=80&w=200",
+        logoUrl: partnerIcon2,
       },
       {
         name: "Euro Build",
-        logoUrl:
-          "https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=200",
+        logoUrl: partnerIcon3,
       },
       {
         name: "Tech Solutions",
-        logoUrl:
-          "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=200",
+        logoUrl: partnerIcon4,
       },
     ],
     professionalHrSolutionsTitle: "Professional HR Solutions",
     professionalHrSolutionsDescription:
       "At WorkinEU Human Resources Consultancies LLC, we provide end-to-end professional HR solutions tailored to the unique needs of the global labor market. Our expertise spans across recruitment, documentation, and visa processing, ensuring a seamless transition for both employers and candidates. We specialize in sourcing highly skilled and unskilled talent from Asia, Africa, and the Gulf, placing them into key industries across Europe and the Middle East.\n\nOur commitment to excellence is reflected in our precision-guided support at every stage of the professional journey. By aligning organizational HR strategies with business objectives, we drive efficiency and long-term productivity for our partners. We don't just fill positions; we build the foundations for sustainable international career success.",
-    professionalHrSolutionsImageUrl:
-      "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200",
+    professionalHrSolutionsImageUrl: hrSolutions,
   });
 
   const [contactForm, setContactForm] = useState({
@@ -516,7 +526,7 @@ export default function HomePage() {
           query(collection(db, "jobs"), orderBy("createdAt", "desc"), limit(20)),
           (snap) => {
             const jobsList = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Job);
-            setFeaturedJobs(jobsList.filter((j) => j.status !== "hidden").slice(0, 3));
+            setFeaturedJobs(jobsList.filter((j) => j.status !== "hidden").slice(0, 6));
           },
         );
 
@@ -645,23 +655,20 @@ export default function HomePage() {
       items.push({
         id: "default-1",
         url:
-          content.heroImageUrl ||
-          "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=1200",
+          content.heroImageUrl || heroHrOffice,
       });
     }
 
     // Job images
     if (featuredJobs && featuredJobs.length > 0) {
       featuredJobs.forEach((job) => {
-        if (job.imageUrl) {
-          items.push({
-            id: `job-${job.id}`,
-            url: job.imageUrl,
-            link: `/jobs/${job.id}`,
-            title: job.title,
-            job: job,
-          });
-        }
+        items.push({
+          id: `job-${job.id}`,
+          url: job.imageUrl || heroHrOffice,
+          link: `/jobs/${job.id}`,
+          title: job.title,
+          job: job,
+        });
       });
     }
 
@@ -824,7 +831,7 @@ export default function HomePage() {
                       </span>
                     </>
                   ) : content.heroTitle ? (
-                    content.heroTitle
+                    <span dangerouslySetInnerHTML={{ __html: content.heroTitle }} />
                   ) : (
                     <>
                       Connecting <span className="text-brand-teal">Talent</span>{" "}
@@ -843,8 +850,11 @@ export default function HomePage() {
                     ),
                   )}
                 >
-                  {content.heroDescription ||
-                    "WorkinEU HR is your trusted partner for premium international recruitment and visa services, bridging the gap between world-class talent and global excellence."}
+                  {content.heroDescription ? (
+                    <span dangerouslySetInnerHTML={{ __html: content.heroDescription }} />
+                  ) : (
+                    "WorkinEU HR is your trusted partner for premium international recruitment and visa services, bridging the gap between world-class talent and global excellence."
+                  )}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-6 pt-6">
                   <Link
@@ -914,6 +924,7 @@ export default function HomePage() {
                             referrerPolicy="no-referrer"
                             loading="eager"
                           />
+                          <PhotoWatermark />
                           <div className="absolute inset-0 bg-gradient-to-t from-[#0f2e2e]/90 via-[#0f2e2e]/50 to-transparent pointer-events-none"></div>
                           <div className="absolute inset-0 bg-gradient-to-tr from-brand-teal/30 via-transparent to-transparent opacity-80 mix-blend-multiply pointer-events-none"></div>
                            {heroItems[currentHeroIndex]?.job && (
@@ -963,6 +974,7 @@ export default function HomePage() {
                              referrerPolicy="no-referrer"
                              loading="eager"
                            />
+                           <PhotoWatermark />
                            <div className="absolute inset-0 bg-gradient-to-t from-[#0f2e2e]/60 to-transparent pointer-events-none mix-blend-overlay"></div>
                            <div className="absolute inset-0 bg-gradient-to-tr from-brand-teal/20 via-transparent to-transparent opacity-0 group-hover/slider:opacity-100 transition-opacity duration-1000 pointer-events-none mix-blend-overlay"></div>
                         </div>
@@ -1210,10 +1222,10 @@ export default function HomePage() {
                 <PlaneTakeoff size={32} />,
               ];
               const imgs = [
-                "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&q=80&w=800",
-                "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&q=80&w=800",
-                "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&q=80&w=800",
-                "https://images.unsplash.com/photo-1436491865332-7a61a109c0f3?auto=format&fit=crop&q=80&w=800",
+                step1Interview,
+                step2Visa,
+                step3Flight,
+                step4Arrival,
               ];
               return (
                 <motion.div
@@ -1225,7 +1237,7 @@ export default function HomePage() {
                     <img
                       src={getDirectImageUrl(imgs[i % imgs.length])}
                       alt={step.title}
-                      className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-1000 pointer-events-none"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 pointer-events-none"
                       referrerPolicy="no-referrer"
                     />
                     <div className="absolute inset-0 bg-slate-900/40 group-hover:bg-brand-teal/20 transition-colors duration-700"></div>
@@ -1274,11 +1286,14 @@ export default function HomePage() {
               >
                 <div className="relative h-64 overflow-hidden">
                   {story.visaImageUrl && (
-                    <img
-                      src={getDirectImageUrl(story.visaImageUrl)}
-                      className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-1000"
-                      referrerPolicy="no-referrer"
-                    />
+                    <>
+                      <img
+                        src={getDirectImageUrl(story.visaImageUrl)}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                        referrerPolicy="no-referrer"
+                      />
+                      <PhotoWatermark />
+                    </>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent" />
                   <div className="absolute bottom-6 left-6 flex items-center gap-4">
@@ -1286,7 +1301,7 @@ export default function HomePage() {
                       {story.candidatePhotoUrl && (
                         <img
                           src={getDirectImageUrl(story.candidatePhotoUrl)}
-                          className="w-full h-full object-contain"
+                          className="w-full h-full object-cover"
                           referrerPolicy="no-referrer"
                         />
                       )}
@@ -1309,9 +1324,10 @@ export default function HomePage() {
                     </span>
                   </div>
                   {story.story && (
-                    <p className="text-slate-600 dark:text-slate-300 text-sm italic leading-relaxed">
-                      "{story.story}"
-                    </p>
+                    <div 
+                      className="text-slate-600 dark:text-slate-300 text-sm italic leading-relaxed prose-sm"
+                      dangerouslySetInnerHTML={{ __html: `"${story.story}"` }} 
+                    />
                   )}
                 </div>
               </motion.div>
@@ -1538,13 +1554,13 @@ export default function HomePage() {
               >
               <img
                 src={getDirectImageUrl(
-                  content.professionalHrSolutionsImageUrl ||
-                  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200"
+                  content.professionalHrSolutionsImageUrl || hrSolutions
                 )}
                 alt="Professional HR Solutions"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
                 referrerPolicy="no-referrer"
               />
+              <PhotoWatermark />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent pointer-events-none"></div>
               <div className="absolute bottom-6 right-6 lg:bottom-10 lg:right-10 w-20 h-20 md:w-24 md:h-24 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 flex items-center justify-center">
                 <Target size={32} className="text-white md:w-10 md:h-10" />
@@ -1639,13 +1655,13 @@ export default function HomePage() {
               <div className="rounded-[4rem] overflow-hidden relative aspect-[3/4] shadow-2xl border-8 border-white dark:border-white/10 group">
                 <img
                   src={getDirectImageUrl(
-                    content.coreStrengthsImageUrl ||
-                    "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800"
+                    content.coreStrengthsImageUrl || coreExpertiseTeam
                   )}
                   alt="Expertise"
-                  className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-1000"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                   referrerPolicy="no-referrer"
                 />
+                <PhotoWatermark />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
                 <div className="absolute bottom-10 left-10 right-10">
                   <p className="text-[10px] font-black text-brand-teal uppercase tracking-[0.4em] mb-3">
@@ -1726,7 +1742,7 @@ export default function HomePage() {
                                   referrerPolicy="no-referrer"
                                   src={getDirectImageUrl(`https://i.pravatar.cc/100?u=partners-${i}`)}
                                   alt="Partner"
-                                  className="w-full h-full object-contain grayscale hover:grayscale-0 transition-all duration-500"
+                                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
                                 />
                               </div>
                             ))}
@@ -1744,84 +1760,23 @@ export default function HomePage() {
                       </motion.div>
                     </div>
 
-                    {/* Side Image & Logo Cloud Section */}
-                    <div className="xl:col-span-6 grid grid-cols-1 md:grid-cols-2">
-                      {/* Side Photo */}
-                      <div className="relative h-[400px] md:h-full overflow-hidden border-x border-slate-100 dark:border-white/10 bg-slate-100 dark:bg-white/10">
-                        <img
-                          src={getDirectImageUrl(
-                            content.globalStandardsImageUrl ||
-                            "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800"
-                          )}
-                          alt="WorkinEU Standards"
-                          className="w-full h-full object-contain grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-1000"
-                          referrerPolicy="no-referrer"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/10 to-transparent"></div>
-                        <div className="absolute bottom-10 left-10">
-                          <div className="text-white font-black text-2xl tracking-tighter uppercase mb-2 drop-shadow-md">
-                            Excellence
-                          </div>
-                          <div className="h-1 w-12 bg-brand-gold rounded-full shadow-lg"></div>
+                    {/* Side Image */}
+                    <div className="xl:col-span-6 relative h-[400px] md:h-full overflow-hidden border-l border-slate-100 dark:border-white/10 bg-slate-100/50 dark:bg-white/5 flex items-center justify-center">
+                      <img
+                        src={getDirectImageUrl(
+                          content.globalStandardsImageUrl || workineuStandards
+                        )}
+                        alt="WorkinEU Standards"
+                        className="w-full h-full object-contain p-8 grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-1000"
+                        referrerPolicy="no-referrer"
+                      />
+                      <PhotoWatermark />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent pointer-events-none"></div>
+                      <div className="absolute bottom-10 left-10">
+                        <div className="text-white font-black text-2xl tracking-tighter uppercase mb-2 drop-shadow-md">
+                          Excellence
                         </div>
-                      </div>
-
-                      {/* Logo Cloud Section */}
-                      <div className="bg-slate-50/50 dark:bg-black/20 p-12 md:p-16 border-l border-slate-100 dark:border-white/10 flex flex-col justify-center relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 rounded-bl-[4rem] pointer-events-none"></div>
-                        <div className="grid grid-cols-2 gap-x-8 gap-y-12 relative z-10">
-                          {clients.length > 0
-                            ? clients.slice(0, 6).map((p, i) =>
-                                p.logoUrl ? (
-                                  <motion.div
-                                    key={i}
-                                    initial={{ opacity: 0, scale: 0.8 }}
-                                    whileInView={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: i * 0.1 }}
-                                    whileHover={{
-                                      scale: 1.1,
-                                      filter: "brightness(1.2)",
-                                    }}
-                                    className="flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-500 group/logo opacity-70 hover:opacity-100"
-                                  >
-                                    <img
-                                      src={getDirectImageUrl(p.logoUrl)}
-                                      alt={p.companyName}
-                                      className="h-8 lg:h-10 w-auto object-contain drop-shadow-sm"
-                                      referrerPolicy="no-referrer"
-                                    />
-                                  </motion.div>
-                                ) : null,
-                              )
-                            : content.partners?.slice(0, 6).map((p, i) =>
-                                p.logoUrl ? (
-                                  <motion.div
-                                    key={i}
-                                    initial={{ opacity: 0, scale: 0.8 }}
-                                    whileInView={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: i * 0.1 }}
-                                    whileHover={{
-                                      scale: 1.1,
-                                      filter: "brightness(1.2)",
-                                    }}
-                                    className="flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-500 opacity-70 hover:opacity-100"
-                                  >
-                                    <img
-                                      src={getDirectImageUrl(p.logoUrl)}
-                                      alt={p.name}
-                                      className="h-8 lg:h-10 w-auto object-contain drop-shadow-sm"
-                                      referrerPolicy="no-referrer"
-                                    />
-                                  </motion.div>
-                                ) : null,
-                              )}
-                        </div>
-
-                        <div className="mt-12 pt-10 border-t border-slate-200 dark:border-white/10 text-center relative z-10">
-                          <p className="text-slate-400 text-[8px] font-black uppercase tracking-[0.4em]">
-                            Certified Recruiting Partner
-                          </p>
-                        </div>
+                        <div className="h-1 w-12 bg-brand-gold rounded-full shadow-lg"></div>
                       </div>
                     </div>
                   </div>
@@ -1899,11 +1854,12 @@ export default function HomePage() {
                 className="relative rounded-[5rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(15,23,42,0.3)] border-[16px] border-slate-50 aspect-[4/5] group perspective-1000"
               >
                 <img
-                  src={getDirectImageUrl("https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&q=80&w=1200")}
+                  src={getDirectImageUrl(livingInEurope)}
                   alt="Living in Europe"
-                  className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-1000"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                   referrerPolicy="no-referrer"
                 />
+                <PhotoWatermark />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent"></div>
 
                 <div className="absolute bottom-12 left-12 right-12">

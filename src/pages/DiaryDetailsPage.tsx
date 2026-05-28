@@ -5,6 +5,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { DiaryPost } from "../types";
 import { motion } from "motion/react";
+import PhotoWatermark from "../components/PhotoWatermark";
 import SEO from "../components/SEO";
 import {
   Calendar,
@@ -112,7 +113,7 @@ export default function DiaryDetailsPage() {
           </div>
 
           <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-8 leading-[1.1] tracking-tight font-serif">
-            {post.title}
+            {post.title.replace(/[*#]/g, "")}
           </h1>
 
           <div className="flex flex-wrap items-center gap-8 text-slate-400 text-sm">
@@ -142,7 +143,7 @@ export default function DiaryDetailsPage() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
-          className="relative aspect-video rounded-[3rem] overflow-hidden mb-16 shadow-2xl"
+          className="relative aspect-video rounded-[3rem] overflow-hidden mb-16 shadow-2xl bg-slate-100 dark:bg-white/5"
         >
           <img
             src={getDirectImageUrl(
@@ -150,9 +151,10 @@ export default function DiaryDetailsPage() {
               `https://images.unsplash.com/photo-1541746972996-4e0b0f43e01a?auto=format&fit=crop&q=80&w=1200`
             )}
             alt={post.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
             referrerPolicy="no-referrer"
           />
+          <PhotoWatermark />
         </motion.div>
 
         {/* Content */}
@@ -163,8 +165,8 @@ export default function DiaryDetailsPage() {
           className="prose prose-xl prose-slate max-w-none"
         >
           <div 
-            className="text-slate-600 dark:text-slate-300 leading-relaxed font-light text-lg md:text-xl"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            className="text-slate-600 dark:text-slate-300 leading-relaxed font-light text-lg md:text-xl whitespace-pre-wrap"
+            dangerouslySetInnerHTML={{ __html: post.content.replace(/[*#]/g, "") }}
           />
         </motion.div>
 

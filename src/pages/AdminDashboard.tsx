@@ -29,6 +29,7 @@ import {
   BarChart3,
   Home,
   Lock,
+  Server,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { motion, AnimatePresence } from "motion/react";
@@ -64,6 +65,7 @@ import AdminCandidateDetail from "./admin/AdminCandidateDetail";
 import AdminFinancialAccounts from "./admin/AdminFinancialAccounts";
 import AdminSystemSettings from "./admin/AdminSystemSettings";
 import AdminAccount from "./admin/AdminAccount";
+import AdminApiManagement from "./admin/AdminApiManagement";
 import ErrorBoundary from "../components/ErrorBoundary";
 
 export default function AdminDashboard() {
@@ -180,6 +182,11 @@ export default function AdminDashboard() {
     },
     { name: "Manage Team", path: "/admin/team", icon: <Users size={20} /> },
     { name: "My Account", path: "/admin/account", icon: <Lock size={20} /> },
+    {
+      name: "API & Integrations",
+      path: "/admin/api-management",
+      icon: <Server size={20} />,
+    },
     {
       name: "System Settings",
       path: "/admin/settings",
@@ -412,6 +419,7 @@ export default function AdminDashboard() {
                 <Route path="/reviews" element={<AdminReviews />} />
                 <Route path="/messages" element={<AdminContactMessages />} />
                 <Route path="/account" element={<AdminAccount />} />
+                <Route path="/api-management" element={<AdminApiManagement />} />
                 <Route path="/settings" element={<AdminSystemSettings />} />
               </Routes>
             </ErrorBoundary>

@@ -1,4 +1,5 @@
 import { getDirectImageUrl } from "../lib/utils";
+import PhotoWatermark from "./PhotoWatermark";
 import { Link } from "react-router-dom";
 import { Job } from "../types";
 import {
@@ -198,7 +199,7 @@ export default function JobCard({ job, onQuickApply }: JobCardProps) {
       </AnimatePresence>
 
       {job.imageUrl && (
-        <Link to={`/jobs/${job.id}`} className="h-40 md:h-48 w-full overflow-hidden relative shrink-0 block cursor-pointer">
+        <Link to={`/jobs/${job.id}`} className="aspect-video w-full overflow-hidden relative shrink-0 block cursor-pointer">
           <img
             src={getDirectImageUrl(job.imageUrl)}
             alt={job.title}
@@ -206,6 +207,7 @@ export default function JobCard({ job, onQuickApply }: JobCardProps) {
             referrerPolicy="no-referrer"
             loading="lazy"
           />
+          <PhotoWatermark />
           <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/90 via-[#121212]/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-700"></div>
 
           {/* Apply Now Overlay */}

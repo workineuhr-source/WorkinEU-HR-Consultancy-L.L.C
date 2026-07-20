@@ -293,9 +293,14 @@ export default function Footer() {
               <span className="w-2 h-2 bg-brand-teal rounded-full animate-pulse shadow-[0_0_10px_rgba(42,185,176,0.6)]"></span>
               Global Operations: Live
             </p>
-            <p className="hover:text-white transition-colors cursor-default">
+            <a
+              href="https://www.facebook.com/udayarajkhanal369"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-brand-teal transition-colors cursor-pointer"
+            >
               Designed by Udaya Raj Khanal
-            </p>
+            </a>
           </div>
         </div>
       </div>

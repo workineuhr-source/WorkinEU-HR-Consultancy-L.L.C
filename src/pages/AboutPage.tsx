@@ -20,6 +20,7 @@ import { Link } from "react-router-dom";
 import BottomCTA from "../components/BottomCTA";
 import PhotoWatermark from "../components/PhotoWatermark";
 import SEO from "../components/SEO";
+import InteractiveMap from "../components/InteractiveMap";
 
 export default function AboutPage() {
   const [content, setContent] = useState<SiteContent | null>(null);
@@ -254,6 +255,13 @@ export default function AboutPage() {
               );
             })}
           </div>
+        </div>
+      </section>
+
+      {/* Interactive Map Section */}
+      <section className="py-24 relative z-10 overflow-hidden">
+        <div className="max-w-[1700px] mx-auto px-4 md:px-8 lg:px-12">
+          <InteractiveMap />
         </div>
       </section>
 

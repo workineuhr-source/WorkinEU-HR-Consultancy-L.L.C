@@ -155,7 +155,7 @@ const Section = ({
                   viewport={{ once: true }}
                   transition={{ delay: 0.1 }}
                   className={cn(
-                    "text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 md:mb-8",
+                    "text-2xl sm:text-3xl md:text-[2.25rem] lg:text-[2.5rem] xl:text-[2.75rem] font-black tracking-tight mb-4 md:mb-6",
                     isDark ? "text-white" : "text-slate-900 dark:text-white",
                   )}
                 >
@@ -825,7 +825,7 @@ export default function HomePage() {
                 ) : (
                   <h1
                     className={cn(
-                      "text-5xl md:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight",
+                      "text-2xl sm:text-3xl md:text-[2.25rem] lg:text-[2.5rem] xl:text-[2.75rem] font-black leading-[1.05] tracking-tight",
                       getFontClass(content.styles?.heroTitle?.font),
                       getTextColor(content.styles?.heroTitle?.color),
                     )}
@@ -1451,7 +1451,7 @@ export default function HomePage() {
                 <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-brand-teal/10 border border-brand-teal/20 text-brand-teal text-[10px] font-black uppercase tracking-[0.3em] mb-12 shadow-inner">
                   <MapPin size={16} /> Global Headquarters
                 </div>
-                <h3 className="text-5xl font-black mb-8 tracking-tight text-white">
+                <h3 className="text-3xl md:text-4xl font-black mb-6 tracking-tight text-white">
                   Dubai, UAE
                 </h3>
                 <p className="text-slate-200 text-base leading-relaxed mb-12 font-medium">
@@ -1518,7 +1518,7 @@ export default function HomePage() {
                 <ShieldCheck size={16} />{" "}
                 {content.professionalHrSolutionsBadge || "Elite HR Consultancy"}
               </div>
-              <h3 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+              <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
                 {content.professionalHrSolutionsTitle ||
                   "Professional HR Solutions"}
               </h3>
@@ -1611,7 +1611,7 @@ export default function HomePage() {
                   <Zap size={16} />{" "}
                   {content.professionalEdgeTitle || "Professional Edge"}
                 </div>
-                <h3 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter leading-tight">
+                <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-black text-slate-900 dark:text-white mb-2 tracking-tight leading-tight">
                   {content.professionalEdgeSubtitle ||
                     "Mastering Global Talent Acquisition"}
                 </h3>
@@ -1736,7 +1736,7 @@ export default function HomePage() {
                           {content.globalStandardsTagline || "Global Standards"}
                         </div>
 
-                        <h3 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-[1.1] group-hover:translate-x-2 transition-transform duration-700">
+                        <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.15] group-hover:translate-x-2 transition-transform duration-700">
                           {content.globalStandardsTitle ||
                             "Your Success, Our Commitment"}
                         </h3>
@@ -1894,7 +1894,7 @@ export default function HomePage() {
                   <div className="inline-flex items-center gap-2 bg-brand-gold text-slate-900 dark:text-white px-6 py-3 rounded-full font-bold text-[10px] uppercase tracking-[0.3em] mb-6 shadow-2xl">
                     <Sparkles size={14} /> Community Life
                   </div>
-                  <h3 className="text-white font-bold text-4xl tracking-tight leading-none mb-6">
+                  <h3 className="text-white font-black text-2xl md:text-3xl tracking-tight leading-tight mb-4">
                     Your New Life <br /> Starts Here
                   </h3>
                   <p className="text-slate-800 dark:text-slate-200 text-sm font-light leading-relaxed">
@@ -2026,7 +2026,7 @@ export default function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           <div>
             <div className="flex items-center justify-between mb-12">
-              <h3 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
                 Candidate Stories
               </h3>
               <div className="flex gap-3">
@@ -2075,7 +2075,7 @@ export default function HomePage() {
             </div>
           </div>
           <div>
-            <h3 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-12">
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight mb-8">
               Common Questions
             </h3>
             {content.showFaqs !== false && (
@@ -2140,7 +2140,7 @@ export default function HomePage() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-8 tracking-tight leading-[1.1] text-slate-900 dark:text-white">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-6 tracking-tight leading-[1.15] text-slate-900 dark:text-white">
               Ready to <span className="text-brand-teal italic">Partner</span>{" "}
               With Us?
             </h2>

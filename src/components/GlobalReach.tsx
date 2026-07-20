@@ -75,7 +75,7 @@ export default function GlobalReach({
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
             className={cn(
-              "text-4xl md:text-7xl lg:text-9xl font-black tracking-tighter mb-8 md:mb-12 font-sans",
+              "text-2xl sm:text-3xl md:text-[2.25rem] lg:text-[2.5rem] xl:text-[2.75rem] font-black tracking-tight mb-4 md:mb-6 font-sans",
               dark ? "text-white" : "text-slate-900 dark:text-white",
             )}
           >

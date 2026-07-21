@@ -200,6 +200,53 @@
         "aiEndpoint": { "type": "string" },
         "aiModelName": { "type": "string" }
       }
+    },
+    "Interview": {
+      "title": "Interview",
+      "description": "A scheduled video interview record",
+      "type": "object",
+      "properties": {
+        "interviewCode": { "type": "string" },
+        "candidateId": { "type": "string" },
+        "candidateName": { "type": "string" },
+        "candidateEmail": { "type": "string" },
+        "candidatePhone": { "type": "string" },
+        "employerId": { "type": "string" },
+        "employerName": { "type": "string" },
+        "recruiterId": { "type": "string" },
+        "recruiterName": { "type": "string" },
+        "position": { "type": "string" },
+        "meetingStatus": { "type": "string", "enum": ["scheduled", "completed", "cancelled", "missed"] },
+        "meetingLink": { "type": "string" },
+        "scheduledDate": { "type": "string" },
+        "scheduledTime": { "type": "string" },
+        "duration": { "type": "number" },
+        "createdAt": { "type": "number" },
+        "notes": {
+          "type": "object",
+          "properties": {
+            "communication": { "type": "number" },
+            "technicalSkill": { "type": "number" },
+            "english": { "type": "number" },
+            "confidence": { "type": "number" },
+            "experience": { "type": "number" },
+            "remarks": { "type": "string" },
+            "recommendation": { "type": "string", "enum": ["selected", "hold", "rejected"] }
+          }
+        },
+        "chat": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sender": { "type": "string" },
+              "text": { "type": "string" },
+              "timestamp": { "type": "number" }
+            }
+          }
+        }
+      },
+      "required": ["interviewCode", "candidateName", "position", "scheduledDate", "scheduledTime", "meetingStatus"]
     }
   },
   "firestore": {
@@ -213,6 +260,7 @@
     "/candidates/{candidateId}": { "schema": "CandidateProfile", "description": "Profiles for job candidates" },
     "/diary": { "schema": "DiaryPost", "description": "Collection of diary entries or blog posts" },
     "/successStories": { "schema": "VisaSuccessStory", "description": "Collection of visa success stories" },
-    "/clients": { "schema": "ClientPartner", "description": "Collection of client partners and reviews" }
+    "/clients": { "schema": "ClientPartner", "description": "Collection of client partners and reviews" },
+    "/interviews": { "schema": "Interview", "description": "Collection of scheduled and live video interviews" }
   }
 }

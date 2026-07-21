@@ -3,7 +3,7 @@ import rateLimit from "express-rate-limit";
 import cors from "cors";
 import OpenAI from "openai";
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, getDoc, collection, getDocs } from "firebase/firestore";
+import { getFirestore, doc, getDoc, collection, getDocs, deleteDoc, query, where } from "firebase/firestore";
 import firebaseConfig from "./firebase-applet-config.json" with { type: "json" };
 
 const app = express();
@@ -244,6 +244,36 @@ CRITICAL RULES:
     res.status(500).json({ error: error.message || "Failed to generate story" });
   }
 });
+
+// Auto-delete completed interviews after 1 hour (3600000ms)
+const autoDeleteCompletedInterviews = async () => {
+  try {
+    const interviewsColl = collection(db, "interviews");
+    const q = query(interviewsColl, where("meetingStatus", "==", "completed"));
+    const snapshot = await getDocs(q);
+    const now = Date.now();
+    const oneHour = 60 * 60 * 1000;
+
+    let deletedCount = 0;
+    for (const docSnap of snapshot.docs) {
+      const data = docSnap.data();
+      const finishedTime = data.completedAt || data.createdAt || now;
+      if (now - finishedTime > oneHour) {
+        await deleteDoc(doc(db, "interviews", docSnap.id));
+        deletedCount++;
+      }
+    }
+    if (deletedCount > 0) {
+      console.log(`[Auto-Delete] Deleted ${deletedCount} completed interview(s) older than 1 hour.`);
+    }
+  } catch (error) {
+    console.error("[Auto-Delete Error] Failed to delete completed interviews:", error);
+  }
+};
+
+// Run auto-delete immediately on startup and then every 5 minutes
+autoDeleteCompletedInterviews();
+setInterval(autoDeleteCompletedInterviews, 5 * 60 * 1000);
 
 // API routes
 app.get("/api/health", (req, res) => {

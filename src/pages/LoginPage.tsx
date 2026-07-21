@@ -64,10 +64,18 @@ export default function LoginPage() {
     if (auth.currentUser) {
       // Check if admin
       const checkAdmin = async () => {
+        const systemSnap = await getDoc(doc(db, "settings", "system"));
+        const systemData = systemSnap.exists() ? systemSnap.data() : null;
+        const authorizedEmails = systemData?.authorizedEmails || [];
+        const isAuthorizedEmail = authorizedEmails.some(
+          (e: string) => e.toLowerCase() === auth.currentUser!.email?.toLowerCase()
+        );
+
         const adminDoc = await getDoc(doc(db, "users", auth.currentUser!.uid));
         const isAdmin =
           (adminDoc.exists() && adminDoc.data().role === "admin") ||
-          auth.currentUser!.email === "workineuhr@gmail.com";
+          auth.currentUser!.email === "workineuhr@gmail.com" ||
+          isAuthorizedEmail;
 
         if (isAdmin) {
           navigate("/admin", { replace: true });
@@ -121,17 +129,22 @@ export default function LoginPage() {
         const user = userCredential.user;
 
         // Check if admin
+        const systemSnap = await getDoc(doc(db, "settings", "system"));
+        const systemData = systemSnap.exists() ? systemSnap.data() : null;
+        const authorizedEmails = systemData?.authorizedEmails || [];
+        const isAuthorizedEmail = authorizedEmails.some(
+          (e: string) => e.toLowerCase() === user.email?.toLowerCase()
+        );
+
         const adminDoc = await getDoc(doc(db, "users", user.uid));
         const isAdmin =
           (adminDoc.exists() && adminDoc.data().role === "admin") ||
-          user.email?.toLowerCase() === "workineuhr@gmail.com";
+          user.email?.toLowerCase() === "workineuhr@gmail.com" ||
+          isAuthorizedEmail;
 
         if (isAdmin) {
-          // Force set role in database if it's the primary admin email
-          if (
-            user.email?.toLowerCase() === "workineuhr@gmail.com" &&
-            (!adminDoc.exists() || adminDoc.data().role !== "admin")
-          ) {
+          // Force set role in database if it's the primary admin email or authorized email
+          if (!adminDoc.exists() || adminDoc.data().role !== "admin") {
             await setDoc(
               doc(db, "users", user.uid),
               {

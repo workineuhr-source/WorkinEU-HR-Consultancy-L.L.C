@@ -46,11 +46,51 @@ export default function AdminSystemSettings() {
       privacyPolicy: "",
       termsConditions: "",
     },
+    authorizedEmails: [],
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [showKey, setShowKey] = useState<string | null>(null);
+  const [newAdminEmail, setNewAdminEmail] = useState("");
+
+  const handleAddAdminEmail = () => {
+    const trimmed = newAdminEmail.trim().toLowerCase();
+    if (!trimmed) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmed)) {
+      toast.error("Please enter a valid email address structure.");
+      return;
+    }
+    if (trimmed === "workineuhr@gmail.com") {
+      toast.info("The primary admin email is always authorized.");
+      setNewAdminEmail("");
+      return;
+    }
+    const existing = settings.authorizedEmails || [];
+    if (existing.includes(trimmed)) {
+      toast.error("This email is already in the authorized list.");
+      return;
+    }
+    setSettings({
+      ...settings,
+      authorizedEmails: [...existing, trimmed],
+    });
+    setNewAdminEmail("");
+    toast.success(`Added ${trimmed} to authorized list. Click 'Push Configuration' to save.`);
+  };
+
+  const handleRemoveAdminEmail = (emailToRemove: string) => {
+    const existing = settings.authorizedEmails || [];
+    setSettings({
+      ...settings,
+      authorizedEmails: existing.filter((email) => email !== emailToRemove),
+    });
+    toast.success(`Removed ${emailToRemove}. Click 'Push Configuration' to save.`);
+  };
 
   const [newConfig, setNewConfig] = useState<Partial<APIConfig>>({
     provider: "gemini",
@@ -90,7 +130,10 @@ export default function AdminSystemSettings() {
               setSettings({ activeConfigId: "", apiConfigs: [] });
             }
           } else {
-            setSettings(data);
+            setSettings({
+              ...data,
+              authorizedEmails: data.authorizedEmails || [],
+            });
           }
         }
       } catch (error) {
@@ -629,6 +672,75 @@ export default function AdminSystemSettings() {
                   })}
                   placeholder="Enter Terms & Conditions content..."
                 />
+              </div>
+            </div>
+          </div>
+
+          {/* Authorized Admin & Recruiter Emails */}
+          <div className="bg-white dark:bg-[#121212] p-10 rounded-[3rem] shadow-sm border border-slate-100 mt-10 space-y-8">
+            <h2 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight flex items-center gap-4">
+              <ShieldCheck className="text-brand-gold" size={32} />
+              Authorized Admins & Recruiters
+            </h2>
+            <p className="text-slate-500 font-bold text-xs uppercase tracking-widest leading-relaxed">
+              Register additional email addresses allowed to log in as administrators or hosts. 
+              The default admin email (<span className="text-brand-gold font-black">workineuhr@gmail.com</span>) is always authorized.
+            </p>
+            
+            <div className="space-y-6">
+              <div className="flex gap-4">
+                <input
+                  type="email"
+                  className="flex-grow bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 text-sm font-bold placeholder-slate-400"
+                  placeholder="recruiter@workineu.com"
+                  value={newAdminEmail}
+                  onChange={(e) => setNewAdminEmail(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddAdminEmail();
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={handleAddAdminEmail}
+                  className="bg-brand-gold text-slate-950 font-black uppercase tracking-wider text-xs px-6 py-4 rounded-2xl hover:translate-y-[-2px] transition-all flex items-center gap-2 shrink-0 shadow-lg cursor-pointer"
+                >
+                  <Plus size={16} /> Add Email
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">
+                  Authorized Recruiter Accounts ({settings.authorizedEmails?.length || 0})
+                </label>
+                {settings.authorizedEmails && settings.authorizedEmails.length > 0 ? (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {settings.authorizedEmails.map((email) => (
+                      <div
+                        key={email}
+                        className="flex justify-between items-center bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800"
+                      >
+                        <span className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate max-w-[200px]">
+                          {email}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveAdminEmail(email)}
+                          className="text-rose-500 hover:text-rose-700 transition-colors p-1"
+                          title="Remove Authorization"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-2xl text-center text-xs text-slate-400 border border-dashed border-slate-200 dark:border-slate-800">
+                    No additional recruiter accounts registered yet.
+                  </div>
+                )}
               </div>
             </div>
           </div>

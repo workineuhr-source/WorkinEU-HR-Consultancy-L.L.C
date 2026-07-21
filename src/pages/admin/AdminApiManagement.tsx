@@ -28,6 +28,7 @@ export default function AdminApiManagement() {
   const [saving, setSaving] = useState(false);
   const [showKey, setShowKey] = useState<string | null>(null);
   const [statuses, setStatuses] = useState<Record<string, "checking" | "online" | "offline" | "idle">>({});
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const testConnection = async (api: ApiIntegration) => {
     setStatuses(prev => ({ ...prev, [api.id]: "checking" }));
@@ -116,9 +117,7 @@ export default function AdminApiManagement() {
   };
 
   const deleteApi = (id: string) => {
-    if (window.confirm("Are you sure you want to remove this API integration?")) {
-      setIntegrations(prev => prev.filter(api => api.id !== id));
-    }
+    setIntegrations(prev => prev.filter(api => api.id !== id));
   };
 
   const addNewApi = () => {
@@ -247,7 +246,7 @@ export default function AdminApiManagement() {
               </div>
               <div className="flex gap-2">
                 <button
-                  onClick={() => deleteApi(api.id)}
+                  onClick={() => setDeleteConfirmId(api.id)}
                   className="p-3 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all"
                   title="Remove API"
                 >
@@ -311,6 +310,55 @@ export default function AdminApiManagement() {
           </div>
         ))}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deleteConfirmId && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0"
+              onClick={() => setDeleteConfirmId(null)}
+            ></motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-md relative z-10 p-8 text-center"
+            >
+              <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Trash2 size={40} />
+              </div>
+              <h3 className="text-2xl font-bold text-brand-blue mb-4">
+                Remove Integration?
+              </h3>
+              <p className="text-gray-500 dark:text-gray-300 mb-8 leading-relaxed">
+                Are you sure you want to remove this API integration? This action
+                cannot be undone.
+              </p>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setDeleteConfirmId(null)}
+                  className="flex-grow px-6 py-3 rounded-xl font-bold text-gray-500 dark:text-gray-300 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    deleteApi(deleteConfirmId);
+                    setDeleteConfirmId(null);
+                  }}
+                  className="flex-grow px-6 py-3 rounded-xl font-bold text-white bg-red-500 hover:bg-red-600 transition-all shadow-lg shadow-red-500/20"
+                >
+                  Remove API
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

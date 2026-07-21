@@ -8,6 +8,7 @@ import {
   doc,
   deleteDoc,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { CandidateProfile } from "../../types";
@@ -157,13 +158,40 @@ export default function AdminCandidates() {
   }, [searchTerm, filterCountry, candidates]);
 
   const handleDelete = async (uid: string) => {
-    if (!window.confirm("Are you sure you want to delete this candidate?"))
-      return;
     try {
+      // 1. Delete candidate profile
       await deleteDoc(doc(db, "candidates", uid));
-      toast.success("Candidate profile deleted.");
+
+      // 2. Clean up associated interviews - update candidateId to "custom"
+      try {
+        const interviewsRef = collection(db, "interviews");
+        const qInterviews = query(interviewsRef, where("candidateId", "==", uid));
+        const interviewSnap = await getDocs(qInterviews);
+        for (const d of interviewSnap.docs) {
+          await updateDoc(doc(db, "interviews", d.id), {
+            candidateId: "custom"
+          });
+        }
+      } catch (interviewErr) {
+        console.error("Error cleaning up candidate interviews:", interviewErr);
+      }
+
+      // 3. Clean up associated applications - delete applications
+      try {
+        const appsRef = collection(db, "applications");
+        const qApps = query(appsRef, where("candidateUid", "==", uid));
+        const appSnap = await getDocs(qApps);
+        for (const d of appSnap.docs) {
+          await deleteDoc(doc(db, "applications", d.id));
+        }
+      } catch (appErr) {
+        console.error("Error cleaning up candidate applications:", appErr);
+      }
+
+      toast.success("Candidate profile and associated records deleted.");
       fetchCandidates();
     } catch (error) {
+      console.error("Error deleting candidate:", error);
       toast.error("Failed to delete candidate.");
     }
   };

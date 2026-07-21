@@ -273,6 +273,7 @@ export interface SystemSettings {
     privacyPolicy: string;
     termsConditions: string;
   };
+  authorizedEmails?: string[];
 }
 
 export interface APIConfig {

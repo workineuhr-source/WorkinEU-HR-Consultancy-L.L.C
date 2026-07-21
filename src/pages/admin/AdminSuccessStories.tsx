@@ -42,6 +42,7 @@ export default function AdminSuccessStories() {
   );
   const [uploading, setUploading] = useState<"photo" | "visa" | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [newStory, setNewStory] = useState<Partial<VisaSuccessStory>>({
     candidateName: "",
     candidatePhotoUrl: "",
@@ -220,8 +221,6 @@ export default function AdminSuccessStories() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this success story?"))
-      return;
     try {
       await deleteDoc(doc(db, "successStories", id));
       toast.success("Story deleted");
@@ -561,8 +560,9 @@ export default function AdminSuccessStories() {
                   <Edit2 size={18} />
                 </button>
                 <button
-                  onClick={() => handleDelete(story.id)}
+                  onClick={() => setDeleteConfirmId(story.id)}
                   className="w-10 h-10 bg-white/90 text-red-500 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white shadow-lg"
+                  title="Delete"
                 >
                   <Trash2 size={18} />
                 </button>
@@ -609,6 +609,55 @@ export default function AdminSuccessStories() {
           </button>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deleteConfirmId && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-brand-blue/60 backdrop-blur-sm"
+              onClick={() => setDeleteConfirmId(null)}
+            ></motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white rounded-3xl shadow-2xl w-full max-w-md relative z-10 p-8 text-center"
+            >
+              <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Trash2 size={40} />
+              </div>
+              <h3 className="text-2xl font-bold text-brand-blue mb-4">
+                Delete Success Story?
+              </h3>
+              <p className="text-gray-500 dark:text-gray-300 mb-8 leading-relaxed">
+                Are you sure you want to delete this success story? This action
+                cannot be undone.
+              </p>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setDeleteConfirmId(null)}
+                  className="flex-grow px-6 py-3 rounded-xl font-bold text-gray-500 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    handleDelete(deleteConfirmId);
+                    setDeleteConfirmId(null);
+                  }}
+                  className="flex-grow px-6 py-3 rounded-xl font-bold text-white bg-red-500 hover:bg-red-600 transition-all shadow-lg shadow-red-500/20"
+                >
+                  Delete Story
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

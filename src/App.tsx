@@ -27,6 +27,8 @@ import DiaryPage from "./pages/DiaryPage";
 import DiaryDetailsPage from "./pages/DiaryDetailsPage";
 import AboutPage from "./pages/AboutPage";
 import OfficePage from "./pages/OfficePage";
+import CandidateInterviewJoin from "./pages/interview/CandidateInterviewJoin";
+import EmployerInterviewView from "./pages/interview/EmployerInterviewView";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import RefundPolicy from "./pages/RefundPolicy";
@@ -40,7 +42,10 @@ import { useLocation } from "react-router-dom";
 
 function AppLayout({ user, isAdmin }: { user: User | null; isAdmin: boolean }) {
   const location = useLocation();
-  const isHideLayout = location.pathname.startsWith("/admin");
+  const isHideLayout =
+    location.pathname.startsWith("/admin") ||
+    location.pathname.startsWith("/interview") ||
+    location.pathname.startsWith("/employer/interview");
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   return (
@@ -88,6 +93,8 @@ function AppLayout({ user, isAdmin }: { user: User | null; isAdmin: boolean }) {
             path="/candidate/profile/:uid"
             element={<CandidateProfilePage />}
           />
+          <Route path="/interview/join/:code" element={<CandidateInterviewJoin />} />
+          <Route path="/employer/interview/:id" element={<EmployerInterviewView />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-conditions" element={<TermsConditions />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
@@ -362,13 +369,31 @@ export default function App() {
             console.error("Auto-provisioning admin failed", e);
           }
         } else {
-          // Check role in Firestore
+          // Check role in Firestore & check system settings for authorized recruiter email
           try {
-            const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-            if (userDoc.exists() && userDoc.data().role === "admin") {
+            const systemSnap = await getDoc(doc(db, "settings", "system"));
+            const systemData = systemSnap.exists() ? systemSnap.data() : null;
+            const authorizedEmails = systemData?.authorizedEmails || [];
+            const isEmailAuthorized = authorizedEmails.some(
+              (email: string) => email.toLowerCase() === currentUser.email?.toLowerCase()
+            );
+
+            const userRef = doc(db, "users", currentUser.uid);
+            const userDoc = await getDoc(userRef);
+
+            if (isEmailAuthorized) {
               setIsAdmin(true);
+              if (!userDoc.exists() || userDoc.data().role !== "admin") {
+                await setDoc(userRef, { email: currentUser.email, role: "admin", updatedAt: new Date() }, { merge: true });
+              }
             } else {
-              setIsAdmin(false);
+              // If not authorized but was previously admin in users table, demote them
+              if (userDoc.exists() && userDoc.data().role === "admin") {
+                await setDoc(userRef, { role: "candidate", updatedAt: new Date() }, { merge: true });
+                setIsAdmin(false);
+              } else {
+                setIsAdmin(userDoc.exists() && userDoc.data().role === "admin");
+              }
             }
           } catch (error) {
             console.error("Error checking admin status:", error);

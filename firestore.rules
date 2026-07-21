@@ -143,5 +143,21 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+
+    // Interviews Collection
+    match /interviews/{interviewId} {
+      allow read: if true; // Candidates can retrieve their scheduled interview by link/ID
+      allow create: if isAdmin();
+      allow update: if isAdmin() || (
+        // Candidates/participants can update waiting room state, post chat messages, and write WebRTC signaling data
+        request.resource.data.diff(resource.data).affectedKeys().hasAny(['waitingRoom', 'chat', 'iceCandidatesCandidate', 'iceCandidatesHost', 'webRtcOffer', 'webRtcAnswer', 'meetingStatus', 'activeParticipants', 'notes', 'completedAt'])
+      );
+      allow delete: if isAdmin() || (
+        resource.data.meetingStatus == 'completed' &&
+        'completedAt' in resource.data &&
+        resource.data.completedAt is number &&
+        request.time.toMillis() > resource.data.completedAt + 3600000
+      );
+    }
   }
 }

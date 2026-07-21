@@ -30,6 +30,7 @@ import {
   Home,
   Lock,
   Server,
+  Video,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { motion, AnimatePresence } from "motion/react";
@@ -66,6 +67,7 @@ import AdminFinancialAccounts from "./admin/AdminFinancialAccounts";
 import AdminSystemSettings from "./admin/AdminSystemSettings";
 import AdminAccount from "./admin/AdminAccount";
 import AdminApiManagement from "./admin/AdminApiManagement";
+import AdminInterviews from "./admin/AdminInterviews";
 import ErrorBoundary from "../components/ErrorBoundary";
 
 export default function AdminDashboard() {
@@ -147,6 +149,11 @@ export default function AdminDashboard() {
       name: "Candidates",
       path: "/admin/candidates",
       icon: <Users size={20} />,
+    },
+    {
+      name: "Interview Management",
+      path: "/admin/interviews",
+      icon: <Video size={20} />,
     },
     {
       name: "Finance & Accounts",
@@ -313,12 +320,6 @@ export default function AdminDashboard() {
         {/* Header */}
         <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md h-16 md:h-24 border-b border-gray-100 dark:border-white/5 flex items-center justify-between px-4 md:px-10 z-40 shadow-sm shrink-0">
           <div className="flex items-center gap-4 md:gap-8 flex-grow">
-            <button
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-3 hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl text-brand-blue dark:text-white transition-all active:scale-95"
-            >
-              <Menu size={24} />
-            </button>
             {/* Mobile Logo */}
             <Link to="/" className="lg:hidden flex items-center gap-2 group">
               <div className="w-10 h-10 bg-white dark:bg-[#121212] rounded-xl flex items-center justify-center shadow-lg overflow-hidden border border-gray-100">
@@ -329,18 +330,6 @@ export default function AdminDashboard() {
                   referrerPolicy="no-referrer"
                 />
               </div>
-            </Link>
-            <Link
-              to="/"
-              className="flex items-center gap-2 p-3 hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl text-brand-blue dark:text-white transition-all active:scale-95 group"
-            >
-              <Home
-                size={22}
-                className="text-brand-teal group-hover:scale-110 transition-transform"
-              />
-              <span className="text-xs font-black uppercase tracking-widest hidden sm:block">
-                Home
-              </span>
             </Link>
             <div className="relative max-w-lg w-full hidden lg:block">
               <Search
@@ -406,6 +395,7 @@ export default function AdminDashboard() {
                   path="/candidates/:uid"
                   element={<AdminCandidateDetail />}
                 />
+                <Route path="/interviews" element={<AdminInterviews />} />
                 <Route path="/finance" element={<AdminFinancialAccounts />} />
                 <Route path="/refunds" element={<AdminRefunds />} />
                 <Route path="/content" element={<AdminContent />} />

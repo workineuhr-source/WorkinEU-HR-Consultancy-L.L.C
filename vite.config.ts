@@ -2,7 +2,6 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig, loadEnv} from 'vite';
-import api from './api.ts';
 
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
@@ -12,7 +11,8 @@ export default defineConfig(({mode}) => {
       tailwindcss(),
       {
         name: 'api-server',
-        configureServer(server) {
+        async configureServer(server) {
+          const { default: api } = await import('./api.ts');
           server.middlewares.use(api);
         }
       }

@@ -166,7 +166,7 @@ export default function InteractiveMap() {
           <span className="text-brand-gold font-bold uppercase tracking-[0.4em] mb-3 block text-xs">
             Global Infrastructure
           </span>
-          <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
+          <h2 className="text-2xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
             Our Network <span className="text-brand-teal italic font-serif">Bridge</span>
           </h2>
           <p className="text-slate-500 dark:text-slate-400 text-sm md:text-base mt-2 max-w-2xl font-light">

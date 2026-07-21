@@ -3,7 +3,8 @@ import rateLimit from "express-rate-limit";
 import cors from "cors";
 import OpenAI from "openai";
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, getDoc, collection, getDocs, deleteDoc, query, where } from "firebase/firestore";
+import { getFirestore, doc, getDoc, collection, getDocs, deleteDoc, query, where, setDoc } from "firebase/firestore";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import firebaseConfig from "./firebase-applet-config.json" with { type: "json" };
 
 const app = express();
@@ -22,6 +23,97 @@ app.use(cors({
 // Initialize Firebase for Backend
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
+const auth = getAuth(firebaseApp);
+
+enum OperationType {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  LIST = 'list',
+  GET = 'get',
+  WRITE = 'write',
+}
+
+interface FirestoreErrorInfo {
+  error: string;
+  operationType: OperationType;
+  path: string | null;
+  authInfo: {
+    userId?: string | null;
+    email?: string | null;
+    emailVerified?: boolean | null;
+    isAnonymous?: boolean | null;
+    tenantId?: string | null;
+    providerInfo?: {
+      providerId?: string | null;
+      email?: string | null;
+    }[];
+  }
+}
+
+function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const errInfo: FirestoreErrorInfo = {
+    error: error instanceof Error ? error.message : String(error),
+    authInfo: {
+      userId: auth.currentUser?.uid,
+      email: auth.currentUser?.email,
+      emailVerified: auth.currentUser?.emailVerified,
+      isAnonymous: auth.currentUser?.isAnonymous,
+      tenantId: auth.currentUser?.tenantId,
+      providerInfo: auth.currentUser?.providerData?.map(provider => ({
+        providerId: provider.providerId,
+        email: provider.email,
+      })) || []
+    },
+    operationType,
+    path
+  };
+  console.error('Firestore Error: ', JSON.stringify(errInfo));
+  throw new Error(JSON.stringify(errInfo));
+}
+
+// Authenticate server-side as the administrative system-backend user
+let authPromise: Promise<void> | null = null;
+const authenticateSystemBackend = (): Promise<void> => {
+  if (authPromise) return authPromise;
+
+  authPromise = (async () => {
+    const email = "system-backend@workineu.com";
+    const password = "SystemBackendSecurePass2026!";
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      console.log("[Firebase Auth] System backend signed in successfully.");
+    } catch (err: any) {
+      if (err.code === "auth/user-not-found" || err.code === "auth/invalid-credential" || err.code === "auth/invalid-login-credentials" || err.message?.includes("INVALID_LOGIN_CREDENTIALS") || err.code === "auth/user-disabled") {
+        try {
+          await createUserWithEmailAndPassword(auth, email, password);
+          console.log("[Firebase Auth] System backend user registered and signed in.");
+        } catch (createErr) {
+          console.error("[Firebase Auth Error] Failed to register system backend user:", createErr);
+        }
+      } else {
+        console.error("[Firebase Auth Error] System backend sign in failed:", err);
+      }
+    }
+
+    if (auth.currentUser) {
+      try {
+        await setDoc(doc(db, "users", auth.currentUser.uid), {
+          email: auth.currentUser.email,
+          role: "admin",
+          createdAt: new Date().toISOString()
+        }, { merge: true });
+        console.log("[Firebase Auth] System backend admin document ensured in Firestore.");
+      } catch (dbErr) {
+        console.error("[Firebase Auth Error] Failed to write system backend admin document:", dbErr);
+      }
+    }
+  })();
+
+  return authPromise;
+};
+
+const authInit = authenticateSystemBackend();
 
 // Global settings cache for rate limiting
 let rateLimitSettings = { isEnabled: true, maxRequests: 100 };
@@ -29,6 +121,7 @@ let lastSettingsFetch = 0;
 
 // Fetch settings helper
 const getRateLimitSettings = async () => {
+  await authInit;
   const now = Date.now();
   if (now - lastSettingsFetch > 60000) { // Cache for 1 minute
     try {
@@ -41,14 +134,20 @@ const getRateLimitSettings = async () => {
       }
       lastSettingsFetch = now;
     } catch (e) {
-      console.error("Failed to fetch rate limit settings:", e);
+      try {
+        handleFirestoreError(e, OperationType.GET, "settings/system");
+      } catch (err: any) {
+        console.error("Failed to fetch rate limit settings:", err.message);
+      }
     }
   }
   return rateLimitSettings;
 };
 
-// Start initial background fetch
-getRateLimitSettings();
+// Start initial background fetch after authentication completes
+authInit.then(() => {
+  getRateLimitSettings();
+});
 
 // Dynamic Rate Limiter Middleware
 const dynamicRateLimiter = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -247,6 +346,7 @@ CRITICAL RULES:
 
 // Auto-delete completed interviews after 1 hour (3600000ms)
 const autoDeleteCompletedInterviews = async () => {
+  await authInit;
   try {
     const interviewsColl = collection(db, "interviews");
     const q = query(interviewsColl, where("meetingStatus", "==", "completed"));
@@ -259,21 +359,31 @@ const autoDeleteCompletedInterviews = async () => {
       const data = docSnap.data();
       const finishedTime = data.completedAt || data.createdAt || now;
       if (now - finishedTime > oneHour) {
-        await deleteDoc(doc(db, "interviews", docSnap.id));
-        deletedCount++;
+        try {
+          await deleteDoc(doc(db, "interviews", docSnap.id));
+          deletedCount++;
+        } catch (delErr) {
+          handleFirestoreError(delErr, OperationType.DELETE, `interviews/${docSnap.id}`);
+        }
       }
     }
     if (deletedCount > 0) {
       console.log(`[Auto-Delete] Deleted ${deletedCount} completed interview(s) older than 1 hour.`);
     }
   } catch (error) {
-    console.error("[Auto-Delete Error] Failed to delete completed interviews:", error);
+    try {
+      handleFirestoreError(error, OperationType.GET, "interviews");
+    } catch (err: any) {
+      console.error("[Auto-Delete Error] Failed to delete completed interviews:", err.message);
+    }
   }
 };
 
-// Run auto-delete immediately on startup and then every 5 minutes
-autoDeleteCompletedInterviews();
-setInterval(autoDeleteCompletedInterviews, 5 * 60 * 1000);
+// Run auto-delete immediately after auth completes and then every 5 minutes
+authInit.then(() => {
+  autoDeleteCompletedInterviews();
+  setInterval(autoDeleteCompletedInterviews, 5 * 60 * 1000);
+});
 
 // API routes
 app.get("/api/health", (req, res) => {

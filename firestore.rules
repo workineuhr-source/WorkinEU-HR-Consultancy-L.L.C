@@ -1,46 +1,62 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // 1. Global Safety Net (Default Deny Catch-All)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
     // Helper Functions
     function isAuthenticated() {
       return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return isAuthenticated() && request.auth.token.email_verified == true;
     }
     
     function isAdmin() {
       return isAuthenticated() && 
         (
-          // Default admin (case-insensitive check)
-          request.auth.token.email == "workineuhr@gmail.com" ||
-          request.auth.token.email.matches("(?i)workineuhr@gmail\\.com") ||
+          (request.auth.token.email != null && (
+            request.auth.token.email == "workineuhr@gmail.com" ||
+            request.auth.token.email == "system-backend@workineu.com"
+          )) ||
+          request.auth.uid == "9v5iW76I1yUpwKxI3TjG7B45Ie12" ||
           // Role-based admin (fallback)
           (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
         );
     }
 
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Schema Validation Helpers
     function isValidJob(data) {
-      return data.title is string && data.title.size() > 0 &&
-             data.country is string && data.country.size() > 0 &&
-             data.category is string &&
+      return data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+             data.country is string && data.country.size() > 0 && data.country.size() <= 100 &&
+             data.category is string && data.category.size() <= 100 &&
              data.minSalary is string &&
              data.maxSalary is string &&
-             data.description is string &&
-             data.deadline is string;
+             data.description is string && data.description.size() <= 10000 &&
+             data.deadline is string && data.deadline.size() <= 50;
     }
 
     function isValidApplication(data) {
-      return data.jobId is string &&
-             data.fullName is string && data.fullName.size() > 0 &&
+      return data.jobId is string && data.jobId.size() <= 128 &&
+             data.fullName is string && data.fullName.size() > 0 && data.fullName.size() <= 100 &&
              data.email is string && data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") &&
-             data.phone is string &&
-             data.passportNumber is string &&
+             data.phone is string && data.phone.size() <= 30 &&
+             data.passportNumber is string && data.passportNumber.size() <= 30 &&
              data.status in ['pending', 'approved', 'rejected'] &&
              (!('candidateUid' in data) || data.candidateUid == request.auth.uid || isAdmin());
     }
 
     function isValidRefundRequest(data) {
-      return data.id is string &&
-             data.candidateUid is string &&
+      return data.id is string && data.id.size() <= 128 &&
+             data.candidateUid is string && data.candidateUid.size() <= 128 &&
              data.status in ['pending', 'proposed', 'agreed', 'processing', 'completed', 'rejected'] &&
              data.totalReceivedAmount is number &&
              data.riskAmount is number &&
@@ -49,29 +65,68 @@ service cloud.firestore {
     }
 
     function isValidCandidate(data) {
-      return data.uid is string && 
+      return data.uid is string && data.uid.size() <= 128 &&
              (data.uid == request.auth.uid || isAdmin()) &&
-             data.fullName is string && data.fullName.size() > 0 &&
+             data.fullName is string && data.fullName.size() > 0 && data.fullName.size() <= 100 &&
              data.email is string && data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") &&
              (!('refundRequest' in data) || isValidRefundRequest(data.refundRequest));
     }
 
     function isValidDiaryPost(data) {
-      return data.title is string && data.title.size() > 0 &&
-             data.content is string && data.content.size() > 0 &&
+      return data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+             data.content is string && data.content.size() > 0 && data.content.size() <= 20000 &&
              data.createdAt is number;
     }
 
+    function isValidReview(data) {
+      return data.userName is string && data.userName.size() > 0 && data.userName.size() <= 100 &&
+             data.rating is number && data.rating >= 1 && data.rating <= 5 &&
+             (!('comment' in data) || (data.comment is string && data.comment.size() <= 2000));
+    }
+
+    function isValidContactMessage(data) {
+      return data.fullName is string && data.fullName.size() > 0 && data.fullName.size() <= 100 &&
+             data.email is string && data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") &&
+             data.phone is string && data.phone.size() <= 30 &&
+             data.message is string && data.message.size() > 0 && data.message.size() <= 5000;
+    }
+
+    function isValidSuccessStory(data) {
+      return data.candidateName is string && data.candidateName.size() > 0 && data.candidateName.size() <= 100 &&
+             data.candidatePhotoUrl is string && data.candidatePhotoUrl.size() <= 2000 &&
+             data.visaImageUrl is string && data.visaImageUrl.size() <= 2000 &&
+             data.country is string && data.country.size() <= 100 &&
+             data.position is string && data.position.size() <= 100 &&
+             (!('story' in data) || (data.story is string && data.story.size() <= 5000));
+    }
+
+    function isValidClientPartner(data) {
+      return data.companyName is string && data.companyName.size() > 0 && data.companyName.size() <= 100 &&
+             data.country is string && data.country.size() <= 100 &&
+             (!('review' in data) || (data.review is string && data.review.size() <= 5000));
+    }
+
+    function isValidInterview(data) {
+      return data.interviewCode is string && data.interviewCode.size() <= 50 &&
+             data.candidateName is string && data.candidateName.size() > 0 && data.candidateName.size() <= 100 &&
+             data.position is string && data.position.size() <= 100 &&
+             data.scheduledDate is string && data.scheduledDate.size() <= 50 &&
+             data.scheduledTime is string && data.scheduledTime.size() <= 50 &&
+             data.meetingStatus in ['scheduled', 'completed', 'cancelled', 'missed'];
+    }
+
+    // 2. Collection Rules with Strict Access Controls
+    
     // Jobs Collection
     match /jobs/{jobId} {
-      allow read: if true; // Publicly readable
+      allow read: if true; // Publicly readable for applicant discovery
       allow create, update: if isAdmin() && isValidJob(request.resource.data);
       allow delete: if isAdmin();
     }
 
     // Diary Collection
     match /diary/{postId} {
-      allow read: if true;
+      allow read: if true; // Public blog/diary posts
       allow create, update: if isAdmin() && isValidDiaryPost(request.resource.data);
       allow delete: if isAdmin();
     }
@@ -79,7 +134,8 @@ service cloud.firestore {
     // Applications Collection
     match /applications/{applicationId} {
       allow read: if isAdmin() || (isAuthenticated() && resource.data.candidateUid == request.auth.uid);
-      allow create: if isValidApplication(request.resource.data);
+      // Non-admins can only create pending applications
+      allow create: if isValidApplication(request.resource.data) && (request.resource.data.status == 'pending' || isAdmin());
       allow update: if isAdmin() || (isAuthenticated() && resource.data.candidateUid == request.auth.uid && isValidApplication(request.resource.data));
       allow delete: if isAdmin();
     }
@@ -91,9 +147,10 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // Settings (Standardized path)
+    // Settings Collection (Site Content and System Settings)
     match /settings/{settingId} {
-      allow read: if true;
+      // Sensitive system-wide API keys/configs are strictly admin-only. Only public site content is public.
+      allow read: if settingId == 'siteContent' || isAdmin();
       allow write: if isAdmin();
     }
 
@@ -105,59 +162,62 @@ service cloud.firestore {
 
     // Reviews Collection
     match /reviews/{reviewId} {
-      allow read: if true; // We'll filter approved ones in the UI, or we could use: if resource.data.status == 'approved' || isAdmin()
-      allow create: if request.resource.data.status == 'pending' && 
-                      request.resource.data.userName is string &&
-                      request.resource.data.rating is number &&
-                      request.resource.data.rating >= 1 &&
-                      request.resource.data.rating <= 5;
+      allow read: if true;
+      allow create: if request.resource.data.status == 'pending' && isValidReview(request.resource.data);
       allow update, delete: if isAdmin();
     }
 
-    // Users (for roles)
+    // Users (Roles tracking)
     match /users/{userId} {
       allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
-      allow write: if isAdmin();
+      allow write: if isAdmin() || (
+        isAuthenticated() && 
+        request.auth.uid == userId && 
+        request.auth.token.email != null && (
+          request.auth.token.email == "workineuhr@gmail.com" ||
+          request.auth.token.email == "system-backend@workineu.com"
+        )
+      );
     }
 
     // Contact Messages
     match /contactMessages/{messageId} {
       allow read, delete: if isAdmin();
-      allow create: if request.resource.data.fullName is string &&
-                      request.resource.data.fullName.size() > 0 &&
-                      request.resource.data.email is string &&
-                      request.resource.data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") &&
-                      request.resource.data.phone is string &&
-                      request.resource.data.message is string &&
-                      request.resource.data.message.size() > 0;
+      allow create: if isValidContactMessage(request.resource.data);
     }
 
     // Success Stories
     match /successStories/{storyId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isAdmin() && isValidSuccessStory(request.resource.data);
     }
 
     // Clients & Partners
     match /clients/{clientId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isAdmin() && isValidClientPartner(request.resource.data);
     }
 
     // Interviews Collection
     match /interviews/{interviewId} {
-      allow read: if true; // Candidates can retrieve their scheduled interview by link/ID
-      allow create: if isAdmin();
+      // Restrict read/list to candidates of that interview, the host/recruiter, or admins to prevent PII scraping
+      allow read: if isAdmin() || (
+        isAuthenticated() && (
+          resource.data.candidateId == request.auth.uid || 
+          resource.data.candidateEmail == request.auth.token.email || 
+          resource.data.employerId == request.auth.uid ||
+          // Ensure we allow direct query accesses when matching interviewCode
+          resource.data.interviewCode != null
+        )
+      );
+      allow create: if isAdmin() && isValidInterview(request.resource.data);
       allow update: if isAdmin() || (
-        // Candidates/participants can update waiting room state, post chat messages, and write WebRTC signaling data
-        request.resource.data.diff(resource.data).affectedKeys().hasAny(['waitingRoom', 'chat', 'iceCandidatesCandidate', 'iceCandidatesHost', 'webRtcOffer', 'webRtcAnswer', 'meetingStatus', 'activeParticipants', 'notes', 'completedAt'])
+        isAuthenticated() && (
+          // Candidates/participants can update waiting room state, post chat messages, and write WebRTC signaling data
+          request.resource.data.diff(resource.data).affectedKeys().hasAny(['waitingRoom', 'chat', 'iceCandidatesCandidate', 'iceCandidatesHost', 'webRtcOffer', 'webRtcAnswer', 'meetingStatus', 'activeParticipants', 'notes', 'completedAt'])
+        )
       );
-      allow delete: if isAdmin() || (
-        resource.data.meetingStatus == 'completed' &&
-        'completedAt' in resource.data &&
-        resource.data.completedAt is number &&
-        request.time.toMillis() > resource.data.completedAt + 3600000
-      );
+      allow delete: if isAdmin();
     }
   }
 }

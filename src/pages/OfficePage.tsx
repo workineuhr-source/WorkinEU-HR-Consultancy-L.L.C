@@ -93,7 +93,7 @@ export default function OfficePage() {
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-gold/20 backdrop-blur-md border border-brand-gold/30 text-brand-gold text-xs font-bold uppercase tracking-[0.3em] mb-8">
                 <Building2 size={14} /> Visit Our Office
               </span>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-8 tracking-tight leading-[0.9]">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-8 tracking-tight leading-tight">
                 Where Excellence <br />
                 <span className="text-brand-gold italic font-serif">
                   Meets Ambition.
@@ -119,7 +119,7 @@ export default function OfficePage() {
                 <span className="text-brand-gold font-bold uppercase tracking-[0.4em] mb-6 block text-xs">
                   Our Legacy
                 </span>
-                <h2 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-10 tracking-tight">
+                <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-8 tracking-tight">
                   {content?.companyStoryTitle ||
                     "A Story of Global Connection & Trust"}
                 </h2>
@@ -203,7 +203,7 @@ export default function OfficePage() {
             <span className="text-brand-gold font-bold uppercase tracking-[0.4em] mb-6 block text-xs">
               The Experts
             </span>
-            <h2 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-8 tracking-tight">
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6 tracking-tight">
               Meet Our Team
             </h2>
             <p className="text-slate-500 text-lg font-light leading-relaxed">

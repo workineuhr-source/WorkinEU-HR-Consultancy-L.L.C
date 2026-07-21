@@ -74,7 +74,7 @@ export default function AboutPage() {
               <span className="text-brand-teal font-black uppercase tracking-[0.5em] mb-10 block text-[10px] md:text-xs">
                 The WorkinEU Identity
               </span>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-12 tracking-tight leading-[0.85]">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white mb-8 tracking-tight leading-tight">
                 Dubai Heart, <br />{" "}
                 <span className="text-brand-teal italic font-serif">
                   Global
@@ -134,7 +134,7 @@ export default function AboutPage() {
                 className="absolute -bottom-16 -left-16 bg-brand-teal p-12 md:p-16 rounded-[3rem] shadow-2xl z-20 hidden md:block border-8 border-white dark:border-[#121212]"
               >
                 <div className="text-white">
-                  <span className="text-7xl font-black block mb-2 tracking-tighter">
+                  <span className="text-5xl lg:text-6xl font-black block mb-2 tracking-tighter">
                     12+
                   </span>
                   <span className="text-[10px] font-black uppercase tracking-[0.4em]">
@@ -159,7 +159,7 @@ export default function AboutPage() {
               <div className="w-20 h-20 bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white rounded-2xl flex items-center justify-center mb-10 shadow-inner group-hover:bg-white group-hover:text-slate-900 dark:group-hover:bg-brand-teal dark:group-hover:text-white transition-all duration-500">
                 <Target size={36} />
               </div>
-              <h3 className="text-4xl font-bold text-slate-900 dark:text-white mb-8 tracking-tight">
+              <h3 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-6 tracking-tight">
                 Our Mission
               </h3>
               <p className="text-slate-500 dark:text-slate-300 leading-relaxed font-light text-xl">
@@ -176,7 +176,7 @@ export default function AboutPage() {
               <div className="w-20 h-20 bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white rounded-2xl flex items-center justify-center mb-10 shadow-inner group-hover:bg-white group-hover:text-slate-900 dark:group-hover:bg-brand-teal dark:group-hover:text-white transition-all duration-500">
                 <Eye size={36} />
               </div>
-              <h3 className="text-4xl font-bold text-slate-900 dark:text-white mb-8 tracking-tight">
+              <h3 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-6 tracking-tight">
                 Our Vision
               </h3>
               <p className="text-slate-500 dark:text-slate-300 leading-relaxed font-light text-xl">
@@ -196,7 +196,7 @@ export default function AboutPage() {
             <span className="text-brand-teal font-black uppercase tracking-[0.5em] mb-10 block text-[10px] md:text-xs">
               Our Foundation
             </span>
-            <h2 className="text-6xl md:text-9xl font-black text-slate-900 dark:text-white tracking-tight">
+            <h2 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tight">
               Core Values
             </h2>
           </div>
@@ -274,7 +274,7 @@ export default function AboutPage() {
               <span className="text-brand-gold font-bold uppercase tracking-[0.5em] mb-8 block text-xs">
                 The Advantage
               </span>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white mb-12 tracking-tighter leading-none">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-8 tracking-tighter leading-none">
                 {content?.whyChooseUs?.title || "Why Partner"}{" "}
                 <span className="text-brand-gold italic">With Us?</span>
               </h2>

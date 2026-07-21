@@ -105,7 +105,7 @@ export default function DiaryPage() {
             <span className="text-brand-gold font-bold uppercase tracking-[0.5em] mb-8 block text-xs">
               Our Diary
             </span>
-            <h1 className="text-6xl md:text-9xl font-bold text-slate-900 dark:text-white mb-10 tracking-tighter leading-none">
+            <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-8 tracking-tighter leading-none">
               Stories from <br /> the{" "}
               <span className="text-brand-gold italic">Field</span>
             </h1>
@@ -179,7 +179,7 @@ export default function DiaryPage() {
             <div className="w-40 h-40 bg-slate-50 dark:bg-white/5 rounded-[3rem] flex items-center justify-center mx-auto mb-12 text-slate-200 shadow-inner">
               <Search size={72} />
             </div>
-            <h3 className="text-5xl font-bold text-slate-900 dark:text-white mb-6 tracking-tight">
+            <h3 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">
               No stories found
             </h3>
             <p className="text-slate-500 text-2xl font-light mb-16 max-w-lg mx-auto leading-relaxed">

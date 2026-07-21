@@ -330,7 +330,7 @@ export default function JobsPage() {
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-6 md:mb-8 tracking-tight leading-[0.9]"
+            className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white mb-6 md:mb-8 tracking-tight leading-tight"
           >
             Job{" "}
             <span className="text-brand-teal italic font-serif">Market</span>
@@ -565,7 +565,7 @@ export default function JobsPage() {
                         Personalized Engine
                       </span>
                     </div>
-                    <h2 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tighter mb-4">
+                    <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter mb-4">
                       Recommended for You
                     </h2>
                     <p className="text-xl text-slate-500 dark:text-slate-300 font-medium max-w-2xl">
@@ -637,7 +637,7 @@ export default function JobsPage() {
               {Object.entries(jobsByCategory).map(([category, catJobs]) => (
                 <div key={category} className="space-y-8">
                   <div className="flex items-center justify-between px-4 md:px-0">
-                    <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter">
+                    <h2 className="text-2xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tighter">
                       {category}{" "}
                       <span className="text-brand-gold text-2xl">
                         ({catJobs.length})
@@ -854,7 +854,7 @@ export default function JobsPage() {
                 <span className="text-brand-gold font-bold uppercase tracking-[0.4em] text-[10px] mb-4 block">
                   Quick Application
                 </span>
-                <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter mb-4">
+                <h2 className="text-2xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tighter mb-4">
                   Applying for {selectedJobToApply.title}
                 </h2>
                 <div className="flex items-center gap-3 text-slate-500 font-medium">

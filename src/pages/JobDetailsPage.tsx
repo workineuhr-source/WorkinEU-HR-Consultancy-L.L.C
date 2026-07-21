@@ -366,7 +366,7 @@ export default function JobDetailsPage() {
                     </span>
                   </div>
 
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white mb-10 tracking-tighter leading-[0.95] group-hover:translate-x-2 transition-transform duration-700">
+                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white mb-10 tracking-tighter leading-[0.95] group-hover:translate-x-2 transition-transform duration-700">
                     {job.title}
                   </h1>
 

@@ -155,7 +155,7 @@ const Section = ({
                   viewport={{ once: true }}
                   transition={{ delay: 0.1 }}
                   className={cn(
-                    "text-2xl sm:text-3xl md:text-[2.25rem] lg:text-[2.5rem] xl:text-[2.75rem] font-black tracking-tight mb-4 md:mb-6",
+                    "text-xl sm:text-2xl md:text-[1.85rem] lg:text-[2.1rem] xl:text-[2.35rem] font-black tracking-tight mb-4 md:mb-6",
                     isDark ? "text-white" : "text-slate-900 dark:text-white",
                   )}
                 >
@@ -825,7 +825,7 @@ export default function HomePage() {
                 ) : (
                   <h1
                     className={cn(
-                      "text-2xl sm:text-3xl md:text-[2.25rem] lg:text-[2.5rem] xl:text-[2.75rem] font-black leading-[1.05] tracking-tight",
+                      "text-xl sm:text-2xl md:text-[1.85rem] lg:text-[2.1rem] xl:text-[2.35rem] font-black leading-tight tracking-tight",
                       getFontClass(content.styles?.heroTitle?.font),
                       getTextColor(content.styles?.heroTitle?.color),
                     )}
@@ -1611,7 +1611,7 @@ export default function HomePage() {
                   <Zap size={16} />{" "}
                   {content.professionalEdgeTitle || "Professional Edge"}
                 </div>
-                <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-black text-slate-900 dark:text-white mb-2 tracking-tight leading-tight">
+                <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-[2.25rem] font-black text-slate-900 dark:text-white mb-2 tracking-tight leading-tight">
                   {content.professionalEdgeSubtitle ||
                     "Mastering Global Talent Acquisition"}
                 </h3>
@@ -2340,7 +2340,7 @@ export default function HomePage() {
                 <span className="text-brand-gold font-bold uppercase tracking-[0.4em] text-[10px] mb-4 block">
                   Quick Application
                 </span>
-                <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter mb-4">
+                <h2 className="text-2xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tighter mb-4">
                   Applying for {selectedJobToApply.title}
                 </h2>
                 <div className="flex items-center gap-3 text-slate-500 font-medium text-lg">

@@ -112,7 +112,7 @@ export default function DiaryDetailsPage() {
             <div className="h-px flex-grow bg-slate-100"></div>
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-8 leading-[1.1] tracking-tight font-serif">
+          <h1 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-8 leading-[1.15] tracking-tight font-serif">
             {post.title.replace(/[*#]/g, "")}
           </h1>
 

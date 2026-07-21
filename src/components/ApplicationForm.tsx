@@ -416,7 +416,7 @@ export default function ApplicationForm({
         >
           <CheckCircle2 size={64} />
         </motion.div>
-        <h2 className="text-5xl font-bold text-slate-900 dark:text-white mb-6 tracking-tighter">
+        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-6 tracking-tighter">
           Application Received!
         </h2>
         <p className="text-slate-500 dark:text-slate-400 text-xl font-light mb-12 max-w-lg mx-auto leading-relaxed">
@@ -486,7 +486,7 @@ export default function ApplicationForm({
           key={step}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="text-4xl font-bold text-slate-900 dark:text-white mb-4 tracking-tighter"
+          className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4 tracking-tighter"
         >
           {step === 1 && "Personal Information"}
           {step === 2 && "Professional Details"}
